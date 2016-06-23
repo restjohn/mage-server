@@ -51,4 +51,19 @@ app.listen(environment.port, environment.address, function() {
 });
 
 // install all plugins
-require('./plugins');
+var plugins = require('./plugins');
+for (var pluginName in plugins) {
+  var plugin = plugins[pluginName];
+  if (plugin && plugin.hasOwnProperty('express')) {
+    var pluginApp = plugin.express;
+    var context = plugin.context || pluginName;
+    if (context[0] !== '/') {
+      context = '/' + context;
+    }
+
+    // TODO: sanitize context and check for collisions
+    // mount the plugin's app on the requeseted context
+    log.info('mounted ' + pluginName + ' app to context ' + context);
+    app.use(context, pluginApp);
+  }
+}
