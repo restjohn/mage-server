@@ -90,11 +90,6 @@ module.exports = function(app, security) {
         teamIds: teams.map(function(team) { return team._id; })
       };
 
-      if (userId) req.newObservation.userId = userId;
-
-      var deviceId = req.provisionedDeviceId ? req.provisionedDeviceId : null;
-      if (deviceId) req.newObservation.deviceId = deviceId;
-
       next();
     });
   }
@@ -279,7 +274,7 @@ module.exports = function(app, security) {
     populateUserFields,
     validateObservation,
     function (req, res, next) {
-      new api.Observation(req.event).create(req.newObservation, function(err, newObservation) {
+      new api.Observation(req.event, req.user, req.provisionedDeviceId).create(req.newObservation, function(err, newObservation) {
         if (err) return next(err);
 
         var response = observationXform.transform(newObservation, transformOptions(req));
@@ -310,13 +305,7 @@ module.exports = function(app, security) {
         }
       }
 
-      var userId = req.user ? req.user._id : null;
-      if (userId) observation.userId = userId;
-
-      var deviceId = req.provisionedDeviceId ? req.provisionedDeviceId : null;
-      if (deviceId) observation.deviceId = deviceId;
-
-      new api.Observation(req.event).update(req.param('id'), observation, function(err, updatedObservation) {
+      new api.Observation(req.event, req.user, req.provisionedDeviceId).update(req.param('id'), observation, function(err, updatedObservation) {
         if (err) return next(err);
 
         if (!updatedObservation) return res.status(404).send('Observation with id ' + req.params.id + " does not exist");
