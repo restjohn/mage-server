@@ -45,25 +45,15 @@ mongoose.connect(mongo.uri, mongo.options, function(err) {
 
 var app = require('./express.js');
 
-// Launches the Node.js Express Server
-app.listen(environment.port, environment.address, function() {
-  log.info(util.format('MAGE Server: Started listening at address %s on port %s', environment.address, environment.port));
-});
-
-// install all plugins
+log.info('initializing plugins...');
 var plugins = require('./plugins');
-for (var pluginName in plugins) {
-  var plugin = plugins[pluginName];
-  if (plugin && plugin.hasOwnProperty('express')) {
-    var pluginApp = plugin.express;
-    var context = plugin.context || pluginName;
-    if (context[0] !== '/') {
-      context = '/' + context;
-    }
-
-    // TODO: sanitize context and check for collisions
-    // mount the plugin's app on the requeseted context
-    log.info('mounted ' + pluginName + ' app to context ' + context);
-    app.use(context, pluginApp);
+plugins.initialize(app, function(err) {
+  if (err) {
+    throw err;
   }
-}
+
+  // Launches the Node.js Express Server
+  app.listen(environment.port, environment.address, function() {
+    log.info(util.format('MAGE Server: Started listening at address %s on port %s', environment.address, environment.port));
+  });
+});
