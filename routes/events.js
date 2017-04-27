@@ -90,7 +90,7 @@ module.exports = function(app, security) {
           userId: req.user._id
         };
 
-        new api.Event().getEvent(options, function(err, events) {
+        new api.Event().getEvents(options, function(err, events) {
           if (err) return next(err);
 
           res.json(events);
