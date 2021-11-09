@@ -29,7 +29,7 @@ jobs:
           npm ci
           npm run build
       - name: test service
-        if: &should_test ${{ contains(github.ref, 'next') }}
+        if: ${{ contains(github.ref, 'next') }}
         run: npm run --prefix ci:test
       - name: pack service
         run: npm pack ./service
@@ -39,7 +39,7 @@ jobs:
           npm ci
           npm run build
       - name: test plugin nga-msi
-        if: *should_test
+        if: ${{ contains(github.ref, 'next') }}
         run: npm run --prefix plugins/nga-msi test:run
       - name: pack nga-msi
         run: npm pack ./plugins/nga-msi
@@ -67,7 +67,7 @@ jobs:
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
       - name: test web-app
-        if: *should_test
+        if: ${{ contains(github.ref, 'next') }}
         run: npm run --prefix web-app test-headless
       - name: pack web-app
         run: npm pack ./web-app/dist/app
