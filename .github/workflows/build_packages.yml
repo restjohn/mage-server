@@ -17,6 +17,8 @@ jobs:
         node: [ 14.x ]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: debug-env
+        run: env
       - name: checkout
         uses: actions/checkout@v2
       - name: install native dev libs
