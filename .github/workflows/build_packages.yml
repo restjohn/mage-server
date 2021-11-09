@@ -32,7 +32,7 @@ jobs:
           npm ci
           npm run build
       - name: test service
-        if: ${{ MAGE_SHOULD_TEST }}
+        if: ${{ env.MAGE_SHOULD_TEST }}
         run: npm run --prefix service ci:test
       - name: pack service
         run: npm pack ./service
