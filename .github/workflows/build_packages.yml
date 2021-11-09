@@ -30,7 +30,7 @@ jobs:
           npm run build
       - name: test service
         if: ${{ contains(github.ref, 'next') }}
-        run: npm run --prefix ci:test
+        run: npm run --prefix service ci:test
       - name: pack service
         run: npm pack ./service
       - name: build plugin nga-msi
