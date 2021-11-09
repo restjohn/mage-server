@@ -2,14 +2,18 @@
   "private": true,
   "name": "@ngageoint/mage.service",
   "version": "6.0.1",
-  "displayName": "MAGE Server",
-  "description": "MAGE is a geospatial situational awareness and data collection application.",
+  "displayName": "MAGE Service",
+  "description": "MAGE is a geospatial situational awareness and data collection platform.  The MAGE Service is the ReST service API that the MAGE client apps use to interact with MAGE data.",
   "keywords": [
     "NGA",
     "MAGE",
     "situational awareness",
     "geospatial"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ngageoint/mage-server.git"
+  },
   "author": {
     "name": "NGA"
   },
@@ -167,7 +171,8 @@
     "migration:run": "node bin/migration.js run",
     "start": "node lib/app.js",
     "debug": "node --inspect-brk=9229 lib/app.js",
-    "clean": "rm -rf lib test-lib"
+    "clean": "rm -rf lib test-lib",
+    "ci:test": "npm-run-all test:compile test:copy_resources test:copy_node_modules test:run"
   },
   "config": {
     "mongodbMemoryServer": {
