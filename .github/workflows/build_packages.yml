@@ -1,9 +1,12 @@
 on:
   push:
     branches:
-      - 'actions-*'
+      - 'actions-next'
 
 name: Build All MAGE Server Packages
+
+env:
+  MAGE_SHOULD_TEST: ${{ !contains(github.ref, 'next') }}
 
 jobs:
   build_service:
@@ -29,7 +32,7 @@ jobs:
           npm ci
           npm run build
       - name: test service
-        if: ${{ contains(github.ref, 'next') }}
+        if: ${{ MAGE_SHOULD_TEST }}
         run: npm run --prefix service ci:test
       - name: pack service
         run: npm pack ./service
@@ -39,7 +42,7 @@ jobs:
           npm ci
           npm run build
       - name: test plugin nga-msi
-        if: ${{ contains(github.ref, 'next') }}
+        if: ${{ env.MAGE_SHOULD_TEST }}
         run: npm run --prefix plugins/nga-msi test:run
       - name: pack nga-msi
         run: npm pack ./plugins/nga-msi
@@ -67,7 +70,7 @@ jobs:
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
       - name: test web-app
-        if: ${{ contains(github.ref, 'next') }}
+        if: ${{ env.MAGE_SHOULD_TEST }}
         run: npm run --prefix web-app test-headless
       - name: pack web-app
         run: npm pack ./web-app/dist/app
