@@ -6,48 +6,74 @@ on:
 name: Build All MAGE Server Packages
 
 jobs:
-  build-packages:
-    name: Build All MAGE Server Packages
-    runs-on: ${{ matrix.os }}
+  build_service:
+    name: Build MAGE Service
     strategy:
       matrix:
-        node: [ 14.x ]
         os: [ ubuntu-latest ]
-
+        node: [ 14.x ]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: checkout
         uses: actions/checkout@v2
-      - name: install dev tools
+      - name: install native dev libs
         run: |
           sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
-      - name: Use Node.js ${{ matrix.node }}
+      - name: Setup Node
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
-      - name: install dependencies
-        run: npm install
       - name: build service
         run: |
           cd service
           npm ci
           npm run build
+      - name: test service
+        if: &should_test ${{ contains(github.ref, 'next') }}
+        run: npm run --prefix ci:test
+      - name: pack service
+        run: npm pack ./service
+      - name: build plugin nga-msi
+        run: |
+          cd plugins/nga-msi
+          npm ci
+          npm run build
+      - name: test plugin nga-msi
+        if: *should_test
+        run: npm run --prefix plugins/nga-msi test:run
+      - name: pack nga-msi
+        run: npm pack ./plugins/nga-msi
+      - name: upload packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: mage_service_packages-node-${{ matrix.node }}
+          path: |
+            ngageoint-mage.*.tgz
+  build_web-app:
+    name: Build MAGE Web App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+      - name: checkout
+        uses: actions/checkout@v2
       - name: build web-app
         run: |
           cd web-app
           npm ci
           npm run build
-          cd dist/app
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
-      - name: build plugin nga-msi
-        run: |
-          cd plugins/nga-msi
-          npm ci
-      - name: package components
-        run: npm run pack-all
-      - name: upload package artifacts
+      - name: test web-app
+        if: *should_test
+        run: npm run --prefix web-app test-headless
+      - name: pack web-app
+        run: npm pack ./web-app/dist/app
+      - name: upload packages
         uses: actions/upload-artifact@v2
         with:
-          name: mage_server_packages
-          path: ngageoint-mage*.tgz
-          retention-days: 10
+          name: mage_web-app_packages
+          path: |
+            ngageoint-mage.*.tgz
