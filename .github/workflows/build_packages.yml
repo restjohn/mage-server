@@ -7,7 +7,7 @@ name: Build All MAGE Server Packages
 
 env:
   MAGE_SHOULD_TEST: ${{ !contains(github.ref, 'next') }}
-  MAGE_NODE_VERSIONS: '[ 14, 12 ]'
+  MAGE_NODE_VERSIONS: '[ "14", "12" ]'
 
 jobs:
   build_service:
