@@ -94,10 +94,14 @@ jobs:
         node: [ 12, 14 ]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: download package artifacts
+      - name: download service artifacts
         uses: actions/download-artifact@v2
         with:
           name: mage_service_packages-node-${{ matrix.node }}
+      - name: download web-app artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: mage_web-app_packages
       - name: list artifacts
         run: ls -R
 
