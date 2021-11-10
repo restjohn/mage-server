@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: npm
-          catch-dependency-path: |
+          cache-dependency-path: |
             service/package-lock.json
             plugins/nga-msi/package-lock.json
       - name: checkout
@@ -66,7 +66,7 @@ jobs:
         with:
           node-version: '14'
           cache: npm
-          catch-dependency-path: web-app/package-lock.json
+          cache-dependency-path: web-app/package-lock.json
       - name: checkout
         uses: actions/checkout@v2
       - name: build web-app
