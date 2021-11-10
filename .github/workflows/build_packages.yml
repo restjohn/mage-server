@@ -7,7 +7,6 @@ name: Build All MAGE Server Packages
 
 env:
   MAGE_SHOULD_TEST: ${{ !contains(github.ref, 'next') }}
-  MAGE_NODE_VERSIONS: '[ "14", "12" ]'
 
 jobs:
   build_service:
@@ -15,7 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        node: ${{ fromJSON(env.MAGE_NODE_VERSIONS) }}
+        node: [ 12, 14 ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: install native dev libs
@@ -92,7 +91,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        node: ${{ fromJSON(env.MAGE_NODE_VERSIONS) }}
+        node: [ 12, 14 ]
     runs-on: ${{ matrix.os }}
     steps:
       - name: download package artifacts
