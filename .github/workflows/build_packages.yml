@@ -17,10 +17,6 @@ jobs:
         node: [ 14.x ]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: debug-env
-        run: env
-      - name: checkout
-        uses: actions/checkout@v2
       - name: install native dev libs
         run: |
           sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
@@ -28,6 +24,12 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
+          cache: npm
+          catch-dependency-path: |
+            service/package-lock.json
+            plugins/nga-msi/package-lock.json
+      - name: checkout
+        uses: actions/checkout@v2
       - name: build service
         run: |
           cd service
@@ -61,7 +63,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: '14.x'
+          node-version: '14'
+          cache: npm
+          catch-dependency-path: web-app/package-lock.json
       - name: checkout
         uses: actions/checkout@v2
       - name: build web-app
