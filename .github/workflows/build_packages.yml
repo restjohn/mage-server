@@ -20,6 +20,8 @@ jobs:
       - name: install native dev libs
         run: |
           sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+      - name: checkout
+        uses: actions/checkout@v2
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
@@ -28,8 +30,6 @@ jobs:
           cache-dependency-path: |
             service/package-lock.json
             plugins/nga-msi/package-lock.json
-      - name: checkout
-        uses: actions/checkout@v2
       - name: build service
         run: |
           cd service
@@ -60,14 +60,14 @@ jobs:
     name: Build MAGE Web App
     runs-on: ubuntu-latest
     steps:
+      - name: checkout
+        uses: actions/checkout@v2
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
           node-version: '14'
           cache: npm
           cache-dependency-path: web-app/package-lock.json
-      - name: checkout
-        uses: actions/checkout@v2
       - name: build web-app
         run: |
           cd web-app
