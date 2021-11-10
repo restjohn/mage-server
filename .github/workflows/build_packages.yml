@@ -96,6 +96,8 @@ jobs:
     steps:
       - name: download package artifacts
         uses: actions/download-artifact@v2
+        with:
+          name: mage_service_packages-node-${{ matrix.node }}
       - name: list artifacts
         run: ls -R
 
