@@ -179,7 +179,7 @@
       "version": "4.0.0"
     }
   },
-  "main": "lib/app.js",
+  "main": "bin/mage.service.js",
   "files": [
     "lib",
     "bin"
