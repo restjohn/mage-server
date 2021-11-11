@@ -70,7 +70,6 @@ mageCmd.parseAsync().then(
     const opts = mageCmd.opts();
     const merged = mergeOptsToConfig(opts);
     tempEnvHack(merged);
-    console.info(`starting mage with config\n${JSON.stringify(merged, null, 2)}`);
     const { boot } = require('../lib/app');
     const service = await boot(merged);
     service.open();
