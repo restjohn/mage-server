@@ -107,10 +107,12 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: mage_service_packages-node-${{ matrix.node }}
+          latest: true
       - name: download web-app artifacts
         uses: actions/download-artifact@v2
         with:
           name: mage_web-app_packages
+          latest: true
       # - name: fake artifacts
       #   if: ${{ true }}
       #   run: |
