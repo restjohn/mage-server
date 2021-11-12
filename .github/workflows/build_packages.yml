@@ -7,12 +7,11 @@ name: Build All MAGE Server Packages
 
 env:
   MAGE_SHOULD_TEST: ${{ !contains(github.ref, 'next') }}
-  WORKFLOW_TEST: true
 
 jobs:
   build_service:
     name: build mage service
-    if: ${{ !env.WORKFLOW_TEST }}
+    if: ${{ false }}
     strategy:
       matrix:
         os: [ ubuntu-latest ]
@@ -60,7 +59,7 @@ jobs:
             ngageoint-mage.*.tgz
   build_web-app:
     name: build mage web app
-    if: ${{ !env.WORKFLOW_TEST }}
+    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -104,21 +103,19 @@ jobs:
       - name: install json utility
         run: npm i json
       - name: download service artifacts
-        if: ${{ !env.WORKFLOW_TEST }}
         uses: actions/download-artifact@v2
         with:
           name: mage_service_packages-node-${{ matrix.node }}
       - name: download web-app artifacts
-        if: ${{ !env.WORKFLOW_TEST }}
         uses: actions/download-artifact@v2
         with:
           name: mage_web-app_packages
-      - name: fake artifacts
-        if: '${{ env.WORKFLOW_TEST }}'
-        run: |
-          touch ngageoint-mage.service-1.2.3-test.1.tgz
-          touch ngageoint-mage.web-app-4.5.6-test.1.tgz
-          touch ngageoint-mage.nga-msi-7.8.9-test.1.tgz
+      # - name: fake artifacts
+      #   if: ${{ true }}
+      #   run: |
+      #     touch ngageoint-mage.service-1.2.3-test.1.tgz
+      #     touch ngageoint-mage.web-app-4.5.6-test.1.tgz
+      #     touch ngageoint-mage.nga-msi-7.8.9-test.1.tgz
       - name: list artifacts
         run: ls -R
       - name: create package.json
