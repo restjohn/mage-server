@@ -89,6 +89,7 @@ jobs:
           path: |
             ngageoint-mage.*.tgz
   build_instance:
+    if: ${{ always() }}
     needs: [ build_service, build_web-app ]
     strategy:
       matrix:
