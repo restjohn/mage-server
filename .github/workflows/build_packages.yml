@@ -128,6 +128,7 @@ jobs:
         run: |
           (
           printf '{ "name": "mage.instance-%s-node-%s", "version": "%s" }\n' ${{ runner.os }} ${{ matrix.node }} ${{ github.ref_name }} &&
+          printf '{ "scripts": { "start": "mage.service --plugin @ngageoint/mage.nga-msi" }}' &&
           printf '{ "dependencies": { "@ngageoint/mage.service": "./%s" }}\n' $(ls -1 *mage.service*.tgz) &&
           printf '{ "dependencies": { "@ngageoint/mage.web-app": "./%s" }}\n' $(ls -1 *mage.web-app*.tgz) &&
           printf '{ "dependencies": { "@ngageoint/nga-msi": "./%s" }}\n' $(ls -1 *mage.nga-msi*.tgz)
