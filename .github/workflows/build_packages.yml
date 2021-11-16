@@ -138,10 +138,15 @@ jobs:
         with:
           name: mage_instance_package-${{ runner.os }}-node-${{ matrix.node }}
           path: package.json
+      - id: get_release_name
+        name: get release name
+        run: |
+          echo ::set-output name=result::$(echo ${GITHUB_REF_NAME} | sed -E 's/^(pre)?releases\///i')
       - name: release
         if: ${{ github.ref_type == 'tag' && contains(github.ref_name, 'releases/') }}
         uses: softprops/action-gh-release@v1
         with:
+          name: ${{ steps.get_release_name.outputs.result }}
           prerelease: ${{ startsWith(github.ref_name, 'prereleases/') }}
           files: |
             package.json
