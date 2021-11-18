@@ -31,7 +31,11 @@ jobs:
           echo 'EOF' >> $GITHUB_ENV
       - id: main
         name: main
+        # shell: zsh {0}
         run: |
+          echo ${SHELL}
+          echo ${BASH}
+          bash --version
           cat $GITHUB_ENV
           echo "node versions lines ${node_versions_lines}"
           node_versions_arr=($(echo "${node_versions_lines}"))
@@ -43,16 +47,17 @@ jobs:
           echo "node versions json: ${node_versions_json}"
           echo "node versions latest: ${node_versions_latest}"
           echo "node versions pre-latest: ${node_versions_pre_latest}"
-          echo ::set-output name=all::${node_versions_json}
+          echo ::set-output name=all_json::${node_versions_json}
           echo ::set-output name=latest::${node_versions_latest}
-          echo ::set-output name=pre-latest::${node_versions_arr[@]:0: -1}
+          echo ::set-output name=pre_latest::${node_versions_pre_latest}
+          echo ::set-output name=pre_latest_json::${node_versions_pre_latest}
   test_node_versions:
     needs: node_versions
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
-        node: ${{ needs.node_versions.outputs.all }}
+        node: ${{ needs.node_versions.outputs.all_json }}
     steps:
       - name: show matrix node version
         run: |
