@@ -16,6 +16,7 @@ jobs:
   node_versions:
     runs-on: ubuntu-latest
     outputs:
+      all: ${{ steps.main.outputs.all }}
       all-json: ${{ steps.main.outputs.all-json }}
       latest: ${{ steps.main.outputs.latest }}
       pre-latest: ${{ steps.main.outputs.pre-latest }}
@@ -54,6 +55,7 @@ jobs:
           echo "node versions latest: ${node_versions_latest}"
           echo "node versions pre-latest: ${node_versions_pre_latest}"
           echo "node versions pre-latest json: ${node_versions_pre_latest_json}"
+          echo ::set-output name=all::${node_versions_arr}
           echo ::set-output name=all-json::${node_versions_json}
           echo ::set-output name=latest::${node_versions_latest}
           echo ::set-output name=pre-latest::${node_versions_pre_latest}
@@ -64,7 +66,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        node: ${{ fromJson(needs.node_versions.outputs.all_json) }}
+        node: ${{ fromJson(needs.node_versions.outputs.all-json) }}
     steps:
       - name: show matrix node version
         run: |
