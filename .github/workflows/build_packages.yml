@@ -44,7 +44,7 @@ jobs:
           node_versions_arr=($(echo "${node_versions_lines}"))
           node_versions_latest=${node_versions_arr[-1]}
           # node_versions_pre_latest=${node_versions_arr[@]:0:${#node_versions_arr[@]}-1}
-          node_versions_pre_latest=${node_versions_arr[@]:0:-1}
+          node_versions_pre_latest=(${node_versions_arr[@]:0:-1})
           node_versions_json=$(printf '"%s",' ${node_versions_arr[@]})
           node_versions_json="[ ${node_versions_json:0:-1} ]"
           node_versions_pre_latest_json=$(printf '"%s",' ${node_versions_pre_latest[@]})
