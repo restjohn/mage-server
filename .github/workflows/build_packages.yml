@@ -29,6 +29,7 @@ jobs:
           echo ::set-output name=latest::${node_versions_arr[-1]}
           echo ::set-output name=pre-latest::${node_versions_arr[@]:0:-1}
   test_node_versions:
+    needs: node_versions
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
