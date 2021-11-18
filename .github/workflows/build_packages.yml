@@ -35,16 +35,10 @@ jobs:
           echo 'EOF' >> $GITHUB_ENV
       - id: main
         name: main
-        shell: zsh {0}
         run: |
-          echo ${SHELL}
-          # echo ${BASH}
-          # bash --version
-          cat $GITHUB_ENV
-          echo "node versions lines ${node_versions_lines}"
           node_versions_arr=($(echo "${node_versions_lines}"))
           node_versions_latest=${node_versions_arr[-1]}
-          # node_versions_pre_latest=${node_versions_arr[@]:0:${#node_versions_arr[@]}-1}
+          node_versions_pre_latest=${node_versions_arr[@]:0:${#node_versions_arr[@]}-1}
           node_versions_pre_latest=(${node_versions_arr[@]:0:-1})
           node_versions_json=$(printf '"%s",' ${node_versions_arr[@]})
           node_versions_json="[ ${node_versions_json:0:-1} ]"
