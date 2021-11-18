@@ -16,9 +16,10 @@ jobs:
   node_versions:
     runs-on: ubuntu-latest
     outputs:
-      all: ${{ steps.main.outputs.all }}
+      all-json: ${{ steps.main.outputs.all-json }}
       latest: ${{ steps.main.outputs.latest }}
       pre-latest: ${{ steps.main.outputs.pre-latest }}
+      pre-latest-json: ${{ steps.main.outputs.pre_latest_json }}
     steps:
       - id: sort
         name: sort versions
@@ -31,33 +32,37 @@ jobs:
           echo 'EOF' >> $GITHUB_ENV
       - id: main
         name: main
-        # shell: zsh {0}
+        shell: zsh {0}
         run: |
           echo ${SHELL}
-          echo ${BASH}
-          bash --version
+          # echo ${BASH}
+          # bash --version
           cat $GITHUB_ENV
           echo "node versions lines ${node_versions_lines}"
           node_versions_arr=($(echo "${node_versions_lines}"))
           node_versions_latest=${node_versions_arr[-1]}
-          node_versions_pre_latest=${node_versions_arr[@]:0:${#node_versions_arr[@]}-1}
+          # node_versions_pre_latest=${node_versions_arr[@]:0:${#node_versions_arr[@]}-1}
+          node_versions_pre_latest=${node_versions_arr[@]:0:-1}
           node_versions_json=$(printf '"%s",' ${node_versions_arr[@]})
           node_versions_json="[ ${node_versions_json:0:-1} ]"
+          node_versions_pre_latest_json=$(printf '"%$",' {node_versions_pre_latest[@]})
+          node_versions_pre_latest_json="[ ${node_versions_pre_latest_json:0:-1} ]"
           echo "node versions arr: ${node_versions_arr[@]}"
           echo "node versions json: ${node_versions_json}"
           echo "node versions latest: ${node_versions_latest}"
           echo "node versions pre-latest: ${node_versions_pre_latest}"
-          echo ::set-output name=all_json::${node_versions_json}
+          echo "node versions pre-latest json: ${node_versions_pre_latest_json}"
+          echo ::set-output name=all-json::${node_versions_json}
           echo ::set-output name=latest::${node_versions_latest}
-          echo ::set-output name=pre_latest::${node_versions_pre_latest}
-          echo ::set-output name=pre_latest_json::${node_versions_pre_latest}
+          echo ::set-output name=pre-latest::${node_versions_pre_latest}
+          echo ::set-output name=pre-latest-json::${node_versions_pre_latest_json}
   test_node_versions:
     needs: node_versions
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
-        node: ${{ fromJSON(needs.node_versions.outputs.all_json) }}
+        node: ${{ fromJson(needs.node_versions.outputs.all_json) }}
     steps:
       - name: show matrix node version
         run: |
