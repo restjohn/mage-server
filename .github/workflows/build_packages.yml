@@ -19,7 +19,7 @@ jobs:
       all-json: ${{ steps.main.outputs.all-json }}
       latest: ${{ steps.main.outputs.latest }}
       pre-latest: ${{ steps.main.outputs.pre-latest }}
-      pre-latest-json: ${{ steps.main.outputs.pre_latest_json }}
+      pre-latest-json: ${{ steps.main.outputs.pre-latest-json }}
     steps:
       - name: install zsh
         run: sudo apt-get install zsh
