@@ -19,7 +19,7 @@ jobs:
       - id: main
         name: main
         run: |
-          node_versions_lines=$(echo ${MAGE_NODE_VERSIONS} | sed -E 's/ +/\n/' | sort -V)
+          node_versions_lines=$(echo ${MAGE_NODE_VERSIONS} | sed -E 's/ +/ /' | tr ' ' '\n' | sort -V)
           echo lines ${node_versions_lines}
           node_versions_arr=($(echo $node_versions_lines))
           node_versions_json=$(printf '"%s",' ${node_versions_arr}[@])
