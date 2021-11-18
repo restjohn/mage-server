@@ -31,7 +31,7 @@ jobs:
           echo ${MAGE_NODE_VERSIONS} | tr ' ' '\n' | sort -V >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
           cat $GITHUB_ENV
-          node_versions_json=$(printf '"%s",' ${node_versions_arr}[@])
+          node_versions_json=$(printf '"%s",' ${node_versions_arr[@]})
           node_versions_json="[ ${node_versions_json:0:-1} ]"
           echo node versions arr: ${node_versions_arr}
           echo node versions json: ${node_versions_json}
