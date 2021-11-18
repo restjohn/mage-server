@@ -10,7 +10,7 @@ name: Build All MAGE Server Packages
 
 env:
   MAGE_SHOULD_TEST: ${{ !contains(github.ref, 'next') }}
-  MAGE_NODE_VERSIONS: 12 14 16
+  MAGE_NODE_VERSIONS: 14 16 12
 
 jobs:
   node_versions:
@@ -20,29 +20,29 @@ jobs:
       latest: ${{ steps.main.outputs.latest }}
       pre-latest: ${{ steps.main.outputs.pre-latest }}
     steps:
-      - name: sort versions
+      - id: sort
+        name: sort versions
         run: |
-          node_versions_arr=($(echo $MAGE_NODE_VERSIONS))
-          node_versions_latest=${node_versions_arr[-1]}
-          echo latest ${node_versions_latest}
-          echo "${MAGE_NODE_VERSIONS// /\\n}" > lines.txt
+          echo "${MAGE_NODE_VERSIONS// /\\n}" | sort -V > lines.txt
+          echo lines by replacement syntax:
           cat lines.txt
-          echo "LINES ${MAGE_NODE_VERSIONS}" | tr ' ' '\n' | sort -V
           echo 'node_versions_lines<<EOF' >> $GITHUB_ENV
           echo ${MAGE_NODE_VERSIONS} | tr ' ' '\n' | sort -V >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
+      - id: main
+        name: main
+        run: |
           cat $GITHUB_ENV
+          echo node versions lines ${node_versions_lines}
+          node_versions_arr=($(echo ${node_versions_lines})
+          node_versions_latest=${node_versions_arr[-1]}
           node_versions_json=$(printf '"%s",' ${node_versions_arr[@]})
           node_versions_json="[ ${node_versions_json:0:-1} ]"
           echo node versions arr: ${node_versions_arr}
           echo node versions json: ${node_versions_json}
           echo ::set-output name=all::${node_versions_json}
-          echo ::set-output name=latest::${node_versions_arr[-1]}
+          echo ::set-output name=latest::${node_versions_latest}
           echo ::set-output name=pre-latest::${node_versions_arr[@]:0:-1}
-      - id: main
-        name: main
-        run: |
-          echo $node_versions_lines
   test_node_versions:
     needs: node_versions
     runs-on: ubuntu-latest
