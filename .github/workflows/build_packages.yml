@@ -57,7 +57,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        node: ${{ needs.node_versions.outputs.all_json }}
+        node: ${{ fromJSON(needs.node_versions.outputs.all_json) }}
     steps:
       - name: show matrix node version
         run: |
