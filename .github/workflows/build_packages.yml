@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: sort versions
         run: |
+          node_versions_arr=($(echo $MAGE_NODE_VERSIONS))
+          echo latest ${node_versions_arr[-1]}
           echo "${MAGE_NODE_VERSIONS// /\\n}" > lines.txt
           cat lines.txt
           echo "LINES ${MAGE_NODE_VERSIONS}" | tr ' ' '\n' | sort -V
