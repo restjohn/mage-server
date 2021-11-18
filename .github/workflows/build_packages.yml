@@ -23,6 +23,8 @@ jobs:
       - id: main
         name: main
         run: |
+          echo "${MAGE_NODE_VERSIONS// /\\n}" > lines.txt
+          cat lines.txt
           echo "LINES ${MAGE_NODE_VERSIONS}" | tr ' ' '\n' | sort -V
           echo 'node_versions_lines<<EOF' >> $GITHUB_ENV
           echo $(echo ${MAGE_NODE_VERSIONS} | tr ' ' '\n' | sort -V) >> $GITHUB_ENV
