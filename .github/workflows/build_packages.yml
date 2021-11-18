@@ -28,7 +28,7 @@ jobs:
           cat lines.txt
           echo "LINES ${MAGE_NODE_VERSIONS}" | tr ' ' '\n' | sort -V
           echo 'node_versions_lines<<EOF' >> $GITHUB_ENV
-          echo $(echo ${MAGE_NODE_VERSIONS} | tr ' ' '\n' | sort -V) >> $GITHUB_ENV
+          echo ${MAGE_NODE_VERSIONS} | tr ' ' '\n' | sort -V >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
           cat $GITHUB_ENV
           echo lines $node_versions_lines
