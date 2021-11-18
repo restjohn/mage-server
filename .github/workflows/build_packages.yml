@@ -24,6 +24,7 @@ jobs:
         name: main
         run: |
           node_versions_arr=($(echo ${MAGE_NODE_VERSIONS}))
+          echo "LINES ${MAGE_NODE_VERSIONS}"" | tr ' ' '\n'
           node_versions_lines=$(printf '%s\n' ${node_versions_arr[@]} | sort -V)
           echo lines $node_versions_lines
           node_versions_arr=($(echo $node_versions_lines))
