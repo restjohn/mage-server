@@ -21,6 +21,8 @@ jobs:
       pre-latest: ${{ steps.main.outputs.pre-latest }}
       pre-latest-json: ${{ steps.main.outputs.pre_latest_json }}
     steps:
+      - name: install zsh
+        run: sudo apt-get install zsh
       - id: sort
         name: sort versions
         run: |
