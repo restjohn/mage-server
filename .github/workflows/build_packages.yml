@@ -20,8 +20,7 @@ jobs:
       latest: ${{ steps.main.outputs.latest }}
       pre-latest: ${{ steps.main.outputs.pre-latest }}
     steps:
-      - id: main
-        name: main
+      - name: sort versions
         run: |
           echo "${MAGE_NODE_VERSIONS// /\\n}" > lines.txt
           cat lines.txt
@@ -29,6 +28,7 @@ jobs:
           echo 'node_versions_lines<<EOF' >> $GITHUB_ENV
           echo $(echo ${MAGE_NODE_VERSIONS} | tr ' ' '\n' | sort -V) >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
+          cat $GITHUB_ENV
           echo lines $node_versions_lines
           node_versions_arr=($(echo $node_versions_lines))
           node_versions_json=$(printf '"%s",' ${node_versions_arr}[@])
@@ -38,6 +38,10 @@ jobs:
           echo ::set-output name=all::${node_versions_json}
           echo ::set-output name=latest::${node_versions_arr[-1]}
           echo ::set-output name=pre-latest::${node_versions_arr[@]:0:-1}
+      - id: main
+        name: main
+        run: |
+          echo $node_versions_lines
   test_node_versions:
     needs: node_versions
     runs-on: ubuntu-latest
