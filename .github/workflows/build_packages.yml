@@ -39,7 +39,7 @@ jobs:
           node_versions_pre_latest=${node_versions_arr[@]:0:-1}
           node_versions_json=$(printf '"%s",' ${node_versions_arr[@]})
           node_versions_json="[ ${node_versions_json:0:-1} ]"
-          echo "node versions arr: ${node_versions_arr}"
+          echo "node versions arr: ${node_versions_arr[@]}"
           echo "node versions json: ${node_versions_json}"
           echo "node versions latest: ${node_versions_latest}"
           echo "node versions pre-latest: ${node_versions_pre_latest}"
