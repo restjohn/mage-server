@@ -34,7 +34,7 @@ jobs:
         run: |
           cat $GITHUB_ENV
           echo node versions lines ${node_versions_lines}
-          node_versions_arr=($(echo ${node_versions_lines})
+          node_versions_arr=($(echo ${node_versions_lines}))
           node_versions_latest=${node_versions_arr[-1]}
           node_versions_json=$(printf '"%s",' ${node_versions_arr[@]})
           node_versions_json="[ ${node_versions_json:0:-1} ]"
