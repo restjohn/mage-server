@@ -176,7 +176,7 @@
   },
   "config": {
     "mongodbMemoryServer": {
-      "version": "4.0.0"
+      "version": "4.0.27"
     }
   },
   "main": "bin/mage.service.js",
