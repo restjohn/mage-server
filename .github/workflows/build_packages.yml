@@ -9,12 +9,12 @@ on:
 name: Build All MAGE Server Packages
 
 env:
-  MAGE_NODE_VERSIONS: 12 14 16
+  MAGE_NODE_VERSIONS: 12 14
 
 jobs:
 
   config:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     outputs:
       tests_enabled: 'true'
       node_versions-all: ${{ steps.node_versions.outputs.all }}
@@ -58,7 +58,7 @@ jobs:
     # strategy:
     #   matrix:
     #     node: ${{ fromJSON(needs.node_versions.outputs.all-json) }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: install native dev libs
         run: |
@@ -105,7 +105,7 @@ jobs:
     name: test mage service
     needs: [ config, build_service ]
     if: ${{ needs.config.outputs.tests_enabled }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node: ${{ fromJSON(needs.config.outputs.node_versions-all-json) }}
