@@ -9,25 +9,23 @@ on:
 name: Build All MAGE Server Packages
 
 env:
-  MAGE_SHOULD_TEST: ${{ contains(github.ref, 'next') }}
   MAGE_NODE_VERSIONS: 12 14 16
 
 jobs:
-  node_versions:
+
+  config:
     runs-on: ubuntu-latest
     outputs:
-      all: ${{ steps.main.outputs.all }}
-      all-json: ${{ steps.main.outputs.all-json }}
-      latest: ${{ steps.main.outputs.latest }}
-      pre-latest: ${{ steps.main.outputs.pre-latest }}
-      pre-latest-json: ${{ steps.main.outputs.pre-latest-json }}
+      tests_enabled: 'true'
+      node_versions-all: ${{ steps.main.outputs.all }}
+      node_versions-all-json: ${{ steps.main.outputs.all-json }}
+      node_versions-latest: ${{ steps.main.outputs.latest }}
+      node_versions-pre-latest: ${{ steps.main.outputs.pre-latest }}
+      node_versions-pre-latest-json: ${{ steps.main.outputs.pre-latest-json }}
     steps:
       - id: sort
         name: sort versions
         run: |
-          echo "${MAGE_NODE_VERSIONS// /\\n}" | sort -V > lines.txt
-          echo lines by replacement syntax:
-          cat lines.txt
           echo 'node_versions_lines<<EOF' >> $GITHUB_ENV
           echo ${MAGE_NODE_VERSIONS} | tr ' ' '\n' | sort -V >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
@@ -47,16 +45,16 @@ jobs:
           echo "node versions latest: ${node_versions_latest}"
           echo "node versions pre-latest: ${node_versions_pre_latest}"
           echo "node versions pre-latest json: ${node_versions_pre_latest_json}"
-          echo ::set-output name=all::${node_versions_arr}
-          echo ::set-output name=all-json::${node_versions_json}
-          echo ::set-output name=latest::${node_versions_latest}
-          echo ::set-output name=pre-latest::${node_versions_pre_latest}
-          echo ::set-output name=pre-latest-json::${node_versions_pre_latest_json}
+          echo ::set-output name=node_versions-all::${node_versions_arr}
+          echo ::set-output name=node_versions-all-json::${node_versions_json}
+          echo ::set-output name=node_versions-latest::${node_versions_latest}
+          echo ::set-output name=node_versions-pre-latest::${node_versions_pre_latest}
+          echo ::set-output name=node_versions-pre-latest-json::${node_versions_pre_latest_json}
 
   build_service:
     # if: ${{ false }}
     name: build mage service
-    needs: node_versions
+    needs: config
     # strategy:
     #   matrix:
     #     node: ${{ fromJSON(needs.node_versions.outputs.all-json) }}
@@ -70,7 +68,7 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ needs.node_versions.outputs.latest }}
+          node-version: ${{ needs.config.outputs.node_versions-latest }}
           cache: npm
           cache-dependency-path: |
             service/package-lock.json
@@ -97,7 +95,7 @@ jobs:
         run: npm pack ./plugins/nga-msi
       - name: upload packages
         uses: actions/upload-artifact@v2
-        if: ${{ matrix.node == needs.node_versions.outputs.latest }}
+        # if: ${{ matrix.node == needs.node_versions.outputs.latest }}
         with:
           name: mage_service_packages
           path: |
@@ -105,12 +103,12 @@ jobs:
 
   test_service:
     name: test mage service
-    needs: [ node_versions, build_service ]
-    if: ${{ fromJSON(env.MAGE_SHOULD_TEST) }}
+    needs: [ config, build_service ]
+    if: ${{ needs.config.outputs.tests_enabled }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ${{ fromJSON(needs.node_versions.outputs.all-json) }}
+        node: ${{ fromJSON(needs.config.outputs.node_versions-all-json) }}
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -134,7 +132,7 @@ jobs:
           tar xzf $(ls -1 ngageoint-mage.service-*.tgz) package/lib
           mv package/lib ./service
           rmdir package
-      - name: run tests no node ${{ matrix.node }}
+      - name: test service with node ${{ matrix.node }}
         run: |
           cd service
           npm run ci:test
