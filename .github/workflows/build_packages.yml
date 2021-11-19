@@ -17,19 +17,19 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tests_enabled: 'true'
-      node_versions-all: ${{ steps.main.outputs.all }}
-      node_versions-all-json: ${{ steps.main.outputs.all-json }}
-      node_versions-latest: ${{ steps.main.outputs.latest }}
-      node_versions-pre-latest: ${{ steps.main.outputs.pre-latest }}
-      node_versions-pre-latest-json: ${{ steps.main.outputs.pre-latest-json }}
+      node_versions-all: ${{ steps.node_versions.outputs.all }}
+      node_versions-all-json: ${{ steps.node_versions.outputs.all-json }}
+      node_versions-latest: ${{ steps.node_versions.outputs.latest }}
+      node_versions-pre_latest: ${{ steps.node_versions.outputs.pre_latest }}
+      node_versions-pre_latest-json: ${{ steps.node_versions.outputs.pre_latest-json }}
     steps:
-      - id: sort
+      - id: sort_node_versions
         name: sort versions
         run: |
           echo 'node_versions_lines<<EOF' >> $GITHUB_ENV
           echo ${MAGE_NODE_VERSIONS} | tr ' ' '\n' | sort -V >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
-      - id: main
+      - id: node_versions
         name: main
         run: |
           node_versions_arr=($(echo "${node_versions_lines}"))
@@ -43,13 +43,13 @@ jobs:
           echo "node versions arr: ${node_versions_arr[@]}"
           echo "node versions json: ${node_versions_json}"
           echo "node versions latest: ${node_versions_latest}"
-          echo "node versions pre-latest: ${node_versions_pre_latest}"
-          echo "node versions pre-latest json: ${node_versions_pre_latest_json}"
-          echo ::set-output name=node_versions-all::${node_versions_arr}
-          echo ::set-output name=node_versions-all-json::${node_versions_json}
-          echo ::set-output name=node_versions-latest::${node_versions_latest}
-          echo ::set-output name=node_versions-pre-latest::${node_versions_pre_latest}
-          echo ::set-output name=node_versions-pre-latest-json::${node_versions_pre_latest_json}
+          echo "node versions pre_latest: ${node_versions_pre_latest}"
+          echo "node versions pre_latest json: ${node_versions_pre_latest_json}"
+          echo ::set-output name=all::${node_versions_arr}
+          echo ::set-output name=all-json::${node_versions_json}
+          echo ::set-output name=latest::${node_versions_latest}
+          echo ::set-output name=pre_latest::${node_versions_pre_latest}
+          echo ::set-output name=pre_latest-json::${node_versions_pre_latest_json}
 
   build_service:
     # if: ${{ false }}
