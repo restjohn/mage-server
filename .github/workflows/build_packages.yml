@@ -14,7 +14,7 @@ env:
 jobs:
 
   config:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     outputs:
       tests_enabled: 'true'
       node_versions-all: ${{ steps.node_versions.outputs.all }}
@@ -58,7 +58,7 @@ jobs:
     # strategy:
     #   matrix:
     #     node: ${{ fromJSON(needs.node_versions.outputs.all-json) }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: install native dev libs
         run: |
@@ -105,7 +105,7 @@ jobs:
     name: test mage service
     needs: [ config, build_service ]
     if: ${{ needs.config.outputs.tests_enabled }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
         node: ${{ fromJSON(needs.config.outputs.node_versions-all-json) }}
