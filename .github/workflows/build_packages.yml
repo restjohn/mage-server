@@ -210,13 +210,21 @@ jobs:
           npm i --production
           mage_instance_build=${{ steps.release_info.outputs.platform_package }}-${{ steps.release_info.outputs.version }}
           echo "mage_instance_build=${mage_instance_build}" >> ${GITHUB_ENV}
-          tar czf ${mage_instance_build}-.tgz package*.json node_modules
-      - name: create release
+          tar czf ${mage_instance_build}.tgz package*.json node_modules
+      - name: release packages
         if: ${{ steps.release_info.outputs.is_release }}
         uses: softprops/action-gh-release@v1
         with:
           name: ${{ steps.release_info.outputs.version }}
           prerelease: ${{ steps.release_info.outputs.is_prerelease }}
           files: |
-            package*.json
-            *.tgz
+            package.json
+            ngageoint-mage.*.tgz
+      - name: release instance build
+        if: ${{ steps.release_info.outputs.is_release }}
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ steps.release_info.outputs.version }}
+          prerelease: ${{ steps.release_info.outputs.is_prerelease }}
+          files: |
+            ${mage_instance_build}.tgz
