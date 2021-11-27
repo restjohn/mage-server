@@ -189,7 +189,7 @@ jobs:
           echo ::set-output name=is_release::${{ (github.ref_type == 'tag' && contains(github.ref_name, 'releases/')) || '' }}
           echo ::set-output name=is_prerelease::${{ startsWith(github.ref_name, 'prereleases/') || '' }}
           echo ::set-output name=version::${mage_version}
-          echo ::set-output name=platform_package::$(printf 'mage.instance-%s-node-%s' ${{ matrix.os }} ${{ matrix.node }})
+          echo ::set-output name=platform_package::$(printf 'mage.instance-%s-node-%s' ${{ runner.os }} ${{ matrix.node }})
       - name: create package.json
         run: |
           (
