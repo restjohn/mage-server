@@ -16,7 +16,7 @@ jobs:
   config:
     runs-on: ubuntu-latest
     outputs:
-      tests_enabled: 'true'
+      tests_enabled: ''
       node_versions-all: ${{ steps.node_versions.outputs.all }}
       node_versions-all-json: ${{ steps.node_versions.outputs.all-json }}
       node_versions-latest: ${{ steps.node_versions.outputs.latest }}
@@ -219,8 +219,5 @@ jobs:
           name: ${{ steps.release_info.outputs.version }}
           prerelease: ${{ steps.release_info.outputs.is_prerelease }}
           files: |
-            ${{ env.mage_instance_build }}.tgz
-
-
-
-
+            package*.json
+            *.tgz
