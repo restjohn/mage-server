@@ -189,7 +189,7 @@ jobs:
           echo ::set-output name=is_release::${{ (github.ref_type == 'tag' && contains(github.ref_name, 'releases/')) || '' }}
           echo ::set-output name=is_prerelease::${{ startsWith(github.ref_name, 'prereleases/') || '' }}
           echo ::set-output name=version::${mage_version}
-          echo ::set-output name=platform_package::$(printf 'mage.instance-%s-node-%s' ${{ runner.os }} ${{ matrix.node }} | tr '[:upper:]' '[:lower:]')
+          echo ::set-output name=platform_package::$(printf 'mage.instance-%s-%s-node-%s' ${mage_version} ${{ runner.os }} ${{ matrix.node }} | tr '[:upper:]' '[:lower:]')
       - name: create package.json
         run: |
           (
@@ -208,7 +208,7 @@ jobs:
         if: ${{ steps.release_info.outputs.is_release }}
         run: |
           npm i --production
-          mage_instance_build=${{ steps.release_info.outputs.platform_package }}-${{ steps.release_info.outputs.version }}
+          mage_instance_build=${{ steps.release_info.outputs.platform_package }}
           echo "mage_instance_build=${mage_instance_build}" >> ${GITHUB_ENV}
           tar czf ${mage_instance_build}.tgz package*.json node_modules
       - name: release packages
