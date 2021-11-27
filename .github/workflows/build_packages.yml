@@ -159,10 +159,10 @@ jobs:
             ngageoint-mage.*.tgz
 
   build_instance_and_release:
-    needs: [ node_versions, build_service, build_web-app ]
+    needs: [ config, build_service, build_web-app ]
     strategy:
       matrix:
-        node: ${{ fromJSON(needs.node_versions.outputs.all-json) }}
+        node: ${{ fromJSON(needs.config.outputs.node_versions-all-json) }}
     runs-on: ubuntu-latest
     steps:
       - name: setup node
