@@ -231,11 +231,11 @@ jobs:
         if: ${{ needs.config.outputs.release-is_release }}
         run: |
           npm i --production
-          tar czf ${{ env.mage_instance_build }}.tgz package*.json node_modules
+          tar czf ${mage_instance_build}.tgz package*.json node_modules
       - name: release instance build
         if: ${{ needs.config.outputs.release-is_release }}
         uses: softprops/action-gh-release@v1
         with:
           name: ${{ needs.config.outputs.release-version }}
           files: |
-            ${{ env.mage_instance_build }}.tgz
+            ${mage_instance_build}.tgz
