@@ -175,11 +175,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: main
-        if: ${{ jobs.config.outputs.release-is_release }}
+        if: ${{ needs.config.outputs.release-is_release }}
         uses: softprops/action-gh-release@v1
         with:
           name: ${{ needs.config.outputs.release-version }}
-
 
   build_instance_and_release:
     needs: [ config, create_release_stub ]
