@@ -22,9 +22,9 @@ jobs:
       node_versions-latest: ${{ steps.node_versions.outputs.latest }}
       node_versions-pre_latest: ${{ steps.node_versions.outputs.pre_latest }}
       node_versions-pre_latest-json: ${{ steps.node_versions.outputs.pre_latest-json }}
-      release-is_release: ${{ }}
-      release-is_prerelease: ${{ }}
-      release-version: ${{ }}
+      release-is_release: ${{ steps.release_info.outputs.is_release }}
+      release-is_prerelease: ${{ steps.release_info.outputs.is_prerelease }}
+      release-version: ${{ steps.release_info.outputs.version }}
 
     steps:
       - id: sort_node_versions
