@@ -206,7 +206,7 @@ jobs:
       - name: create instance platform package
         run: |
           mage_platform_package=$(printf 'mage.instance-%s-node-%s' ${{ runner.os }} ${{ matrix.node }} | tr '[:upper:]' '[:lower:]')
-          printf 'mage_platform_package=%s' ${mage_platform_package} >> ${GITHUB_ENV}
+          printf 'mage_platform_package=%s\n' ${mage_platform_package} >> ${GITHUB_ENV}
           cat ${GITHUB_ENV}
           (
           printf '{ "name": "%s", "version": "%s" }\n' ${mage_platform_package} ${{ needs.config.outputs.release-version }} &&
