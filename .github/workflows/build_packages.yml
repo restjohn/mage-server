@@ -206,7 +206,8 @@ jobs:
       - name: create instance platform package
         run: |
           mage_platform_package=$(printf 'mage.instance-%s-node-%s' ${{ runner.os }} ${{ matrix.node }} | tr '[:upper:]' '[:lower:]')
-          echo "mage_platform_package=${mage_platform_package}" >> ${GITHUB_ENV}
+          printf 'mage_platform_package=%s' ${mage_platform_package} >> ${GITHUB_ENV}
+          cat ${GITHUB_ENV}
           (
           printf '{ "name": "%s", "version": "%s" }\n' ${mage_platform_package} ${{ needs.config.outputs.release-version }} &&
           printf '{ "scripts": { "start": "mage.service --plugin @ngageoint/mage.nga-msi" }}\n' &&
@@ -230,6 +231,7 @@ jobs:
       - name: build release instance platform package
         if: ${{ needs.config.outputs.release-is_release }}
         run: |
+          cat ${GITHUB_ENV}
           npm i --production
           tar czf ${mage_platform_package}.tgz package*.json node_modules
       - name: release instance build
