@@ -207,7 +207,6 @@ jobs:
         run: |
           mage_platform_package=$(printf 'mage.instance-%s-node-%s' ${{ runner.os }} ${{ matrix.node }} | tr '[:upper:]' '[:lower:]')
           printf 'mage_platform_package=%s\n' ${mage_platform_package} >> ${GITHUB_ENV}
-          cat ${GITHUB_ENV}
           (
           printf '{ "name": "%s", "version": "%s" }\n' ${mage_platform_package} ${{ needs.config.outputs.release-version }} &&
           printf '{ "scripts": { "start": "mage.service --plugin @ngageoint/mage.nga-msi" }}\n' &&
@@ -215,6 +214,8 @@ jobs:
           printf '{ "dependencies": { "@ngageoint/mage.web-app": "./%s" }}\n' $(ls -1 *mage.web-app*.tgz) &&
           printf '{ "dependencies": { "@ngageoint/nga-msi": "./%s" }}\n' $(ls -1 *mage.nga-msi*.tgz)
           ) | npx json --deep-merge > package.json
+          echo "created instance platform package.json"
+          cat package.json
       - name: upload instance platform package.json
         uses: actions/upload-artifact@v2
         with:
@@ -231,13 +232,12 @@ jobs:
       - name: build release instance platform package
         if: ${{ needs.config.outputs.release-is_release }}
         run: |
-          cat ${GITHUB_ENV}
           npm i --production
-          tar czf ${mage_platform_package}.tgz package*.json node_modules
+          tar czf ${mage_platform_package}-${{ needs.config.outputs.release-version }}.tgz package*.json node_modules
       - name: release instance build
         if: ${{ needs.config.outputs.release-is_release }}
         uses: softprops/action-gh-release@v1
         with:
           name: ${{ needs.config.outputs.release-version }}
           files: |
-            ${mage_platform_package}.tgz
+            ${{ env.mage_platform_package }}-${{ needs.config.outputs.release-version }}.tgz
