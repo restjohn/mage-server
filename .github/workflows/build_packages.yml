@@ -171,6 +171,8 @@ jobs:
             ngageoint-mage.*.tgz
 
   create_release_stub:
+    # so the matrix job does not race to create the release
+    name: create empty release stub
     needs: [ config, build_service, build_web-app ]
     runs-on: ubuntu-latest
     steps:
@@ -179,9 +181,38 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: ${{ needs.config.outputs.release-version }}
+          prerelease: ${{ needs.config.outputs.release-is_prerelease }}
 
-  build_instance_and_release:
+  release_packages:
+    name:  add npm package tarballs to release
     needs: [ config, create_release_stub ]
+    if: ${{ needs.config.outputs.release-is_release }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ needs.config.outputs.node_versions-latest }}
+      - name: download service packages
+        uses: actions/download-artifact@v2
+        with:
+          name: mage_service_packages
+      - name: download web-app packages
+        uses: actions/download-artifact@v2
+        with:
+          name: mage_web-app_packages
+      - name: add package tarballs to release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ needs.config.outputs.release-version }}
+          files: |
+            package.json
+            ngageoint-mage.*.tgz
+
+  release_prebuilt_platform_instance:
+    name:  add pre-built mage instance tarballs to release
+    needs: [ config, create_release_stub ]
+    if: ${{ needs.config.outputs.release-is_release && !needs.config.outputs.release-is_prerelease }}
     strategy:
       matrix:
         node: ${{ fromJSON(needs.config.outputs.node_versions-all-json) }}
@@ -216,28 +247,15 @@ jobs:
           ) | npx json --deep-merge > package.json
           echo "created instance platform package.json"
           cat package.json
-      - name: upload instance platform package.json
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.mage_platform_package }}
-          path: package.json
-      - name: release latest node packages
-        if: ${{ needs.config.outputs.release-is_release && needs.config.outputs.node_versions-latest == matrix.node }}
+      - name: build platform instance
+        if: ${{ needs.config.outputs.release-is_release }}
+        run: |
+          npm i --production
+          tar czf ${mage_platform_package}-${{ needs.config.outputs.release-version }}.tgz ngageoint-*.tgz package*.json node_modules
+      - name: release instance build
         uses: softprops/action-gh-release@v1
         with:
           name: ${{ needs.config.outputs.release-version }}
           files: |
             package.json
-            ngageoint-mage.*.tgz
-      - name: build release instance platform package
-        if: ${{ needs.config.outputs.release-is_release }}
-        run: |
-          npm i --production
-          tar czf ${mage_platform_package}-${{ needs.config.outputs.release-version }}.tgz package*.json node_modules
-      - name: release instance build
-        if: ${{ needs.config.outputs.release-is_release }}
-        uses: softprops/action-gh-release@v1
-        with:
-          name: ${{ needs.config.outputs.release-version }}
-          files: |
             ${{ env.mage_platform_package }}-${{ needs.config.outputs.release-version }}.tgz
