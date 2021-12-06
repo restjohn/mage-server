@@ -257,5 +257,4 @@ jobs:
         with:
           name: ${{ needs.config.outputs.release-version }}
           files: |
-            package.json
             ${{ env.mage_platform_package }}-${{ needs.config.outputs.release-version }}.tgz
