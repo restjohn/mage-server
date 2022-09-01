@@ -1,4 +1,4 @@
-
+name: build and test service
 
 on:
   workflow_call:
@@ -58,9 +58,9 @@ jobs:
           path: |
             ngageoint-mage.*.tgz
 
-  test_service:
+  test:
     name: test mage service
-    needs: [ config, build_service ]
+    needs: [ config, build ]
     if: ${{ needs.config.outputs.tests_enabled }}
     runs-on: ubuntu-latest
     strategy:

@@ -4,20 +4,18 @@ name: build configuration
 on:
   workflow_call:
     outputs:
-      # '' to disable tests, 'true' to enable
-      tests_enabled: 'true'
-      node_versions-all: ${{ jobs.config.outputs.node_versions-all }}
-      node_versions-all-json: ${{ jobs.config.outputs.node_versions-.all-json }}
-      node_versions-latest: ${{ jobs.config.outputs.node_versions-latest }}
-      node_versions-pre_latest: ${{ jobs.config.outputs.node_versions-pre_latest }}
-      node_versions-pre_latest-json: ${{ jobs.config.outputs.node_versions-pre_latest-json }}
+      node_versions-all: ${{ jobs.main.outputs.node_versions-all }}
+      node_versions-all-json: ${{ jobs.main.outputs.node_versions-.all-json }}
+      node_versions-latest: ${{ jobs.main.outputs.node_versions-latest }}
+      node_versions-pre_latest: ${{ jobs.main.outputs.node_versions-pre_latest }}
+      node_versions-pre_latest-json: ${{ jobs.main.outputs.node_versions-pre_latest-json }}
 
 env:
   MAGE_NODE_VERSIONS: 14 16
 
 jobs:
 
-  config:
+  main:
     runs-on: ubuntu-latest
     outputs:
       node_versions-all: ${{ steps.node_versions.outputs.all }}
