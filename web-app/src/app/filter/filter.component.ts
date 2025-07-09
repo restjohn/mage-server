@@ -104,12 +104,26 @@ export class FilterComponent implements OnInit {
     });
   }
 
+  /**
+   * Fetches Users for Given Event
+   * @param  {Event} event Event to Get Users From
+   * @return {Promise<User[]>} Returns List of Users as an Async Promise
+   */
+
   async getUsers(event: Event): Promise<User[]> {
     const users = await firstValueFrom(this.eventService.getMembers(event));
     return users;
   }
 
-  setFilteredValues(events: Event[], eUsers: User[], eForms: Form[]) {
+  /**
+   * Resets Filter When Event is Selected
+   * @param  {Event[]} events List of Events
+   * @param  {User[]} eUsers Users in the Event
+   * @param  {Form[]} eForms Forms in the Event
+   * @return {void} No Return
+   */
+
+  setFilteredValues(events: Event[], eUsers: User[], eForms: Form[]): void {
     this.events = events;
 
     this.filteredEvents = this.eventControl.valueChanges.pipe(
@@ -189,6 +203,12 @@ export class FilterComponent implements OnInit {
       })
     );
   }
+
+  /**
+   * Resets Filter When Event is Selected
+   * @param  {MatAutocompleteSelectedEvent} event The Event from the Autocomplete SelectBox
+   * @return {Promise<void>} No Return
+   */
 
   async onSelectEvent(event: MatAutocompleteSelectedEvent): Promise<void> {
     this.selectedTeams = [];
@@ -285,6 +305,11 @@ export class FilterComponent implements OnInit {
   public compareIntervalChoices = function (option, value): boolean {
     return option.label === value.label;
   };
+
+  /**
+   * Filters Observation List using the FilterService
+   * @return {void} No Return
+   */
 
   onFilter(): void {
     var options: IntervalOptions = {};

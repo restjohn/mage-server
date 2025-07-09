@@ -25,6 +25,7 @@ import { MemberPage, filterChanges } from "./event.types";
 import {
   Attachment,
   Event,
+  Filter,
   Form,
   FormField,
   Layer,
@@ -155,7 +156,13 @@ export class EventService {
     });
   }
 
-  onFiltersChanged(filter: any): void {
+  /**
+   * Updates List of Observations and Users when Filter Changes
+   * @param  {Filter} filter Filter Parametes
+   * @return {void} No Return
+   */
+
+  onFiltersChanged(filter: Filter): void {
     const event = this.filterService.getEvent();
     if (!event) return;
 

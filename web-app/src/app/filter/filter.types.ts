@@ -83,6 +83,11 @@ export type IntervalOptions = {
   localTime?: Boolean;
 };
 
+export type SearchInterval = {
+    start: string;
+    end: string;
+}
+
 export type Interval = {
   choice?: FilterChoice;
   options?: IntervalOptions;

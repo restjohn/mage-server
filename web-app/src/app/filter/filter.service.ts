@@ -15,11 +15,14 @@ import {
   Changes,
   Form,
   FormProperties,
+  SearchInterval,
 } from "./filter.types";
+import { filterChanges } from "../event/event.types";
 
 @Injectable({
   providedIn: "root",
 })
+
 export class FilterService {
   event: Event = null;
   teamsById: TeamById = {};
@@ -93,7 +96,13 @@ export class FilterService {
     this.listeners = this.listeners.filter((l: any) => l !== listener);
   }
 
-  setFilter(filter: Filter) {
+  /**
+   * Updates the Observation Filter With the Selected Items
+   * @param  {Filter} filter Contains the Selected Filter Values
+   * @return {void} No Return
+   */
+
+  setFilter(filter: Filter): void {
     var eventChanged = null;
     var teamsChanged = null;
     var usersChanged = null;
@@ -156,7 +165,13 @@ export class FilterService {
     this.filterChanged(changed);
   }
 
-  setEvent(newEvent: Event) {
+  /**
+   * Updates the Event Selected
+   * @param  {Event} newEvent the new Event Selection
+   * @return {filterChanges} a List of events added/removed from the list
+   */
+
+  setEvent(newEvent: Event): filterChanges {
     if (!newEvent && this.event) {
       this.event = null;
 
@@ -187,7 +202,13 @@ export class FilterService {
     return this.event;
   }
 
-  setUsers(newUsers: User[]) {
+  /**
+   * Updates the List of Users in the Selected Event
+   * @param  {User[]} newUser the new List of Users that are in the events
+   * @return {filterChanges} a List of users added and removed from the list
+   */
+
+  setUsers(newUsers: User[]): filterChanges {
     var added = [];
     var removed = [];
 
@@ -208,7 +229,13 @@ export class FilterService {
     };
   }
 
-  setForms(newForms: Form[]) {
+  /**
+   * Updates the List of Forms in the Selected Event
+   * @param  {Form[]} newForms the new List of Forms that are in the events
+   * @return {filterChanges} a List of forms added and removed from the list
+   */
+
+  setForms(newForms: Form[]): filterChanges {
     var added = [];
     var removed = [];
 
@@ -229,7 +256,13 @@ export class FilterService {
     };
   }
 
-  setTeams(newTeams: Team[]) {
+  /**
+   * Updates the List of Teams in the Selected Event
+   * @param  {Team[]} newTeams the new List of Teams that are in the events
+   * @return {filterChanges} a List of teams added and removed from the list
+   */
+
+  setTeams(newTeams: Team[]): filterChanges {
     var added = [];
     var removed = [];
 
@@ -279,7 +312,13 @@ export class FilterService {
     return this.interval;
   }
 
-  setTimeInterval(newInterval: Interval) {
+  /**
+   * Sets the Time Interval if a change was made
+   * @param  {Interval} newInterval Contains the Selected Interval Type and Custom Information
+   * @return {boolean} If a change was made, returns True, else False
+   */
+
+  setTimeInterval(newInterval: Interval): boolean {
     if (newInterval.choice.filter === "custom") {
       if (
         this.interval.options?.startDate &&
@@ -297,7 +336,13 @@ export class FilterService {
     return true;
   }
 
-  observationInFilter(o: Observation) {
+  /**
+   * Checks to see if the ID is within the list of filters Users
+   * @param  {Observation} o The Current Observation
+   * @return {boolean} Returns True if Observation is Allowed, or False if Not
+   */
+
+  observationInFilter(o: Observation): boolean {
     if (!this.isObservationInTimeFilter(o)) return false;
 
     if (!this.isUserInTeamFilter(o.userId)) return false;
@@ -322,12 +367,24 @@ export class FilterService {
     return true;
   }
 
-  isUserInList(observationUserId: string) {
+  /**
+   * Checks to see if the ID is within the list of filters Users
+   * @param  {string} observationUserId Observations User ID
+   * @return {boolean} Returns True if Observation is Allowed, or False if Not
+   */
+
+  isUserInList(observationUserId: string): boolean {
     if (this.users.length <= 0) return true;
     return this.users.findIndex((u) => u.id === observationUserId) >= 0;
   }
 
-  hasFormInList(observationForms: FormProperties[]) {
+  /**
+   * Checks Incoming Observation to see if it has Forms within the Filter List
+   * @param  {FormProperties[]} observationForms The Current Observations Forms
+   * @return {boolean} Returns True if Observation is Allowed, or False if Not
+   */
+
+  hasFormInList(observationForms: FormProperties[]): boolean {
     if (this.forms.length <= 0) return true;
     var intersection = this.forms
       .map((x) => x.id)
@@ -335,8 +392,14 @@ export class FilterService {
     return intersection.length > 0;
   }
 
-  isObservationInTimeFilter(o: Observation) {
-    var time = this.formatInterval(this.interval);
+  /**
+   * Checks Incoming Observation to Make Sure it is Within the Time Constraints
+   * @param  {Observation} o The Current Observation
+   * @return {boolean} Returns True if Observation is Allowed, or False if Not
+   */
+
+  isObservationInTimeFilter(o: Observation): boolean {
+    var time: SearchInterval = this.formatInterval(this.interval);
     if (time) {
       var properties = o.properties;
       if (time?.start && time?.end) {
@@ -350,14 +413,26 @@ export class FilterService {
     return true;
   }
 
-  isUserInTeamFilter(userId: string) {
+  /**
+   * Checks to see if the declared username is filtered Team selections
+   * @param  {string} userId the unique ID of the User who Created the Observation
+   * @return {boolean} Returns True if Observation is Allowed, or False if Not
+   */
+
+  isUserInTeamFilter(userId: string): boolean {
     if (Object.keys(this.teamsById).length === 0) return true;
     return Object.values(this.teamsById).some((team: Team) =>
       team.userIds.includes(userId)
     );
   }
 
-  formatInterval(interval: Interval) {
+  /**
+   * Calculates and Returns the Start and End Time for Selected Interval
+   * @param  {Interval} interval Contains the Selected Interval Type and Custom Information
+   * @return {SearchInterval} A Start and End Value to Compare DateTimes to
+   */
+
+  formatInterval(interval: Interval): SearchInterval  {
     if (!interval) return null;
     var choice = interval.choice;
     var options = interval.options;
