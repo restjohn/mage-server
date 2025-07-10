@@ -55,7 +55,7 @@ module.exports = function (app, security) {
         return res.sendStatus(403);
       }
 
-      var tasks = [];
+      const tasks = [];
       if (validateObservationId) {
         tasks.push(function (done) {
           /*
@@ -181,7 +181,7 @@ module.exports = function (app, security) {
   }
 
   function getUserForObservation(req, res, next) {
-    var userId = req.observation.userId;
+    let userId = req.observation.userId;
     if (!userId) return next();
 
     new api.User().getById(userId, function (err, user) {
@@ -193,19 +193,19 @@ module.exports = function (app, security) {
   }
 
   function getIconForObservation(req, res, next) {
-    var form = {};
-    var primary;
-    var secondary;
+    let form = {};
+    let primary;
+    let secondary;
     if (req.observation.properties.forms.length) {
-      var formId = req.observation.properties.forms[0].formId;
-      var formDefinitions = req.event.forms.filter(function (form) {
+      let formId = req.observation.properties.forms[0].formId;
+      let formDefinitions = req.event.forms.filter(function (form) {
         return form._id === formId;
       });
 
       if (formDefinitions.length) {
         form = formDefinitions[0];
         primary = req.observation.properties.forms[0][form.primaryField];
-        secondary = req.observation.properties.forms[0][form.variantField];
+        secondary = req.observation.properties.forms[0][form.letiantField];
       }
     }
 

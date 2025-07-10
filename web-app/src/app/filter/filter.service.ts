@@ -103,12 +103,12 @@ export class FilterService {
    */
 
   setFilter(filter: Filter): void {
-    var eventChanged = null;
-    var teamsChanged = null;
-    var usersChanged = null;
-    var formsChanged = null;
-    var timeIntervalChanged = null;
-    var actionFilterChanged = null;
+    let eventChanged = null;
+    let teamsChanged = null;
+    let usersChanged = null;
+    let formsChanged = null;
+    let timeIntervalChanged = null;
+    let actionFilterChanged = null;
 
     if (filter.users) usersChanged = this.setUsers(filter.users);
 
@@ -124,9 +124,9 @@ export class FilterService {
       // if they changed the event, and didn't set teams filter
       // then reset teams filter to empty array
       if (!filter.teams) {
-        var oldTeamIds = this.localStorageService.getTeams() || [];
-        var teams = [];
-        for (var i = 0; i < filter.event.teams.length; i++) {
+        let oldTeamIds = this.localStorageService.getTeams() || [];
+        const teams = [];
+        for (let i = 0; i < filter.event.teams.length; i++) {
           if (oldTeamIds.indexOf(this.event.teams[i].id) != -1) {
             teams.push(this.event.teams[i]);
           }
@@ -144,7 +144,7 @@ export class FilterService {
       timeIntervalChanged = filter.timeInterval;
     }
 
-    var changed: Changes = {};
+    const changed: Changes = {};
     if (eventChanged) changed.event = eventChanged;
     if (teamsChanged) changed.teams = teamsChanged;
     if (usersChanged) changed.users = usersChanged;
@@ -156,7 +156,7 @@ export class FilterService {
   }
 
   removeFilters() {
-    var changed: Changes = {};
+    const changed: Changes = {};
     if (this.event) {
       changed.event = { removed: [this.event] };
       this.event = null;
@@ -180,8 +180,8 @@ export class FilterService {
         removed: [this.event],
       };
     } else if ((newEvent && !this.event) || this.event.id !== newEvent.id) {
-      var added = [newEvent];
-      var removed = this.event ? [this.event] : [];
+      const added = [newEvent];
+      const removed = this.event ? [this.event] : [];
 
       this.userService.addRecentEvent(newEvent).subscribe({
         error: (e) => console.error("Error adding recent event", e),
@@ -209,8 +209,8 @@ export class FilterService {
    */
 
   setUsers(newUsers: User[]): filterChanges {
-    var added = [];
-    var removed = [];
+    const added = [];
+    const removed = [];
 
     newUsers.forEach((user: User) => {
       if (this.users.findIndex((u) => u.id === user.id) < 0) added.push(user);
@@ -236,8 +236,8 @@ export class FilterService {
    */
 
   setForms(newForms: Form[]): filterChanges {
-    var added = [];
-    var removed = [];
+    const added = [];
+    const removed = [];
 
     newForms.forEach((form: Form) => {
       if (this.forms.findIndex((f) => f.id === form.id) < 0) added.push(form);
@@ -263,8 +263,8 @@ export class FilterService {
    */
 
   setTeams(newTeams: Team[]): filterChanges {
-    var added = [];
-    var removed = [];
+    const added = [];
+    const removed = [];
 
     newTeams.forEach((team: Team) => {
       if (!this.teamsById[team.id]) {
@@ -272,7 +272,7 @@ export class FilterService {
       }
     });
 
-    var newTeamsById = _.keyBy(newTeams, "id");
+    let newTeamsById = _.keyBy(newTeams, "id");
     Object.values(this.teamsById).forEach((team: Team) => {
       if (!newTeamsById[team.id]) {
         removed.push(team);
@@ -386,7 +386,7 @@ export class FilterService {
 
   hasFormInList(observationForms: FormProperties[]): boolean {
     if (this.forms.length <= 0) return true;
-    var intersection = this.forms
+    const intersection = this.forms
       .map((x) => x.id)
       .filter((fID) => observationForms.map((y) => y.formId).includes(fID));
     return intersection.length > 0;
@@ -399,9 +399,9 @@ export class FilterService {
    */
 
   isObservationInTimeFilter(o: Observation): boolean {
-    var time: SearchInterval = this.formatInterval(this.interval);
+    const time: SearchInterval = this.formatInterval(this.interval);
     if (time) {
-      var properties = o.properties;
+      const properties = o.properties;
       if (time?.start && time?.end) {
         return moment(properties.timestamp).isBetween(time.start, time.end);
       } else if (time?.start) {
@@ -434,10 +434,10 @@ export class FilterService {
 
   formatInterval(interval: Interval): SearchInterval  {
     if (!interval) return null;
-    var choice = interval.choice;
-    var options = interval.options;
-    var start: string = null;
-    var end: string = null;
+    const choice = interval.choice;
+    const options = interval.options;
+    let start: string = null;
+    let end: string = null;
 
     if (choice.filter === "all") {
       return null;
@@ -445,12 +445,12 @@ export class FilterService {
       start = moment().startOf("day").toISOString();
       end = moment().endOf("day").toISOString();
     } else if (choice.filter === "custom") {
-      var startDate = moment(options.startDate);
+      let startDate = moment(options.startDate);
       if (startDate) {
         startDate = options.localTime ? startDate.utc() : startDate;
         start = startDate.utc().toISOString();
       }
-      var endDate = moment(options.endDate);
+      let endDate = moment(options.endDate);
       if (endDate) {
         endDate = options.localTime ? endDate.utc() : endDate;
         end = endDate.utc().toISOString();

@@ -398,7 +398,7 @@ export class EventService {
   }
 
   addObservationFavorite(observation) {
-    var event = this.eventsById[observation.eventId];
+    let event = this.eventsById[observation.eventId];
     return this.observationService
       .addObservationFavorite(event, observation)
       .pipe(
@@ -410,7 +410,7 @@ export class EventService {
   }
 
   removeObservationFavorite(observation) {
-    var event = this.eventsById[observation.eventId];
+    let event = this.eventsById[observation.eventId];
     return this.observationService
       .removeObservationFavorite(event, observation)
       .pipe(
@@ -425,7 +425,7 @@ export class EventService {
     observation: Observation,
     important
   ): Observable<Observation> {
-    var event = this.eventsById[observation.eventId];
+    let event = this.eventsById[observation.eventId];
     return this.observationService
       .markObservationAsImportantForEvent(event, observation, important)
       .pipe(
@@ -439,7 +439,7 @@ export class EventService {
   clearObservationAsImportant(
     observation: Observation
   ): Observable<Observation> {
-    var event = this.eventsById[observation.eventId];
+    let event = this.eventsById[observation.eventId];
     return this.observationService
       .clearObservationAsImportantForEvent(event, observation)
       .pipe(
@@ -451,7 +451,7 @@ export class EventService {
   }
 
   archiveObservation(observation): Observable<Observation> {
-    var event = this.eventsById[observation.eventId];
+    let event = this.eventsById[observation.eventId];
     return this.observationService
       .archiveObservationForEvent(event, observation)
       .pipe(
@@ -486,13 +486,13 @@ export class EventService {
   }
 
   getForms(observation: Observation, options?: any) {
-    var event = this.eventsById[observation.eventId];
+    let event = this.eventsById[observation.eventId];
     return this.getFormsForEvent(event, options);
   }
 
   getFormsForEvent(event: Event, options?: any) {
     options = options || {};
-    var forms = event.forms;
+    let forms = event.forms;
     if (options.archived === false) {
       forms = forms.filter((form: Form) => !form.archived);
     }
@@ -669,24 +669,24 @@ export class EventService {
   }
 
   parseObservations(event: Event, observations: Observation[]): void {
-    var added = [];
-    var updated = [];
-    var removed = [];
+    const added = [];
+    const updated = [];
+    const removed = [];
 
-    var observationsById = {};
-    var filteredObservationsById =
+    const observationsById = {};
+    let filteredObservationsById =
       this.eventsById[event.id].filteredObservationsById;
     observations.forEach((observation: Observation) => {
       // Check if this observation passes the current filter
       if (this.filterService.observationInFilter(observation)) {
         // Check if we already have this observation, if so update, otherwise add
-        var localObservation = filteredObservationsById[observation.id];
+        let localObservation = filteredObservationsById[observation.id];
         if (localObservation) {
           if (localObservation.lastModified !== observation.lastModified) {
             updated.push(observation);
           } else if (observation.attachments) {
-            var some = _.some(observation.attachments, function (attachment) {
-              var localAttachment = _.find(
+            let some = _.some(observation.attachments, function (attachment) {
+              let localAttachment = _.find(
                 localObservation.attachments,
                 function (a) {
                   return a.id === attachment.id;
@@ -713,7 +713,7 @@ export class EventService {
     });
 
     // remaining elements were not pulled from the server, hence we should remove them
-    removed = Object.values(filteredObservationsById);
+    removed.push(Object.values(filteredObservationsById));
 
     this.eventsById[event.id].observationsById = _.keyBy(observations, "id");
     this.eventsById[event.id].filteredObservationsById = observationsById;
@@ -741,7 +741,7 @@ export class EventService {
       delete userLocation.locations;
 
       if (userLocation.user.iconUrl) {
-        var params = new HttpParams();
+        let params = new HttpParams();
         params = params.append(
           "access_token",
           this.localStorageService.getToken()

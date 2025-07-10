@@ -4,6 +4,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable, map, mergeMap } from "rxjs";
 import * as _ from "underscore";
 import { MageEvent } from "core-lib-src/event";
+import { Form, Observation } from "../filter/filter.types";
 
 @Injectable({
   providedIn: "root",
@@ -148,9 +149,9 @@ export class ObservationService {
   transformObservations(observations, event) {
     if (!_.isArray(observations)) observations = [observations];
 
-    var formMap = _.indexBy(event.forms, "id");
-    observations.forEach((observation: any) => {
-      let form: any;
+    let formMap = _.indexBy(event.forms, "id");
+    observations.forEach((observation: Observation) => {
+      let form: Form;
       if (observation.properties.forms.length) {
         form = formMap[observation.properties.forms[0].formId];
       }
@@ -171,16 +172,16 @@ export class ObservationService {
   }
 
   minimizePolygon(polygon) {
-    for (var i = 0; i < polygon.length; i++) {
+    for (let i = 0; i < polygon.length; i++) {
       this.minimizeLineString(polygon[i]);
     }
   }
 
   minimizeLineString(lineString) {
-    var world = 360;
-    var coord = lineString[0];
-    for (var i = 1; i < lineString.length; i++) {
-      var next = lineString[i];
+    let world = 360;
+    let coord = lineString[0];
+    for (let i = 1; i < lineString.length; i++) {
+      let next = lineString[i];
       if (coord[0] < next[0]) {
         if (next[0] - coord[0] > coord[0] - next[0] + world) {
           next[0] = next[0] - world;
@@ -194,45 +195,45 @@ export class ObservationService {
   }
 
   getObservationStyleForForm(observation, event, form) {
-    var formId = null;
-    var formStyle = null;
-    var primaryField = null;
-    var variantField = null;
+    let formId = null;
+    let formStyle = null;
+    let primaryField = null;
+    let letiantField = null;
 
     if (observation.properties.forms.length) {
-      var firstForm = observation.properties.forms[0];
+      let firstForm = observation.properties.forms[0];
       formId = form.id;
       formStyle = form.style;
       primaryField = firstForm[form.primaryField];
-      variantField = firstForm[form.variantField];
+      letiantField = firstForm[form.letiantField];
     }
 
     let style: any = this.getObservationStyle(
       event.style,
       formStyle,
       primaryField,
-      variantField
+      letiantField
     );
     style.iconUrl = this.getObservationIconUrlForEvent(
       event.id,
       formId,
       primaryField,
-      variantField
+      letiantField
     );
 
     return style;
   }
 
-  getObservationStyle(eventStyle, formStyle, primary, variant) {
-    var style = eventStyle || {};
+  getObservationStyle(eventStyle, formStyle, primary, letiant) {
+    let style = eventStyle || {};
     if (formStyle) {
       if (
         primary &&
         formStyle[primary] &&
-        variant &&
-        formStyle[primary][variant]
+        letiant &&
+        formStyle[primary][letiant]
       ) {
-        style = formStyle[primary][variant];
+        style = formStyle[primary][letiant];
       } else if (primary && formStyle[primary]) {
         style = formStyle[primary];
       } else {
@@ -249,8 +250,8 @@ export class ObservationService {
     };
   }
 
-  getObservationIconUrlForEvent(eventId, formId, primary, variant) {
-    var url = "/api/events/" + eventId + "/icons";
+  getObservationIconUrlForEvent(eventId, formId, primary, letiant) {
+    let url = "/api/events/" + eventId + "/icons";
 
     if (formId) {
       url += "/" + formId;
@@ -260,11 +261,11 @@ export class ObservationService {
       url += "/" + primary;
     }
 
-    if (variant) {
-      url += "/" + variant;
+    if (letiant) {
+      url += "/" + letiant;
     }
 
-    var params = new HttpParams();
+    let params = new HttpParams();
     params = params.append("access_token", this.localStorageService.getToken());
 
     return url + "?" + params.toString();

@@ -75,7 +75,7 @@ export class FilterComponent implements OnInit {
     this.selectedUsers = users;
     this.selectedForms = forms;
     if (!this.eventUsers.length) {
-      var eUsers = await this.getUsers(event);
+      let eUsers = await this.getUsers(event);
       this.eventUsers.push(...eUsers);
     }
     if (!this.eventForms.length && event.forms) this.eventForms = event.forms;
@@ -218,8 +218,8 @@ export class FilterComponent implements OnInit {
     this.userControl.setValue("");
     this.formControl.setValue("");
 
-    var newEvent: Event = event.option.value;
-    var eUsers = await this.getUsers(newEvent);
+    let newEvent: Event = event.option.value;
+    let eUsers = await this.getUsers(newEvent);
 
     this.eventUsers = eUsers;
     this.eventForms = newEvent.forms;
@@ -312,7 +312,7 @@ export class FilterComponent implements OnInit {
    */
 
   onFilter(): void {
-    var options: IntervalOptions = {};
+    const options: IntervalOptions = {};
     if (this.intervalChoice.filter === "custom") {
       options.startDate = this.startDate;
       options.endDate = this.endDate;
