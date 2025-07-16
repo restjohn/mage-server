@@ -534,12 +534,14 @@ export class EventService {
   }
 
   getMembers(event): Observable<User[]> {
-    let memberPage = this.httpClient.get<MemberPage>(
-      `/api/events/${event.id}/members`
-    );
-    memberPage.pipe(take(1)).subscribe((x) => this.memberSubject.next(x.items));
-    return this.memberSubject.asObservable();
+    return this.httpClient
+      .get<MemberPage>(`/api/events/${event.id}/members?page_size=${Number.MAX_SAFE_INTEGER}`)
+      .pipe(
+        take(1),
+        map(res => res.items)
+      );
   }
+  
 
   isUserInEvent(user, event): boolean {
     if (!event) return false;

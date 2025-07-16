@@ -76,9 +76,16 @@ export class FilterComponent implements OnInit {
     this.selectedForms = forms;
     if (!this.eventUsers.length) {
       let eUsers = await this.getUsers(event);
-      this.eventUsers.push(...eUsers);
+      if (eUsers.length > 0)
+        this.eventUsers.push(...eUsers);
+      else
+        this.userControl.disable({ emitEvent: false });
     }
     if (!this.eventForms.length && event.forms) this.eventForms = event.forms;
+    else if (!this.eventForms.length) this.formControl.disable({ emitEvent: false });
+
+    if (this.eventControl.value.teams && this.eventControl.value.teams.length <= 0)
+      this.teamControl.disable({ emitEvent: false });
 
     this.interval = this.filterService.getInterval();
     this.timeZone =
@@ -109,12 +116,16 @@ export class FilterComponent implements OnInit {
    * @param  {Event} event Event to Get Users From
    * @return {Promise<User[]>} Returns List of Users as an Async Promise
    */
-
   async getUsers(event: Event): Promise<User[]> {
-    const users = await firstValueFrom(this.eventService.getMembers(event));
-    return users;
+    try {
+      const users = await firstValueFrom(this.eventService.getMembers(event));
+      return users;
+    } catch (error) {
+      console.error('Error Fetching Members ', error);
+      return [];
+    }
   }
-
+  
   /**
    * Resets Filter When Event is Selected
    * @param  {Event[]} events List of Events
@@ -223,6 +234,18 @@ export class FilterComponent implements OnInit {
 
     this.eventUsers = eUsers;
     this.eventForms = newEvent.forms;
+
+    if (this.eventUsers.length > 0) this.userControl.enable({ emitEvent: false });
+    else this.userControl.disable({ emitEvent: false });
+    
+    if (newEvent.forms.length > 0) this.formControl.enable({ emitEvent: false });
+    else this.formControl.disable({ emitEvent: false });
+
+    if (this.eventControl.value.teams.length > 0) this.teamControl.enable({ emitEvent: false });
+    else this.teamControl.disable({ emitEvent: false });
+
+    if (this.events.length > 0)  this.eventControl.enable({ emitEvent: false });
+    else this.eventControl.disable({ emitEvent: false });
 
     this.eventService.query().subscribe(async (events: Event[]) => {
       this.setFilteredValues(events, eUsers, newEvent.forms);
