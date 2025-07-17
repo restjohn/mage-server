@@ -4,12 +4,13 @@ import { AdminDashboardModule } from './admin-dashboard/admin-dashboard.module';
 
 @NgModule({
   declarations: [
-    AdminPluginTabContentComponent, AdminDashboardModule,
+    AdminPluginTabContentComponent,
   ],
   imports: [
+    AdminDashboardModule
   ],
   exports: [
-    AdminPluginTabContentComponent, AdminDashboardModule,
+    AdminPluginTabContentComponent,
   ]
 })
 export class AdminModule {

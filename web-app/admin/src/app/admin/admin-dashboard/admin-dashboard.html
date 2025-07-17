@@ -17,7 +17,7 @@
         <mat-card>
           <mat-card-title>
             Inactive Users
-            <sup><mat-badge [content]="count()" matBadgeColor="accent"></mat-badge></sup>
+            <sup [matBadge]="count()" matBadgeColor="accent"></sup>
           </mat-card-title>
 
           <mat-form-field appearance="fill" class="w-100 mb-3">
@@ -47,7 +47,7 @@
         <mat-card>
           <mat-card-title>
             Unregistered Devices
-            <sup><mat-badge [content]="deviceCount()" matBadgeColor="accent"></mat-badge></sup>
+            <sup [matBadge]="deviceCount()" matBadgeColor="accent"></sup>
           </mat-card-title>
 
           <mat-form-field appearance="fill" class="w-100 mb-3">
