@@ -2,7 +2,6 @@ import angular from 'angular';
 import admin from './admin.component';
 import adminTab from './admin.tab.component';
 import adminPluginTabContentBridge from './admin.plugin-tab-content-bridge.component'
-import { AdminDashboardComponent } from './admin-dashboard';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AdminPluginTabContentComponent } from '../../app/admin/plugin-tab/plugin-tab-content.component';
 
@@ -10,7 +9,6 @@ angular
   .module('mage')
   .component('admin', admin)
   .component('adminTab', adminTab)
-  .directive('adminDashboard', downgradeComponent({ component: AdminPluginTabContentComponent }))
   .component('mageAdminPluginTabContentBridge', adminPluginTabContentBridge)
   .directive('mageAdminPluginTabContent', downgradeComponent({ component: AdminPluginTabContentComponent }));
 

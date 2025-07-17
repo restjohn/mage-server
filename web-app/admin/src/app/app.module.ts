@@ -135,6 +135,8 @@ import { AdminEventFormPreviewDialogComponent } from './admin/admin-event/admin-
 import { AdminMapComponent } from './admin/admin-map/admin-map.component';
 import { AdminTeamsModule } from './admin/admin-teams/admin-teams.module';
 import { CardNavbarComponent } from './core/card-navbar/card-navbar.component';
+import { AdminDashboardModule } from './admin/admin-dashboard/admin-dashboard.module';
+
 
 @NgModule({
   declarations: [
@@ -256,7 +258,8 @@ import { CardNavbarComponent } from './core/card-navbar/card-navbar.component';
     AdminBreadcrumbModule,
     MatSlideToggleModule,
     MatStepperModule,
-    InputMaskModule.forRoot()
+    InputMaskModule.forRoot(),
+    AdminDashboardModule,
   ],
   providers: [
     mapServiceProvider,
