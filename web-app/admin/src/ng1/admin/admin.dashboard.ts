@@ -21,8 +21,8 @@ import {
 
 @Component({
   selector: 'app-admin-dashboard',
-  templateUrl: './admin-dashboard.component.html',
-  styleUrls: ['./admin-dashboard.component.scss']
+  templateUrl: './admin.dashboard.html',
+  styleUrls: ['./admin.dashboard.scss']
 })
 export class AdminDashboardComponent implements OnInit {
   @Output() onUserActivated = new EventEmitter<any>();

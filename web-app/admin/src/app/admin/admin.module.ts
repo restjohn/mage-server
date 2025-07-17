@@ -1,9 +1,14 @@
 import { NgModule } from '@angular/core'
-import { AdminPluginTabContentComponent } from './plugin-tab/plugin-tab-content.component';
+import { AdminPluginTabContentComponent } from './plugin-tab/plugin-tab-content.component'
+import { CommonModule } from '@angular/common';
+import { AdminDashboardComponent } from 'admin/src/ng1/admin/admin.dashboard';
 
 @NgModule({
   declarations: [
-    AdminPluginTabContentComponent
+    AdminPluginTabContentComponent, AdminDashboardComponent,
+  ],
+  imports: [
+    CommonModule,
   ],
   exports: [
     AdminPluginTabContentComponent
