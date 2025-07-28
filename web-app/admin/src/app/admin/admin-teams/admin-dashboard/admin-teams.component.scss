@@ -1,0 +1,26 @@
+.mat-table-even-columns {
+    table-layout: fixed;
+    width: 100%;
+
+    .mat-cell {
+        text-overflow: ellipsis;
+        white-space: wrap;
+    }
+
+    .mat-header-cell {
+        font-size: 1em;
+    }
+
+    .mat-cell {
+        font-size: 0.875em;
+    }
+
+    .mat-header-cell,
+    .mat-cell {
+        padding: 0 0.75rem;
+    }
+}
+
+.table-container {
+    position: relative;
+}

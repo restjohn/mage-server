@@ -133,7 +133,8 @@ import { AdminSettingsUnsavedComponent } from './admin/admin-settings/admin-sett
 import { AdminEventFormPreviewComponent } from './admin/admin-event/admin-event-form/admin-event-form-preview/admin-event-form-preview.component';
 import { AdminEventFormPreviewDialogComponent } from './admin/admin-event/admin-event-form/admin-event-form-preview/admin-event-form-preview-dialog.component';
 import { AdminMapComponent } from './admin/admin-map/admin-map.component';
-
+import { AdminTeamsModule } from './admin/admin-teams/admin-teams.module';
+import { PaginationTableComponent } from './core/pagination-table/pagination-table.component';
 
 @NgModule({
   declarations: [
@@ -188,7 +189,8 @@ import { AdminMapComponent } from './admin/admin-map/admin-map.component';
     AdminSettingsUnsavedComponent,
     AdminEventFormPreviewComponent,
     AdminEventFormPreviewDialogComponent,
-    AdminMapComponent
+    AdminMapComponent,
+    PaginationTableComponent
   ],
   imports: [
     CommonModule,
@@ -248,6 +250,7 @@ import { AdminMapComponent } from './admin/admin-map/admin-map.component';
     MatDatepickerModule,
     NgxMatSelectSearchModule,
     AdminModule,
+    AdminTeamsModule,
     AdminFeedsModule,
     FeedItemSummaryModule,
     StaticIconModule,
