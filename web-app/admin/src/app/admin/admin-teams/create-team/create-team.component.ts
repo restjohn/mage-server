@@ -6,14 +6,15 @@ import { Team } from '../team';
 
 @Component({
     selector: 'mage-admin-team-create',
-    templateUrl: './admin-team-create.component.html',
-    styleUrls: ['./admin-team-create.component.scss']
+    templateUrl: './create-team.component.html',
+    styleUrls: ['./create-team.component.scss']
 })
-export class AdminTeamCreateComponent {
+export class CreateTeamDialogComponent {
     teamForm: FormGroup;
+    errorMessage: string = '';
 
     constructor(
-        public dialogRef: MatDialogRef<AdminTeamCreateComponent>,
+        public dialogRef: MatDialogRef<CreateTeamDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: { team: Partial<Team> },
         private fb: FormBuilder,
         private teamsService: TeamsService
@@ -26,12 +27,19 @@ export class AdminTeamCreateComponent {
 
     save(): void {
         if (this.teamForm.invalid) {
+            this.errorMessage = 'Please fill in all required fields.';
             return;
         }
 
+        this.errorMessage = '';
         const teamData = this.teamForm.value;
-        this.teamsService.createTeam(teamData).subscribe(newTeam => {
-            this.dialogRef.close(newTeam);
+        this.teamsService.createTeam(teamData).subscribe({
+            next: (newTeam) => {
+                this.dialogRef.close(newTeam);
+            },
+            error: () => {
+                this.errorMessage = 'Failed to create team. Please try again.';
+            }
         });
     }
 

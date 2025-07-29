@@ -10,21 +10,21 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 
-import { AdminTeamsComponent } from './admin-dashboard/admin-teams.component';
-import { AdminTeamCreateComponent } from './admin-team-create/admin-team-create.component';
+import { TeamDashboardComponent } from './dashboard/team-dashboard.component';
+import { CreateTeamDialogComponent } from './create-team/create-team.component';
 import { TeamsService } from './teams-service';
 
 const routes: Routes = [
     {
         path: '',
-        component: AdminTeamsComponent
+        component: TeamDashboardComponent
     }
 ];
 
 @NgModule({
     declarations: [
-        AdminTeamsComponent,
-        AdminTeamCreateComponent
+        TeamDashboardComponent,
+        CreateTeamDialogComponent
     ],
     imports: [
         CommonModule,
@@ -43,7 +43,7 @@ const routes: Routes = [
         TeamsService
     ],
     entryComponents: [
-        AdminTeamCreateComponent
+        CreateTeamDialogComponent
     ]
 })
 export class AdminTeamsModule { }

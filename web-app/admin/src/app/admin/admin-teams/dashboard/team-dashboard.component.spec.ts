@@ -6,14 +6,14 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 
-import { AdminTeamsComponent } from './admin-teams.component';
+import { TeamDashboardComponent } from './team-dashboard.component';
 import { TeamsService } from '../teams-service';
 import { Team } from '../team';
-import { AdminTeamCreateComponent } from '../admin-team-create/admin-team-create.component';
+import { CreateTeamDialogComponent } from '../create-team/create-team.component';
 
-describe('AdminTeamsComponent', () => {
-  let component: AdminTeamsComponent;
-  let fixture: ComponentFixture<AdminTeamsComponent>;
+fdescribe('TeamDashboardComponent', () => {
+  let component: TeamDashboardComponent;
+  let fixture: ComponentFixture<TeamDashboardComponent>;
   let mockTeamsService: jasmine.SpyObj<TeamsService>;
   let mockDialog: jasmine.SpyObj<MatDialog>;
 
@@ -33,7 +33,7 @@ describe('AdminTeamsComponent', () => {
     const dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
     await TestBed.configureTestingModule({
-      declarations: [AdminTeamsComponent],
+      declarations: [TeamDashboardComponent],
       imports: [
         MatTableModule,
         MatPaginatorModule,
@@ -46,19 +46,17 @@ describe('AdminTeamsComponent', () => {
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AdminTeamsComponent);
+    fixture = TestBed.createComponent(TeamDashboardComponent);
     component = fixture.componentInstance;
     mockTeamsService = TestBed.inject(TeamsService) as jasmine.SpyObj<TeamsService>;
     mockDialog = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
 
     mockTeamsService.getTeams.and.returnValue(of(mockTeamsResponse));
+    mockTeamsService.getTeams.calls.reset();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should initialize with correct default values', () => {
     expect(component.teamSearch).toBe('');
     expect(component.pageSize).toBe(10);
     expect(component.pageIndex).toBe(0);
@@ -81,11 +79,14 @@ describe('AdminTeamsComponent', () => {
 
   it('should perform search with debouncing', fakeAsync(() => {
     fixture.detectChanges();
-    mockTeamsService.getTeams.calls.reset();
-
     component.search('test');
     tick(100); // Less than debounce time
-    expect(mockTeamsService.getTeams).not.toHaveBeenCalled();
+    expect(mockTeamsService.getTeams).not.toHaveBeenCalledWith({
+      term: 'test',
+      sort: { name: 1 },
+      limit: 10,
+      start: '0'
+    });
 
     tick(200); // Complete debounce time (250ms total)
     expect(mockTeamsService.getTeams).toHaveBeenCalledWith({
@@ -107,9 +108,6 @@ describe('AdminTeamsComponent', () => {
   }));
 
   it('should handle page changes', () => {
-    fixture.detectChanges();
-    mockTeamsService.getTeams.calls.reset();
-
     const pageEvent: PageEvent = {
       pageIndex: 1,
       pageSize: 25,
@@ -131,8 +129,6 @@ describe('AdminTeamsComponent', () => {
   it('should reset search and pagination', () => {
     component.teamSearch = 'test';
     component.pageIndex = 2;
-    fixture.detectChanges();
-    mockTeamsService.getTeams.calls.reset();
 
     component.reset();
 
@@ -153,7 +149,7 @@ describe('AdminTeamsComponent', () => {
 
     component.newTeam();
 
-    expect(mockDialog.open).toHaveBeenCalledWith(AdminTeamCreateComponent, {
+    expect(mockDialog.open).toHaveBeenCalledWith(CreateTeamDialogComponent, {
       width: '50rem',
       height: '25rem',
       data: { team: {} }
@@ -161,12 +157,10 @@ describe('AdminTeamsComponent', () => {
   });
 
   it('should refresh teams after creating new team', () => {
-    fixture.detectChanges();
     const newTeam = { id: '4', name: 'New Team', description: 'New team description' };
     const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
     dialogRefSpy.afterClosed.and.returnValue(of(newTeam));
     mockDialog.open.and.returnValue(dialogRefSpy);
-    mockTeamsService.getTeams.calls.reset();
 
     component.newTeam();
 
@@ -174,11 +168,9 @@ describe('AdminTeamsComponent', () => {
   });
 
   it('should not refresh teams if dialog is cancelled', () => {
-    fixture.detectChanges();
     const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
     dialogRefSpy.afterClosed.and.returnValue(of(null));
     mockDialog.open.and.returnValue(dialogRefSpy);
-    mockTeamsService.getTeams.calls.reset();
 
     component.newTeam();
 

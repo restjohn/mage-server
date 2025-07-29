@@ -24,7 +24,7 @@ import { AdminServiceComponent } from '../app/admin/admin-feeds/admin-service/ad
 import { AdminFeedEditComponent } from '../app/admin/admin-feeds/admin-feed/admin-feed-edit/admin-feed-edit.component';
 import { AuthenticationCreateComponent } from '../app/admin/admin-authentication/admin-authentication-create/admin-authentication-create.component';
 import { AdminEventFormPreviewComponent } from '../app/admin/admin-event/admin-event-form/admin-event-form-preview/admin-event-form-preview.component';
-import { AdminTeamsComponent } from '../app/admin/admin-teams/admin-dashboard/admin-teams.component';
+import { TeamDashboardComponent } from '../app/admin/admin-teams/dashboard/team-dashboard.component';
 
 require('angular-minicolors');
 require('select2');
@@ -64,7 +64,7 @@ app
   .directive('authenticationCreate', downgradeComponent({ component: AuthenticationCreateComponent }))
   .directive('contact', downgradeComponent({ component: ContactComponent }))
   .directive('adminEventFormPreview', downgradeComponent({ component: AdminEventFormPreviewComponent }))
-  .directive('adminTeams', downgradeComponent({ component: AdminTeamsComponent }));
+  .directive('adminTeams', downgradeComponent({ component: TeamDashboardComponent }));
 
 app
   .component('navbar', require('./navbar/navbar.component'))

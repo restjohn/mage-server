@@ -1,6 +1,9 @@
 <div class="admin-team-create">
     <h1 mat-dialog-title>New Team</h1>
     <div mat-dialog-content>
+        <div *ngIf="errorMessage" class="error-message" style="color: red; margin-bottom: 16px;">
+            {{ errorMessage }}
+        </div>
         <form [formGroup]="teamForm">
             <mat-form-field class="full-width">
                 <mat-label>Name</mat-label>

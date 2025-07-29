@@ -6,14 +6,14 @@ import { Team } from '../team';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 import { TeamsService } from '../teams-service';
-import { AdminTeamCreateComponent } from '../admin-team-create/admin-team-create.component';
+import { CreateTeamDialogComponent } from '../create-team/create-team.component';
 
 @Component({
   selector: 'mage-admin-teams',
-  templateUrl: './admin-teams.component.html',
-  styleUrls: ['./admin-teams.component.scss']
+  templateUrl: './team-dashboard.component.html',
+  styleUrls: ['./team-dashboard.component.scss']
 })
-export class AdminTeamsComponent implements OnInit, OnDestroy {
+export class TeamDashboardComponent implements OnInit, OnDestroy {
   teamSearch = '';
   teams: Team[] = [];
   totalTeams = 0;
@@ -97,7 +97,7 @@ export class AdminTeamsComponent implements OnInit, OnDestroy {
   }
 
   newTeam(): void {
-    const dialogRef = this.modal.open(AdminTeamCreateComponent, {
+    const dialogRef = this.modal.open(CreateTeamDialogComponent, {
       width: '50rem',
       height: '25rem',
       data: { team: {} }
