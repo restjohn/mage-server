@@ -112,6 +112,7 @@ export class TeamDashboardComponent implements OnInit, OnDestroy {
 
   gotoTeam(team: Team): void {
     // TODO: convert to this to using a router once upgrade is complete
-    window.location.href = `/#/home/teams/${team.id}`;
+    const baseUrl = window.location.href.split('#')[0];
+    window.location.href = `${baseUrl}#/home/teams/${team.id}`;
   }
 }
