@@ -4,8 +4,8 @@ export interface Team {
     id: ObjectId;
     name: string;
     description: string;
-    teamEventId: number;
-    userIds: ObjectId[];
-    acl: Records<ObjectId, string>;
-    permissions: string[];
+    teamEventId: number | string;
+    userIds?: ObjectId[];
+    acl?: Records<ObjectId, string>;
+    permissions?: string[];
 }

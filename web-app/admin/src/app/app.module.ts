@@ -134,7 +134,6 @@ import { AdminEventFormPreviewComponent } from './admin/admin-event/admin-event-
 import { AdminEventFormPreviewDialogComponent } from './admin/admin-event/admin-event-form/admin-event-form-preview/admin-event-form-preview-dialog.component';
 import { AdminMapComponent } from './admin/admin-map/admin-map.component';
 import { AdminTeamsModule } from './admin/admin-teams/admin-teams.module';
-import { PaginationTableComponent } from './core/pagination-table/pagination-table.component';
 
 @NgModule({
   declarations: [
@@ -189,8 +188,7 @@ import { PaginationTableComponent } from './core/pagination-table/pagination-tab
     AdminSettingsUnsavedComponent,
     AdminEventFormPreviewComponent,
     AdminEventFormPreviewDialogComponent,
-    AdminMapComponent,
-    PaginationTableComponent
+    AdminMapComponent
   ],
   imports: [
     CommonModule,
