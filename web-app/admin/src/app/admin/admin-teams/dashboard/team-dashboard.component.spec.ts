@@ -11,7 +11,7 @@ import { TeamsService } from '../teams-service';
 import { Team } from '../team';
 import { CreateTeamDialogComponent } from '../create-team/create-team.component';
 
-fdescribe('TeamDashboardComponent', () => {
+describe('TeamDashboardComponent', () => {
   let component: TeamDashboardComponent;
   let fixture: ComponentFixture<TeamDashboardComponent>;
   let mockTeamsService: jasmine.SpyObj<TeamsService>;
@@ -52,7 +52,6 @@ fdescribe('TeamDashboardComponent', () => {
     mockDialog = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
 
     mockTeamsService.getTeams.and.returnValue(of(mockTeamsResponse));
-    mockTeamsService.getTeams.calls.reset();
   });
 
   it('should create', () => {
