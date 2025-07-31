@@ -14,6 +14,7 @@ import { TeamDashboardComponent } from './dashboard/team-dashboard.component';
 import { CreateTeamDialogComponent } from './create-team/create-team.component';
 import { TeamsService } from './teams-service';
 import { TeamDetailsComponent } from './team-details/team-details.component';
+import { CoreModule } from '../../core/core.module';
 
 const routes: Routes = [
     {
@@ -31,6 +32,7 @@ const routes: Routes = [
     imports: [
         CommonModule,
         FormsModule,
+        CoreModule,
         ReactiveFormsModule,
         MatTableModule,
         MatPaginatorModule,

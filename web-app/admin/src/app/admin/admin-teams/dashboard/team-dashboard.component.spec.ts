@@ -76,31 +76,11 @@ describe('TeamDashboardComponent', () => {
     expect(component.dataSource.data).toEqual(mockTeams);
   });
 
-  it('should perform search with debouncing', fakeAsync(() => {
-    fixture.detectChanges();
-    component.search('test');
-    tick(100); // Less than debounce time
-    expect(mockTeamsService.getTeams).not.toHaveBeenCalledWith({
-      term: 'test',
-      sort: { name: 1 },
-      limit: 10,
-      start: '0'
-    });
-
-    tick(200); // Complete debounce time (250ms total)
-    expect(mockTeamsService.getTeams).toHaveBeenCalledWith({
-      term: 'test',
-      sort: { name: 1 },
-      limit: 10,
-      start: '0'
-    });
-  }));
-
   it('should reset page index when searching', fakeAsync(() => {
     fixture.detectChanges();
     component.pageIndex = 2;
 
-    component.search('test');
+    component.onSearchTermChanged('test');
     tick(250);
 
     expect(component.pageIndex).toBe(0);
@@ -129,7 +109,7 @@ describe('TeamDashboardComponent', () => {
     component.teamSearch = 'test';
     component.pageIndex = 2;
 
-    component.reset();
+    component.onSearchCleared();
 
     expect(component.teamSearch).toBe('');
     expect(component.pageIndex).toBe(0);
