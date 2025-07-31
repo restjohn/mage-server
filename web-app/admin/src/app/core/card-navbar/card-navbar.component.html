@@ -7,7 +7,8 @@
         <div class="navbar-form navbar-left search-container" *ngIf="isSearchable">
             <input type="text" class="form-control search-input" [placeholder]="searchPlaceholder"
                 [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange($event)">
-            <button type="button" class="btn clear-search-btn" (click)="clearSearch()">
+            <button type="button" class="btn clear-search-btn" (click)="clearSearch()"
+                *ngIf="searchTerm && searchTerm.trim()">
                 <i class="fa fa-times"></i>
             </button>
         </div>

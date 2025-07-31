@@ -4,6 +4,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TeamsService } from '../teams-service';
 import { Team } from '../team';
 
+/**
+ * Dialog component for creating new teams.
+ * Provides a form interface with validation for team name (required) and description (optional).
+ */
 @Component({
     selector: 'mage-admin-team-create',
     templateUrl: './create-team.component.html',
@@ -25,6 +29,10 @@ export class CreateTeamDialogComponent {
         });
     }
 
+    /**
+     * Handles form submission for creating a new team.
+     * Validates the form, creates the team via the teams service, and closes the dialog on success.
+     */
     save(): void {
         if (this.teamForm.invalid) {
             this.errorMessage = 'Please fill in all required fields.';
@@ -43,6 +51,9 @@ export class CreateTeamDialogComponent {
         });
     }
 
+    /**
+     * Closes the dialog without saving any data or making any changes.
+     */
     cancel(): void {
         this.dialogRef.close();
     }
