@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { TeamDashboardComponent } from './dashboard/team-dashboard.component';
 import { CreateTeamDialogComponent } from './create-team/create-team.component';
 import { TeamsService } from './teams-service';
+import { CoreModule } from '../../core/core.module';
 
 const routes: Routes = [
     {
@@ -29,6 +30,7 @@ const routes: Routes = [
     imports: [
         CommonModule,
         FormsModule,
+        CoreModule,
         ReactiveFormsModule,
         MatTableModule,
         MatPaginatorModule,

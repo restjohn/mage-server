@@ -4,9 +4,9 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Team } from '../team';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 import { TeamsService } from '../teams-service';
 import { CreateTeamDialogComponent } from '../create-team/create-team.component';
+import { CardActionButton } from '../../../core/card-navbar/card-navbar.component';
 
 @Component({
   selector: 'mage-admin-teams',
@@ -24,7 +24,8 @@ export class TeamDashboardComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<Team>();
   displayedColumns = ['name', 'description'];
 
-  private search$ = new Subject<string>();
+  actionButtons: CardActionButton[] = [{ label: 'New Team', type: 'primary', action: () => this.newTeam() }];
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -34,28 +35,6 @@ export class TeamDashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.fetchTeams();
-
-    this.search$.pipe(
-      debounceTime(250),
-      distinctUntilChanged(),
-      switchMap(searchTerm => {
-        this.pageIndex = 0;
-        return this.teamService.getTeams({
-          term: searchTerm,
-          sort: { name: 1 },
-          limit: this.pageSize,
-          start: String(this.pageIndex * this.pageSize)
-        });
-      }),
-      takeUntil(this.destroy$)
-    ).subscribe((results) => {
-      if (results?.length > 0) {
-        const teams = results[0];
-        this.teams = teams.items;
-        this.totalTeams = teams.totalCount;
-        this.dataSource.data = this.teams;
-      }
-    });
   }
 
   ngOnDestroy(): void {
@@ -85,12 +64,13 @@ export class TeamDashboardComponent implements OnInit, OnDestroy {
     this.fetchTeams();
   }
 
-  search(term: string): void {
+  onSearchTermChanged(term: string): void {
     this.teamSearch = term;
-    this.search$.next(term);
+    this.pageIndex = 0; // Reset to first page when searching
+    this.fetchTeams();
   }
 
-  reset(): void {
+  onSearchCleared(): void {
     this.teamSearch = '';
     this.pageIndex = 0;
     this.fetchTeams();
