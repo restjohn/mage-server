@@ -4,7 +4,7 @@ import { By } from '@angular/platform-browser';
 
 import { CardNavbarComponent, CardActionButton } from './card-navbar.component';
 
-fdescribe('CardNavbarComponent', () => {
+describe('CardNavbarComponent', () => {
   let component: CardNavbarComponent;
   let fixture: ComponentFixture<CardNavbarComponent>;
 
@@ -184,6 +184,11 @@ fdescribe('CardNavbarComponent', () => {
 
     it('should trigger clearSearch when clear button is clicked', () => {
       spyOn(component, 'clearSearch');
+
+      const searchInput = fixture.debugElement.query(By.css('.search-input'));
+      searchInput.nativeElement.value = 'test';
+      searchInput.nativeElement.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
 
       const clearButton = fixture.debugElement.query(By.css('.clear-search-btn'));
       clearButton.nativeElement.click();
