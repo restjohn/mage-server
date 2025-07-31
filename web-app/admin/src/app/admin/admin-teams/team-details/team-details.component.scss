@@ -1,0 +1,72 @@
+.admin-teams-table {
+    position: relative;
+    border: 1px solid #ccc;
+    border-top: 0;
+    height: 300px;
+}
+
+.admin-teams-table-content {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: auto;
+}
+
+.admin-teams-table-items {
+    padding: 10px;
+}
+
+.admin-teams-table-item {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.admin-teams-table-item:last-child {
+    border-bottom: none;
+}
+
+.admin-teams-user {
+    display: flex;
+    align-items: center;
+}
+
+.admin-teams-user-detail {
+    flex-grow: 1;
+}
+
+.admin-teams-table-item-icon {
+    font-size: 35px;
+    padding-right: 10px;
+    color: #999;
+}
+
+.admin-teams-pager {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.admin-teams-table-status {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, .8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.admin-teams-table-status-text {
+    font-size: 18px;
+    font-weight: 600;
+    padding-bottom: 10px;
+}
+
+.admin-teams-table-status-spinner {
+    font-size: 30px;
+}
