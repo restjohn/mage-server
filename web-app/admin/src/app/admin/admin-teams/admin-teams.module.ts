@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -15,13 +14,6 @@ import { CreateTeamDialogComponent } from './create-team/create-team.component';
 import { TeamsService } from './teams-service';
 import { TeamDetailsComponent } from './team-details/team-details.component';
 import { CoreModule } from '../../core/core.module';
-
-const routes: Routes = [
-    {
-        path: '',
-        component: TeamDashboardComponent
-    }
-];
 
 @NgModule({
     declarations: [
@@ -40,8 +32,7 @@ const routes: Routes = [
         MatDialogModule,
         MatFormFieldModule,
         MatInputModule,
-        MatButtonModule,
-        RouterModule.forChild(routes)
+        MatButtonModule
     ],
     providers: [
         TeamsService

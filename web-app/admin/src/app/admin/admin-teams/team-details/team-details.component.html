@@ -1,7 +1,8 @@
 <div class="admin-nav-gap">
     <div class="container-fluid">
         <ol class="breadcrumb">
-            <li><i class="fa fa-users admin-dashboard"></i><a [routerLink]="['/admin/teams']">Teams</a></li>
+            <li><i class="fa fa-users admin-dashboard"></i><a href="javascript:void(0);" (click)="goToTeams()">Teams</a>
+            </li>
             <li class="active">{{team?.name}}</li>
         </ol>
     </div>

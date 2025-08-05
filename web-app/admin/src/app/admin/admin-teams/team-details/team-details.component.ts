@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
-// import { ActivatedRoute, Router } from '@angular/router';
+import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
+import { Team, Event, UserService } from '../../../upgrade/ajs-upgraded-providers';
 
 interface Page<T> {
   items: T[];
@@ -14,16 +15,16 @@ interface User {
   email: string;
 }
 
-interface Team {
+interface TeamModel {
   id: string;
   name: string;
   description: string;
   userIds: string[];
   acl: any;
-  $save: (params: any, callback: (team: Team) => void) => void;
+  $save: (params: any, callback: (team: TeamModel) => void) => void;
 }
 
-interface Event {
+interface EventModel {
   id: string;
   name: string;
   description: string;
@@ -36,7 +37,7 @@ interface Event {
   styleUrls: ['./team-details.component.scss']
 })
 export class TeamDetailsComponent implements OnInit {
-  team: Team;
+  team: TeamModel;
   hasUpdatePermission = false;
   hasDeletePermission = false;
 
@@ -61,56 +62,54 @@ export class TeamDetailsComponent implements OnInit {
   };
   nonMemberSearchTerm: string;
 
-  teamEvents: Event[] = [];
-  nonTeamEvents: Event[] = [];
+  teamEvents: EventModel[] = [];
+  nonTeamEvents: EventModel[] = [];
   teamEventsPage = 0;
   nonTeamEventsPage = 0;
   eventsPerPage = 5;
   eventSearch: string;
   teamEventSearch: string;
 
-  filteredEvents: Event[] = [];
-  filteredNonTeamEvents: Event[] = [];
+  filteredEvents: EventModel[] = [];
+  filteredNonTeamEvents: EventModel[] = [];
 
   constructor(
-    // private route: ActivatedRoute,
-    // private router: Router,
+    private stateService: StateService,
     private dialog: MatDialog,
-    @Inject('Team') private Team: any,
-    @Inject('Event') private Event: any,
-    @Inject('UserService') private UserService: any
+    @Inject(Team) private Team: any,
+    @Inject(Event) private Event: any,
+    @Inject(UserService) private UserService: any
   ) { }
 
   ngOnInit(): void {
-    // this.route.paramMap.subscribe(params => {
-    //   const teamId = params.get('teamId');
-    //   if (teamId) {
-    //     this.Team.get({ id: teamId, populate: false }, (team: Team) => {
-    //       this.team = team;
+    // this.stateService.transitionTo('admin.teams');
+    const teamId = this.stateService.params.teamId;
+    if (teamId) {
+      this.Team.get({ id: teamId, populate: false }, (team: TeamModel) => {
+        this.team = team;
 
-    //       const myAccess = this.team.acl[this.UserService.myself.id];
-    //       const aclPermissions = myAccess ? myAccess.permissions : [];
+        const myAccess = this.team.acl[this.UserService.myself.id];
+        const aclPermissions = myAccess ? myAccess.permissions : [];
 
-    //       this.hasUpdatePermission = this.UserService.myself.role.permissions.includes('UPDATE_TEAM') || aclPermissions.includes('update');
-    //       this.hasDeletePermission = this.UserService.myself.role.permissions.includes('DELETE_TEAM') || aclPermissions.includes('delete');
-    //     });
+        this.hasUpdatePermission = this.UserService.myself.role.permissions.includes('UPDATE_TEAM') || aclPermissions.includes('update');
+        this.hasDeletePermission = this.UserService.myself.role.permissions.includes('DELETE_TEAM') || aclPermissions.includes('delete');
+      });
 
-    //     this.getMembersPage();
-    //     this.getNonMembersPage();
+      this.getMembersPage();
+      this.getNonMembersPage();
 
-    //     this.Event.query((events: Event[]) => {
-    //       this.teamEvents = events.filter(event => {
-    //         return event.teams.some(team => team.id === this.team.id);
-    //       });
+      this.Event.query((events: EventModel[]) => {
+        this.teamEvents = events.filter(event => {
+          return event.teams.some(team => team.id === this.team.id);
+        });
 
-    //       this.nonTeamEvents = events.filter(event => {
-    //         return !event.teams.some(team => team.id === this.team.id);
-    //       });
+        this.nonTeamEvents = events.filter(event => {
+          return !event.teams.some(team => team.id === this.team.id);
+        });
 
-    //       this.updateFilteredEvents();
-    //     });
-    //   }
-    // });
+        this.updateFilteredEvents();
+      });
+    }
   }
 
   getMembersPage(): void {
@@ -195,8 +194,12 @@ export class TeamDetailsComponent implements OnInit {
     this.getNonMembersPage();
   }
 
-  editTeam(team: Team): void {
-    // this.router.navigate(['/admin/teams', team.id, 'edit']);
+  editTeam(team: TeamModel): void {
+    this.stateService.go('admin.teams.edit', { teamId: team.id });
+  }
+
+  goToTeams(): void {
+    this.stateService.go('admin.teams');
   }
 
   addMember($event: MouseEvent, nonMember: User): void {
@@ -212,37 +215,37 @@ export class TeamDetailsComponent implements OnInit {
   }
 
   saveTeam(): void {
-    this.team.$save(null, (team: Team) => {
+    this.team.$save(null, (team: TeamModel) => {
       this.team = team;
       this.getMembersPage();
       this.getNonMembersPage();
     });
   }
 
-  editAccess(team: Team): void {
-    // this.router.navigate(['/admin/teams', team.id, 'access']);
+  editAccess(team: TeamModel): void {
+    this.stateService.go('admin.teams.access', { teamId: team.id });
   }
 
-  gotoEvent(event: Event): void {
-    // this.router.navigate(['/admin/events', event.id]);
+  gotoEvent(event: EventModel): void {
+    this.stateService.go('admin.events.detail', { eventId: event.id });
   }
 
   gotoUser(user: User): void {
-    // this.router.navigate(['/admin/users', user.id]);
+    this.stateService.go('admin.users.detail', { userId: user.id });
   }
 
-  addEventToTeam($event: MouseEvent, event: Event): void {
+  addEventToTeam($event: MouseEvent, event: EventModel): void {
     $event.stopPropagation();
-    this.Event.addTeam({ id: event.id }, this.team, (updatedEvent: Event) => {
+    this.Event.addTeam({ id: event.id }, this.team, (updatedEvent: EventModel) => {
       this.teamEvents.push(updatedEvent);
       this.nonTeamEvents = this.nonTeamEvents.filter(e => e.id !== updatedEvent.id);
       this.updateFilteredEvents();
     });
   }
 
-  removeEventFromTeam($event: MouseEvent, event: Event): void {
+  removeEventFromTeam($event: MouseEvent, event: EventModel): void {
     $event.stopPropagation();
-    this.Event.removeTeam({ id: event.id, teamId: this.team.id }, (updatedEvent: Event) => {
+    this.Event.removeTeam({ id: event.id, teamId: this.team.id }, (updatedEvent: EventModel) => {
       this.teamEvents = this.teamEvents.filter(e => e.id !== updatedEvent.id);
       this.nonTeamEvents.push(updatedEvent);
       this.updateFilteredEvents();
@@ -256,7 +259,7 @@ export class TeamDetailsComponent implements OnInit {
     // });
     // dialogRef.afterClosed().subscribe(result => {
     //   if (result) {
-    //     this.router.navigate(['/admin/teams']);
+    //     this.stateService.go('admin.teams');
     //   }
     // });
   }
@@ -278,7 +281,7 @@ export class TeamDetailsComponent implements OnInit {
     this.updateFilteredEvents();
   }
 
-  getPagedEvents(events: Event[], page: number): Event[] {
+  getPagedEvents(events: EventModel[], page: number): EventModel[] {
     const start = page * this.eventsPerPage;
     return events.slice(start, start + this.eventsPerPage);
   }
