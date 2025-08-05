@@ -123,6 +123,8 @@ export class ObservationEditComponent implements OnInit, OnChanges {
 
   formRemoveSnackbar: MatSnackBarRef<SimpleSnackBar>;
 
+  noGeometryLabel = 'No Geometry';
+
   constructor(
     sanitizer: DomSanitizer,
     matIconRegistry: MatIconRegistry,
@@ -219,10 +221,12 @@ export class ObservationEditComponent implements OnInit, OnChanges {
       Validators.required
     );
 
-    const formArray = new UntypedFormArray([]);
-    const observationForms = observation.properties.forms || [];
-    observationForms.forEach((observationForm) => {
-      const formDefinition = this.formDefinitions[observationForm.formId];
+    const noGeometryControl = new UntypedFormControl(!!observation.noGeometry);
+
+    const formArray = new UntypedFormArray([])
+    const observationForms = observation.properties.forms || []
+    observationForms.forEach(observationForm => {
+      const formDefinition = this.formDefinitions[observationForm.formId]
       const fieldGroup = new UntypedFormGroup({
         id: new UntypedFormControl(observationForm.id),
         formId: new UntypedFormControl(formDefinition.id),
@@ -250,6 +254,7 @@ export class ObservationEditComponent implements OnInit, OnChanges {
       eventId: new UntypedFormControl(observation.eventId),
       type: new UntypedFormControl(observation.type),
       geometry: geometryControl,
+      noGeometry: noGeometryControl,
       properties: new UntypedFormGroup({
         timestamp: timestampControl,
         forms: formArray,

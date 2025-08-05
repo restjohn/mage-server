@@ -13,7 +13,7 @@ export class ObservationService {
   constructor(
     private client: HttpClient,
     private localStorageService: LocalStorageService
-  ) {}
+  ) { }
 
   getId(eventId: number): Observable<any> {
     return this.client.post<any>(`/api/events/${eventId}/observations/id/`, {
@@ -50,12 +50,19 @@ export class ObservationService {
   saveObservationForEvent(event: MageEvent, observation: any): Observable<any> {
     return this.saveObservation(event, observation).pipe(
       map((observation) => {
-        return this.transformObservations(observation, event)[0];
+        return this.transformObservations(observation, event)[0]
       })
-    );
+    )
   }
 
   private saveObservation(event: MageEvent, observation: any): Observable<any> {
+    // If the noGemetry flag is set, override the geometry to a default point.
+    if (!!observation.noGeometry) {
+      observation.geometry = {
+        type: 'Point',
+        coordinates: [0, 0]
+      }
+    }
     if (observation.id) {
       return this.client.put<any>(
         `/api/events/${event.id}/observations/${observation.id}`,
