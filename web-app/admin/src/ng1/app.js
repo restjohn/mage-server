@@ -19,6 +19,7 @@ import { AdminSettingsComponent } from '../app/admin/admin-settings/admin-settin
 import { AdminAuthenticationComponent } from '../app/admin/admin-authentication/admin-authentication.component';
 import { AdminMapComponent } from '../app/admin/admin-map/admin-map.component';
 import { AdminFeedsComponent } from '../app/admin/admin-feeds/admin-feeds.component';
+import { AdminDashboardComponent } from '../app/admin/admin-dashboard/admin-dashboard';
 import { AdminFeedComponent } from '../app/admin/admin-feeds/admin-feed/admin-feed.component';
 import { AdminServiceComponent } from '../app/admin/admin-feeds/admin-service/admin-service.component'
 import { AdminFeedEditComponent } from '../app/admin/admin-feeds/admin-feed/admin-feed-edit/admin-feed-edit.component';

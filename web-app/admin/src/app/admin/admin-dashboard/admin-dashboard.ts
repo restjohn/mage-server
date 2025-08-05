@@ -8,7 +8,6 @@ import {
 import { Router } from '@angular/router';
 import * as _ from 'underscore';
 import * as moment from 'moment';
-
 import {
   UserService,
   DeviceService,
@@ -18,9 +17,12 @@ import {
   LayerService,
   UserPagingService
 } from 'admin/src/app/upgrade/ajs-upgraded-providers';
+import { AdminBreadcrumb } from '../admin-breadcrumb/admin-breadcrumb.model';
+import { User } from 'core-lib-src/user';
+import { Device, LoginPage } from 'admin/src/@types/dashboard/admin-dashboard';
 
 @Component({
-  selector: 'app-admin-dashboard',
+  selector: 'admin-dashboard',
   templateUrl: './admin-dashboard.html',
   styleUrls: ['./admin-dashboard.scss']
 })
@@ -28,11 +30,18 @@ export class AdminDashboardComponent implements OnInit {
   @Output() onUserActivated = new EventEmitter<any>();
   @Output() onDeviceEnabled = new EventEmitter<any>();
 
-  userSearch = '';
-  userState = 'inactive';
-  inactiveUsers: any[] = [];
+  breadcrumbs: AdminBreadcrumb[] = [{
+    title: 'Feeds',
+    icon: 'rss_feed'
+  }]
+
+  users: User[] = [];
+  userSearch: string = '';
+  userState: string = 'inactive';
+  inactiveUsers: User[] = [];
   stateAndData: any;
 
+  devices: Device[] = [];
   deviceSearch = '';
   deviceState = 'unregistered';
   unregisteredDevices: any[] = [];
@@ -45,7 +54,7 @@ export class AdminDashboardComponent implements OnInit {
     endDate: null
   };
 
-  loginPage: any;
+  loginPage: LoginPage;
   loginResultsLimit = 25;
   loginSearchResults: any[] = [];
   loginDeviceSearchResults: any[] = [];
@@ -59,6 +68,8 @@ export class AdminDashboardComponent implements OnInit {
   filter: any = {};
   user: any = null;
   device: any = null;
+
+  toggleFilters = false;
 
   constructor(
     private router: Router,
@@ -79,14 +90,17 @@ export class AdminDashboardComponent implements OnInit {
       this.unregisteredDevices = this.devicePagingService.devices(this.deviceStateAndData[this.deviceState]);
     });
 
-    this.eventService.count(data => this.eventCount = data.count);
-    this.layerService.count(data => this.layerCount = data.count);
+    console.log(this.eventService)
 
-    this.loginService.query({ limit: this.loginResultsLimit }).then(loginPage => {
+    this.loginService.query({ limit: this.loginResultsLimit }).then((loginPage: LoginPage) => {
       this.loginPage = loginPage;
       if (loginPage.logins.length) {
         this.firstLogin = loginPage.logins[0];
       }
+      loginPage.logins.forEach(login => {
+        this.users.push(login.user);
+        this.devices.push(login.device);
+      });
     });
 
     this.userPagingService.refresh(this.stateAndData).then(() => {
@@ -168,7 +182,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  searchLoginsAgainstDevices(searchString: string | null) {
+  searchLoginsAgainstDevices(searchString: string | number | null) {
     if (!searchString) searchString = '.*';
     return this.devicePagingService.search(this.deviceStateAndData['all'], searchString).then(devices => {
       this.loginDeviceSearchResults = devices.length ? devices : [{ userAgent: 'No Results Found' }];
@@ -181,9 +195,9 @@ export class AdminDashboardComponent implements OnInit {
     if (device.iconClass) return device.iconClass;
 
     const userAgent = (device.userAgent || "").toLowerCase();
-    if (device.appVersion === 'Web Client') return 'fa-desktop admin-desktop-icon-xs';
-    if (userAgent.includes("android")) return 'fa-android admin-android-icon-xs';
-    if (userAgent.includes("ios")) return 'fa-apple admin-apple-icon-xs';
+    if (device.appVersion === 'Web Client') return 'fa fa-desktop admin-desktop-icon-xs';
+    if (userAgent.includes("android")) return 'fa fa-android admin-android-icon-xs';
+    if (userAgent.includes("ios")) return 'fa fa-apple admin-apple-icon-xs';
     return 'fa-mobile admin-generic-icon-xs';
   }
 
@@ -234,6 +248,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   filterLogins() {
+    console.log(this.user)
     this.filter.user = this.user;
     this.filter.device = this.device;
     this.filter.startDate = this.login.startDate;
@@ -247,6 +262,24 @@ export class AdminDashboardComponent implements OnInit {
       this.showPrevious = false;
     });
   }
+
+onUserInputChange(value: string | User) {
+  let searchValue: string = typeof value === 'string' ? value : value?.displayName || '';
+  this.searchLoginsAgainstUsers(searchValue);
+}
+
+onDeviceInputChange(value: string | Device) {
+  let searchValue: string | number = typeof value === 'string' ? value : value?.uid || '';
+  this.searchLoginsAgainstDevices(searchValue);
+}
+
+displayUser(user: User): string {
+  return user && user.displayName ? user.displayName : '';
+}
+
+displayDevice(user: Device): string | number {
+  return user && user.uid ? user.uid : '';
+}
 
   dateFilterChanged() {
     this.filterLogins();

@@ -10,7 +10,7 @@ angular
   .component('admin', admin)
   .component('adminTab', adminTab)
   .component('mageAdminPluginTabContentBridge', adminPluginTabContentBridge)
-  .directive('mageAdminPluginTabContent', downgradeComponent({ component: AdminPluginTabContentComponent }));
+  .directive('mageAdminPluginTabContent', downgradeComponent({ component: AdminPluginTabContentComponent }))
 
 require('./users');
 require('./devices');

@@ -1,141 +1,194 @@
+<!-- Dashboard Breadcrumbs -->
 <div class="admin-nav-gap">
-  <mat-toolbar color="primary">
+  <mat-toolbar class="breadcrumbs-toolbar" color="transparent">
     <span><mat-icon>dashboard</mat-icon>&nbsp;Dashboard</span>
   </mat-toolbar>
 </div>
 
+<!-- Main Admin Content -->
 <div class="admin-content p-4">
-  <mat-card class="mb-4">
-    <mat-card-title>
-      MAGE Access
-    </mat-card-title>
-
+  <!-- Top Summary Card -->
+  <mat-card class="mb-4 top-card">
     <div fxLayout="row" fxLayoutGap="24px" fxLayoutAlign="start stretch">
+      <div class="top-row">
+        <!-- Inactive Users -->
+        <div class="inactive-users">
+          <mat-card>
+            <mat-card-title>
+              <span class="title-with-badge">
+                Inactive Users
+                <span matBadge="{{ count() }}" matBadgeColor="accent" matBadgeOverlap="false" class="inline-badge"></span>
+              </span>
+            </mat-card-title>
+            <div class="search-wrapper">
+              <mat-form-field class="w-100 mb-3">
+                <mat-label>Search</mat-label>
+                <input matInput [(ngModel)]="userSearch" (ngModelChange)="search()" />
+              </mat-form-field>
+            </div>
+            <mat-list>
+              <mat-list-item *ngFor="let user of inactiveUsers" (click)="gotoUser(user)" class="clickable">
+                <mat-icon matListIcon>person</mat-icon>
+                <div matLine>{{ user.displayName }}</div>
+                <button mat-mini-button color="primary" *ngIf="hasPermission('UPDATE_USER')" (click)="activateUser($event, user)">
+                  <mat-icon>check</mat-icon>
+                  <span>Activate</span>
+                </button>
+              </mat-list-item>
+            </mat-list>
 
-      <!-- Inactive Users Section -->
-      <div fxFlex="50">
-        <mat-card>
-          <mat-card-title>
-            Inactive Users
-            <sup [matBadge]="count()" matBadgeColor="accent"></sup>
-          </mat-card-title>
+            <div class="pagination-controls">
+              <button mat-button (click)="previous()" [disabled]="!hasPrevious()">← Previous User</button>
+              <button mat-button (click)="next()" [disabled]="!hasNext()">Next User →</button>
+            </div>
+          </mat-card>
+        </div>
 
-          <mat-form-field appearance="fill" class="w-100 mb-3">
-            <mat-label>Search</mat-label>
-            <input matInput [(ngModel)]="userSearch" (ngModelChange)="search()" />
-          </mat-form-field>
+        <!-- Unregistered Devices -->
+        <div class="unregistered-devices">
+          <mat-card>
+            <mat-card-title>
+              <span class="title-with-badge">
+                Unregistered Devices
+                <span matBadge="{{ deviceCount() }}" matBadgeColor="accent" matBadgeOverlap="false" class="inline-badge"></span>
+              </span>
+            </mat-card-title>
 
-          <mat-list>
-            <mat-list-item *ngFor="let user of inactiveUsers" (click)="gotoUser(user)" class="clickable">
-              <mat-icon matListIcon>person</mat-icon>
-              <div matLine>{{ user.displayName }}</div>
-              <button mat-mini-button color="primary" *ngIf="hasPermission('UPDATE_USER')" (click)="activateUser($event, user)">
-                <mat-icon>check</mat-icon> Activate
-              </button>
-            </mat-list-item>
-          </mat-list>
+            <div class="search-wrapper">
+              <mat-form-field class="w-100 mb-3">
+                <mat-label>Search</mat-label>
+                <input matInput [(ngModel)]="deviceSearch" (ngModelChange)="searchDevices()" />
+              </mat-form-field>
+            </div>
+            <mat-list>
+              <mat-list-item *ngFor="let d of unregisteredDevices" (click)="gotoDevice(d)" class="clickable">
+                <mat-icon matListIcon [ngClass]="iconClass(d)"></mat-icon>
+                <div matLine *ngIf="d.user">{{ d.user.displayName }}</div>
+                <div matLine class="text-muted" *ngIf="d.user">({{ d.uid }})</div>
+                <button mat-mini-button color="primary" *ngIf="hasPermission('UPDATE_DEVICE')" (click)="registerDevice($event, d)">
+                  <mat-icon>check</mat-icon> Register
+                </button>
+              </mat-list-item>
+            </mat-list>
 
-          <div class="d-flex justify-content-end mt-3">
-            <button mat-button (click)="previous()" [disabled]="!hasPrevious()">← Previous User</button>
-            <button mat-button (click)="next()" [disabled]="!hasNext()">Next User →</button>
-          </div>
-        </mat-card>
-      </div>
-
-      <!-- Unregistered Devices Section -->
-      <div fxFlex="50">
-        <mat-card>
-          <mat-card-title>
-            Unregistered Devices
-            <sup [matBadge]="deviceCount()" matBadgeColor="accent"></sup>
-          </mat-card-title>
-
-          <mat-form-field appearance="fill" class="w-100 mb-3">
-            <mat-label>Search</mat-label>
-            <input matInput [(ngModel)]="deviceSearch" (ngModelChange)="searchDevices()" />
-          </mat-form-field>
-
-          <mat-list>
-            <mat-list-item *ngFor="let d of unregisteredDevices" (click)="gotoDevice(d)" class="clickable">
-              <mat-icon matListIcon [ngClass]="iconClass(d)"></mat-icon>
-              <div matLine *ngIf="d.user">{{ d.user.displayName }}</div>
-              <div matLine class="text-muted" *ngIf="d.user">({{ d.uid }})</div>
-              <button mat-mini-button color="primary" *ngIf="hasPermission('UPDATE_DEVICE')" (click)="registerDevice($event, d)">
-                <mat-icon>check</mat-icon> Register
-              </button>
-            </mat-list-item>
-          </mat-list>
-
-          <div class="d-flex justify-content-end mt-3">
-            <button mat-button (click)="previousDevice()" [disabled]="!hasPreviousDevice()">← Previous Device</button>
-            <button mat-button (click)="nextDevice()" [disabled]="!hasNextDevice()">Next Device →</button>
-          </div>
-        </mat-card>
+            <div class="pagination-controls">
+              <button mat-button (click)="previousDevice()" [disabled]="!hasPreviousDevice()">← Previous Device</button>
+              <button mat-button (click)="nextDevice()" [disabled]="!hasNextDevice()">Next Device →</button>
+            </div>
+          </mat-card>
+        </div>
       </div>
     </div>
   </mat-card>
 
   <!-- Logins Section -->
-  <mat-card class="mt-5">
-    <mat-card-title>Logins</mat-card-title>
+  <mat-card class="mt-5 logins">
+    <div class="logins-header">
+      <mat-card-title>Logins</mat-card-title>
+    </div>
+    
+    <!-- Filter Toggle Button above the filter bar -->
+    <div class="filter-toggle-wrapper">
+      <button mat-stroked-button color="primary" (click)="toggleFilters = !toggleFilters" [attr.aria-expanded]="toggleFilters">
+        <mat-icon>{{ toggleFilters ? 'close' : 'filter_list' }}</mat-icon>
+        {{ toggleFilters ? 'Hide Filters' : 'Show Filters' }}
+      </button>
+    </div>
 
-    <div fxLayout="row" fxLayoutGap="24px" fxLayoutAlign="start stretch">
-      <mat-form-field appearance="fill" fxFlex>
+    <!-- Filter Bar -->
+    <div class="filter-bar" [ngClass]="{ 'expanded': toggleFilters }">
+      <mat-form-field>
         <mat-label>Filter on User</mat-label>
-        <input matInput [matAutocomplete]="userAuto" [(ngModel)]="user" (ngModelChange)="filterLogins()" />
-        <mat-autocomplete #userAuto="matAutocomplete">
+        <input
+          type="text"
+          matInput
+          [matAutocomplete]="userAuto"
+          [(ngModel)]="user"
+          (ngModelChange)="onUserInputChange($event)"
+        />
+        <mat-autocomplete #userAuto="matAutocomplete" (optionSelected)="filterLogins()" [displayWith]="displayUser">
           <mat-option *ngFor="let u of loginSearchResults" [value]="u">
             {{ u.displayName }}
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
 
-      <mat-form-field appearance="fill" fxFlex>
+      <mat-form-field>
         <mat-label>Filter on Device</mat-label>
-        <input matInput [matAutocomplete]="deviceAuto" [(ngModel)]="device" (ngModelChange)="filterLogins()" />
-        <mat-autocomplete #deviceAuto="matAutocomplete">
+        <mat-select [(ngModel)]="device" (selectionChange)="filterLogins()" multiple>
           <mat-option *ngFor="let d of loginDeviceSearchResults" [value]="d">
-            {{ d.uid }}
+            {{ d.userAgent }}
           </mat-option>
-        </mat-autocomplete>
+        </mat-select>
       </mat-form-field>
 
-      <mat-form-field appearance="fill">
+      <mat-form-field>
         <mat-label>Start Date</mat-label>
         <input matInput [matDatepicker]="startPicker" [(ngModel)]="login.startDate" (dateChange)="dateFilterChanged()" />
         <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
         <mat-datepicker #startPicker></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field appearance="fill">
+      <mat-form-field>
         <mat-label>End Date</mat-label>
         <input matInput [matDatepicker]="endPicker" [(ngModel)]="login.endDate" (dateChange)="dateFilterChanged()" />
         <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
         <mat-datepicker #endPicker></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field appearance="fill">
-        <mat-label>Results</mat-label>
-        <mat-select [(ngModel)]="loginResultsLimit" (selectionChange)="loginResultsLimitChanged()">
-          <mat-option *ngFor="let opt of [10, 25, 50, 100]" [value]="opt">{{ opt }}</mat-option>
-        </mat-select>
-      </mat-form-field>
+      <div class="results-select">
+        <mat-form-field>
+          <mat-label>Results</mat-label>
+          <mat-select [(ngModel)]="loginResultsLimit" (selectionChange)="loginResultsLimitChanged()">
+            <mat-option *ngFor="let opt of [10, 25, 50, 100]" [value]="opt">{{ opt }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
     </div>
 
-    <mat-list class="mt-4">
-      <mat-list-item *ngFor="let login of loginPage?.logins">
-        <mat-icon matListIcon [ngClass]="iconClass(login.device)"></mat-icon>
-        <div matLine>
-          <a (click)="gotoUser(login.user)">{{ login.user.displayName }}</a>
-          <span class="muted">(<a (click)="gotoDevice(login.device)">{{ login.device.uid }}</a>)</span>
-        </div>
-        <div matLine>
-          {{ login.timestamp | date:'short' }} ({{ login.timestamp | date:'shortTime' }})
-        </div>
-      </mat-list-item>
-    </mat-list>
+    <!-- Table Wrapper -->
+    <div class="table-wrapper">
+      <table mat-table [dataSource]="loginPage?.logins" class="mat-elevation-z1 full-width-table">
+        <!-- Icon Column -->
+        <ng-container matColumnDef="icon">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let login">
+            <mat-icon [ngClass]="iconClass(login.device)"></mat-icon>
+          </td>
+        </ng-container>
 
-    <div class="d-flex justify-content-end mt-3">
+        <!-- User Column -->
+        <ng-container matColumnDef="user">
+          <th mat-header-cell *matHeaderCellDef>User</th>
+          <td mat-cell *matCellDef="let login">
+            <a (click)="gotoUser(login.user)">{{ login.user.displayName }}</a>
+          </td>
+        </ng-container>
+
+        <!-- Device Column -->
+        <ng-container matColumnDef="device">
+          <th mat-header-cell *matHeaderCellDef>Device</th>
+          <td mat-cell *matCellDef="let login">
+            <a (click)="gotoDevice(login.device)">{{ login.device.uid }}</a>
+          </td>
+        </ng-container>
+
+        <!-- Timestamp Column -->
+        <ng-container matColumnDef="timestamp">
+          <th mat-header-cell *matHeaderCellDef>Timestamp</th>
+          <td mat-cell *matCellDef="let login">
+            {{ login.timestamp | date:'short' }}
+          </td>
+        </ng-container>
+
+        <!-- Table Rows -->
+        <tr mat-header-row *matHeaderRowDef="['icon', 'user', 'device', 'timestamp']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['icon', 'user', 'device', 'timestamp']"></tr>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-end mt-3 pagination-controls">
       <button mat-button (click)="pageLogin(loginPage.prev)" [disabled]="!showPrevious">← Previous</button>
       <button mat-button (click)="pageLogin(loginPage.next)" [disabled]="!showNext">Next →</button>
     </div>
