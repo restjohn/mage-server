@@ -1,13 +1,11 @@
-<!-- Dashboard Breadcrumbs -->
 <div class="admin-nav-gap">
   <mat-toolbar class="breadcrumbs-toolbar" color="transparent">
-    <span><mat-icon>dashboard</mat-icon>&nbsp;Dashboard</span>
+    <span>
+      <mat-icon>dashboard</mat-icon>&nbsp;Dashboard
+    </span>
   </mat-toolbar>
 </div>
-
-<!-- Main Admin Content -->
 <div class="admin-content p-4">
-  <!-- Top Summary Card -->
   <mat-card class="mb-4 top-card">
     <div fxLayout="row" fxLayoutGap="24px" fxLayoutAlign="start stretch">
       <div class="top-row">
@@ -15,9 +13,7 @@
         <div class="inactive-users">
           <mat-card>
             <mat-card-title>
-              <span class="title-with-badge">
-                Inactive Users
-                <span matBadge="{{ count() }}" matBadgeColor="accent" matBadgeOverlap="false" class="inline-badge"></span>
+              <span class="title-with-badge"> Inactive Users <span matBadge="{{ count() }}" matBadgeColor="accent" matBadgeOverlap="false" class="inline-badge"></span>
               </span>
             </mat-card-title>
             <div class="search-wrapper">
@@ -36,24 +32,19 @@
                 </button>
               </mat-list-item>
             </mat-list>
-
             <div class="pagination-controls">
               <button mat-button (click)="previous()" [disabled]="!hasPrevious()">← Previous User</button>
               <button mat-button (click)="next()" [disabled]="!hasNext()">Next User →</button>
             </div>
           </mat-card>
         </div>
-
         <!-- Unregistered Devices -->
         <div class="unregistered-devices">
           <mat-card>
             <mat-card-title>
-              <span class="title-with-badge">
-                Unregistered Devices
-                <span matBadge="{{ deviceCount() }}" matBadgeColor="accent" matBadgeOverlap="false" class="inline-badge"></span>
+              <span class="title-with-badge"> Unregistered Devices <span matBadge="{{ deviceCount() }}" matBadgeColor="accent" matBadgeOverlap="false" class="inline-badge"></span>
               </span>
             </mat-card-title>
-
             <div class="search-wrapper">
               <mat-form-field class="w-100 mb-3">
                 <mat-label>Search</mat-label>
@@ -63,14 +54,15 @@
             <mat-list>
               <mat-list-item *ngFor="let d of unregisteredDevices" (click)="gotoDevice(d)" class="clickable">
                 <mat-icon matListIcon [ngClass]="iconClass(d)"></mat-icon>
-                <div matLine *ngIf="d.user">{{ d.user.displayName }}</div>
-                <div matLine class="text-muted" *ngIf="d.user">({{ d.uid }})</div>
+                <div class="mat-line-horizontal">
+                  <span *ngIf="d.user">{{ d.user.displayName }}</span>
+                  <span class="text-muted">({{ d.uid }})</span>
+                </div>
                 <button mat-mini-button color="primary" *ngIf="hasPermission('UPDATE_DEVICE')" (click)="registerDevice($event, d)">
                   <mat-icon>check</mat-icon> Register
                 </button>
               </mat-list-item>
             </mat-list>
-
             <div class="pagination-controls">
               <button mat-button (click)="previousDevice()" [disabled]="!hasPreviousDevice()">← Previous Device</button>
               <button mat-button (click)="nextDevice()" [disabled]="!hasNextDevice()">Next Device →</button>
@@ -80,62 +72,54 @@
       </div>
     </div>
   </mat-card>
-
   <!-- Logins Section -->
   <mat-card class="mt-5 logins">
     <div class="logins-header">
       <mat-card-title>Logins</mat-card-title>
     </div>
-    
-    <!-- Filter Toggle Button above the filter bar -->
     <div class="filter-toggle-wrapper">
       <button mat-stroked-button color="primary" (click)="toggleFilters = !toggleFilters" [attr.aria-expanded]="toggleFilters">
         <mat-icon>{{ toggleFilters ? 'close' : 'filter_list' }}</mat-icon>
         {{ toggleFilters ? 'Hide Filters' : 'Show Filters' }}
       </button>
     </div>
-
     <!-- Filter Bar -->
     <div class="filter-bar" [ngClass]="{ 'expanded': toggleFilters }">
       <mat-form-field>
         <mat-label>Filter on User</mat-label>
-        <input
-          type="text"
-          matInput
-          [matAutocomplete]="userAuto"
-          [(ngModel)]="user"
-          (ngModelChange)="onUserInputChange($event)"
-        />
+        <input type="text" matInput [matAutocomplete]="userAuto" [(ngModel)]="user" (ngModelChange)="onUserInputChange($event)" />
+        <button mat-icon-button matSuffix *ngIf="user" aria-label="Clear" (click)="clearUserFilter()">
+          <mat-icon>close</mat-icon>
+        </button>
         <mat-autocomplete #userAuto="matAutocomplete" (optionSelected)="filterLogins()" [displayWith]="displayUser">
           <mat-option *ngFor="let u of loginSearchResults" [value]="u">
             {{ u.displayName }}
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
-
       <mat-form-field>
         <mat-label>Filter on Device</mat-label>
         <mat-select [(ngModel)]="device" (selectionChange)="filterLogins()" multiple>
           <mat-option *ngFor="let d of loginDeviceSearchResults" [value]="d">
-            {{ d.userAgent }}
+            {{ d.uid }} - {{ d.user?.displayName || 'Unknown User' }}
           </mat-option>
         </mat-select>
+        <button mat-icon-button matSuffix *ngIf="device?.length" aria-label="Clear" (click)="clearDeviceFilter()">
+          <mat-icon>close</mat-icon>
+        </button>
       </mat-form-field>
-
       <mat-form-field>
         <mat-label>Start Date</mat-label>
         <input matInput [matDatepicker]="startPicker" [(ngModel)]="login.startDate" (dateChange)="dateFilterChanged()" />
         <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
         <mat-datepicker #startPicker></mat-datepicker>
       </mat-form-field>
-
       <mat-form-field>
         <mat-label>End Date</mat-label>
         <input matInput [matDatepicker]="endPicker" [(ngModel)]="login.endDate" (dateChange)="dateFilterChanged()" />
         <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
         <mat-datepicker #endPicker></mat-datepicker>
       </mat-form-field>
-
       <div class="results-select">
         <mat-form-field>
           <mat-label>Results</mat-label>
@@ -145,8 +129,6 @@
         </mat-form-field>
       </div>
     </div>
-
-    <!-- Table Wrapper -->
     <div class="table-wrapper">
       <table mat-table [dataSource]="loginPage?.logins" class="mat-elevation-z1 full-width-table">
         <!-- Icon Column -->
@@ -156,7 +138,6 @@
             <mat-icon [ngClass]="iconClass(login.device)"></mat-icon>
           </td>
         </ng-container>
-
         <!-- User Column -->
         <ng-container matColumnDef="user">
           <th mat-header-cell *matHeaderCellDef>User</th>
@@ -164,7 +145,6 @@
             <a (click)="gotoUser(login.user)">{{ login.user.displayName }}</a>
           </td>
         </ng-container>
-
         <!-- Device Column -->
         <ng-container matColumnDef="device">
           <th mat-header-cell *matHeaderCellDef>Device</th>
@@ -172,7 +152,6 @@
             <a (click)="gotoDevice(login.device)">{{ login.device.uid }}</a>
           </td>
         </ng-container>
-
         <!-- Timestamp Column -->
         <ng-container matColumnDef="timestamp">
           <th mat-header-cell *matHeaderCellDef>Timestamp</th>
@@ -180,13 +159,11 @@
             {{ login.timestamp | date:'short' }}
           </td>
         </ng-container>
-
         <!-- Table Rows -->
         <tr mat-header-row *matHeaderRowDef="['icon', 'user', 'device', 'timestamp']"></tr>
         <tr mat-row *matRowDef="let row; columns: ['icon', 'user', 'device', 'timestamp']"></tr>
       </table>
     </div>
-
     <!-- Pagination -->
     <div class="d-flex justify-content-end mt-3 pagination-controls">
       <button mat-button (click)="pageLogin(loginPage.prev)" [disabled]="!showPrevious">← Previous</button>
