@@ -9,12 +9,15 @@ import { AppRoutingModule } from './routing.module';
 import { LocalStorageService } from './http/local-storage.service';
 import { TokenInterceptorService } from './http/token.interceptor';
 import { MageCommonModule } from '@ngageoint/mage.web-core-lib/common';
+import { settingsProvider } from 'admin/src/app/upgrade/ajs-upgraded-providers';
+import { UpgradeModule } from '@angular/upgrade/static';
 
 @NgModule({
   declarations: [
     AppComponent
   ],
   imports: [
+    UpgradeModule,
     AppRoutingModule,
     CommonModule,
     BrowserModule,
@@ -27,11 +30,15 @@ import { MageCommonModule } from '@ngageoint/mage.web-core-lib/common';
   providers: [
     LocalStorageService,
     TokenInterceptorService,
+    settingsProvider,
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptorService, multi: true }
   ]
 })
 export class AppModule implements DoBootstrap {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public ngDoBootstrap(_appRef: ApplicationRef): void { }
+  constructor(private upgrade: UpgradeModule) {}
+
+  public ngDoBootstrap(_appRef: ApplicationRef): void {
+    this.upgrade.bootstrap(document.body, ['hybridMage'], { strictDi: true });
+  }
 }
