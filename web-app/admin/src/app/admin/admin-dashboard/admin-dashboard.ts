@@ -60,7 +60,7 @@ export class AdminDashboardComponent implements OnInit {
   loginDeviceSearchResults: Device[] = [];
   firstLogin: Login;
   showPrevious: boolean = false;
-  showNext: boolean = true;
+  showNext: boolean = false;
 
   filter: LoginFilter = {};
   user: User = null;

@@ -26,7 +26,7 @@ import { AdminFeedEditComponent } from '../app/admin/admin-feeds/admin-feed/admi
 import { AuthenticationCreateComponent } from '../app/admin/admin-authentication/admin-authentication-create/admin-authentication-create.component';
 import { AdminEventFormPreviewComponent } from '../app/admin/admin-event/admin-event-form/admin-event-form-preview/admin-event-form-preview.component';
 import { TeamDashboardComponent } from '../app/admin/admin-teams/dashboard/team-dashboard.component';
-import { AdminDashboardComponent } from '../app/admin/admin-dashboard/admin-dashboard';
+
 
 require('angular-minicolors');
 require('select2');
