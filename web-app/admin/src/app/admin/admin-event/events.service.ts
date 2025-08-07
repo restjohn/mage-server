@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Team } from './team';
 import { User } from '@ngageoint/mage.web-core-lib/user';
 
 export interface SearchOptions {
@@ -17,11 +16,11 @@ export interface SearchOptions {
 @Injectable({
     providedIn: 'root'
 })
-export class TeamsService {
+export class EventsService {
 
     constructor(private http: HttpClient) { }
 
-    getTeams(options: SearchOptions): Observable<any> {
+    getEvents(options: SearchOptions): Observable<any> {
         let params = new HttpParams();
 
         if (options.populate !== undefined) {
@@ -43,19 +42,7 @@ export class TeamsService {
             params = params.set('start', options.start);
         }
 
-        return this.http.get('/api/teams', { params });
-    }
-
-    createTeam(teamData: Partial<Team>): Observable<Team> {
-        return this.http.post<Team>('/api/teams', teamData);
-    }
-
-    editTeam(id: string, teamData: Partial<Team>): Observable<Team> {
-        return this.http.put<Team>(`/api/teams/${id}`, teamData);
-    }
-
-    getTeamById(id: string): Observable<any> {
-        return this.http.get<Team>(`/api/teams/${id}`);
+        return this.http.get('/api/events', { params });
     }
 
     getNonMembers(options: SearchOptions): Observable<User[]> {
@@ -80,10 +67,6 @@ export class TeamsService {
             params = params.set('start', options.start);
         }
 
-        return this.http.get<User[]>(`/api/teams/${options.id}/nonMembers`, { params });
-    }
-
-    deleteTeam(id: string): Observable<any> {
-        return this.http.delete(`/api/teams/${id}`);
+        return this.http.get<User[]>(`/api/events/${options.id}/nonMembers`, { params });
     }
 }

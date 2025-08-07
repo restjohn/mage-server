@@ -1,0 +1,40 @@
+<div class="modal-header">
+    <h3 class="modal-title">Delete "{{team.name}}"</h3>
+</div>
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-12">
+            <p class="mb-3">Team "{{team.name}}" will be deleted.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="checkbox mb-3">
+                <label>
+                    <input type="checkbox" [(ngModel)]="deleteAllUsers"> Delete all users that are a part of this team.
+                </label>
+            </div>
+
+            <div class="mt-3 p-3 bg-danger-light border border-danger rounded" *ngIf="deleteAllUsers">
+                <h4 class="text-danger mb-3">Are you ABSOLUTELY sure?</h4>
+                <p class="mb-2">This will delete all users that are part of this team, regardless of if they are in
+                    other teams. This action <strong>CANNOT</strong> be undone.</p>
+                <p class="mb-3">Please type in the name of the team to confirm.</p>
+                <input type="text" class="form-control" [(ngModel)]="confirm.text" placeholder="Type team name here">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer d-flex justify-content-end">
+    <button class="btn btn-default me-2" (click)="cancel()">Cancel</button>
+    <button class="btn btn-danger" *ngIf="!deleteAllUsers" (click)="deleteTeam()">
+        <i class="icon-trash me-1"></i> Delete Team
+    </button>
+    <button class="btn btn-danger" *ngIf="deleteAllUsers" [disabled]="deleting || team.name !== confirm.text"
+        (click)="deleteTeam()">
+        <i class="fa me-1" [ngClass]="deleting ? 'fa-spinner fa-spin' : 'fa-trash'"></i> Delete Team and Users
+    </button>
+</div>

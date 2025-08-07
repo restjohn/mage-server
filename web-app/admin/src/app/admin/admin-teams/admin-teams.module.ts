@@ -12,14 +12,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { TeamDashboardComponent } from './dashboard/team-dashboard.component';
 import { CreateTeamDialogComponent } from './create-team/create-team.component';
 import { TeamsService } from './teams-service';
+import { EventsService } from '../admin-event/events.service';
 import { TeamDetailsComponent } from './team-details/team-details.component';
 import { CoreModule } from '../../core/core.module';
+import { DeleteTeamComponent } from './delete-team/delete-team.component';
 
 @NgModule({
     declarations: [
         TeamDashboardComponent,
         CreateTeamDialogComponent,
-        TeamDetailsComponent
+        TeamDetailsComponent,
+        DeleteTeamComponent
     ],
     imports: [
         CommonModule,
@@ -35,10 +38,12 @@ import { CoreModule } from '../../core/core.module';
         MatButtonModule
     ],
     providers: [
-        TeamsService
+        TeamsService,
+        EventsService
     ],
     entryComponents: [
-        CreateTeamDialogComponent
+        CreateTeamDialogComponent,
+        DeleteTeamComponent
     ]
 })
 export class AdminTeamsModule { }

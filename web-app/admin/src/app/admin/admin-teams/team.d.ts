@@ -5,7 +5,7 @@ export interface Team {
     name: string;
     description: string;
     teamEventId: number | string;
-    userIds?: ObjectId[];
+    users?: ObjectId[];
     acl?: Records<ObjectId, string>;
     permissions?: string[];
 }

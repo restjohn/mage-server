@@ -18,8 +18,10 @@
                 </div>
                 <div class="col-md-4">
                     <h2 *ngIf="hasUpdatePermission">
-                        <button class="btn btn-default pull-right" (click)="editTeam(team)"><i class="fa fa-edit"></i>
-                            Edit</button>
+                        <button class="btn btn-default pull-right" (click)="toggleEditDetails()">
+                            <i class="fa" [ngClass]="editingDetails ? 'fa-times' : 'fa-edit'"></i>
+                            {{editingDetails ? 'Cancel' : 'Edit'}}
+                        </button>
                         <button class="btn btn-default pull-right right-gap" (click)="editAccess(team)"><i
                                 class="fa fa-shield"></i> Access</button>
                     </h2>
@@ -33,19 +35,34 @@
 
                     <div class="row top-gap-l">
                         <div class="col-md-3">
-                            <span class="muted">Name:&nbsp;</span>
+                            <span class="muted">Name:</span>
                         </div>
                         <div class="col-md-9">
-                            <span>{{team.name}}</span>
+                            <span *ngIf="!editingDetails">{{team.name}}</span>
+                            <input *ngIf="editingDetails" type="text" class="form-control" [(ngModel)]="editForm.name"
+                                placeholder="Team name">
                         </div>
                     </div>
 
                     <div class="row top-gap-s bottom-gap">
                         <div class="col-md-3">
-                            <span class="muted">Description:&nbsp;</span>
+                            <span class="muted">Description:</span>
                         </div>
                         <div class="col-md-9">
-                            <span>{{team.description}}</span>
+                            <span *ngIf="!editingDetails">{{team.description}}</span>
+                            <textarea *ngIf="editingDetails" class="form-control" rows="3"
+                                [(ngModel)]="editForm.description" placeholder="Team description"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row top-gap-s" *ngIf="editingDetails">
+                        <div class="col-md-offset-3 col-md-9">
+                            <button class="btn btn-primary right-gap" (click)="saveTeamDetails()">
+                                <i class="fa fa-save"></i> Save
+                            </button>
+                            <button class="btn btn-default" (click)="cancelEditDetails()">
+                                <i class="fa fa-times"></i> Cancel
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -69,99 +86,12 @@
 
             <div class="row">
                 <div class="col-md-6 col-xs-12">
-
-                    <div *ngIf="hasUpdatePermission" class="bottom-gap-l">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <nav class="navbar navbar-default admin-dashboard-navbar">
-                                    <div class="container-fluid">
-                                        <div class="navbar-header">
-                                            <a class="navbar-brand">Add Team Member <sup><span
-                                                        class="badge">{{nonMembersPage.totalCount}}</span></sup></a>
-                                        </div>
-
-                                        <form class="navbar-form navbar-left">
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" placeholder="Search"
-                                                    [(ngModel)]="nonMemberSearchTerm"
-                                                    [ngModelOptions]="{standalone: true, debounce: 500}"
-                                                    (ngModelChange)="searchNonMember()">
-                                            </div>
-                                        </form>
-                                    </div>
-                                </nav>
-                            </div>
-                        </div>
-
-                        <div class="admin-table admin-teams-table">
-                            <div class="admin-teams-table-content">
-                                <div class="admin-teams-table-items">
-                                    <div class="admin-teams-table-item" *ngFor="let user of nonMembersPage.items">
-                                        <div class="row pointer" (click)="gotoUser(user)">
-                                            <div class="admin-teams-user">
-                                                <!-- <user-avatar class="right-gap" [user]="user" [avatarWidth]="40"
-                                                    [avatarHeight]="40"></user-avatar> -->
-                                                <div class="admin-teams-user-detail">
-                                                    <div class="strong right-gap">
-                                                        <span class="right-gap">{{user.displayName}}</span>
-                                                        <span class="muted">({{user.username}})</span>
-                                                    </div>
-                                                    <div class="muted">{{user.email}}</div>
-                                                </div>
-                                                <a class="btn btn-xs btn-success" (click)="addMember($event, user)">Add
-                                                    Member</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <ul class="pager pull-right admin-teams-pager">
-                                            <li [ngClass]="{'disabled': !hasPreviousNonMember()}">
-                                                <a href="javascript:void(0);" (click)="previousNonMemberPage()">&larr;
-                                                    Previous</a>
-                                            </li>
-                                            <li [ngClass]="{'disabled': !hasNextNonMember()}">
-                                                <a href="javascript:void(0);"
-                                                    (click)="nextNonMemberPage()">Next&rarr;</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="admin-teams-table-status" *ngIf="loadingNonMembers">
-                                <div class="admin-teams-table-status-text">Loading</div>
-                                <div>
-                                    <i class="fa fa-spinner fa-spin admin-teams-table-status-spinner"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="row">
                         <div class="col-md-12">
-                            <nav class="navbar navbar-default admin-dashboard-navbar">
-                                <div class="container-fluid">
-                                    <div class="navbar-header">
-                                        <a class="navbar-brand">Team Members <sup><span
-                                                    class="badge">{{membersPage.totalCount}}</span></sup></a>
-                                    </div>
+                            <mage-card-navbar [title]="'Team Members'" [isSearchable]="true"
+                                [searchPlaceholder]="'Search teams...'" (searchTermChanged)="searchMembers()"
+                                (searchCleared)="searchMembers()" [actionButtons]="actionButtons"></mage-card-navbar>
 
-                                    <form class="navbar-form navbar-left">
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" placeholder="Search"
-                                                [(ngModel)]="memberSearchTerm"
-                                                [ngModelOptions]="{standalone: true, debounce: 500}"
-                                                (ngModelChange)="searchMembers()">
-                                        </div>
-                                    </form>
-                                    <div class="navbar-form navbar-right right-gap-s" *ngIf="hasUpdatePermission">
-                                        <button class="btn btn-default navbar-right"
-                                            (click)="edit = !edit">Edit</button>
-                                    </div>
-                                </div>
-                            </nav>
                         </div>
                     </div>
                     <div class="admin-table admin-teams-table">
@@ -211,65 +141,6 @@
 
                 <div class="col-md-6 col-xs-12">
                     <div class="row">
-                        <div class="col-md-12">
-                            <nav class="navbar navbar-default admin-dashboard-navbar">
-                                <div class="container-fluid">
-                                    <div class="navbar-header">
-                                        <a class="navbar-brand">Add Team to an Event <sup><span
-                                                    class="badge">{{filteredNonTeamEvents.length}}</span></sup></a>
-                                    </div>
-
-                                    <form class="navbar-form navbar-left">
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" placeholder="Search"
-                                                [(ngModel)]="eventSearch" [ngModelOptions]="{standalone: true}"
-                                                (ngModelChange)="onEventSearchChange()">
-                                        </div>
-                                    </form>
-                                </div>
-                            </nav>
-                        </div>
-                    </div>
-
-                    <div class="admin-table admin-teams-table">
-                        <div class="admin-teams-table-content">
-                            <div class="admin-teams-table-items">
-                                <div class="admin-teams-table-item"
-                                    *ngFor="let event of getPagedEvents(filteredNonTeamEvents, nonTeamEventsPage)">
-                                    <div class="row pointer" (click)="gotoEvent(event)">
-                                        <div class="admin-teams-user">
-                                            <i class="fa fa-calendar admin-teams-table-item-icon"></i>
-                                            <div class="admin-teams-user-detail">
-                                                <div class="strong right-gap">
-                                                    <span class="right-gap">{{event.name}}</span>
-                                                </div>
-                                                <div class="muted">{{event.description}}</div>
-                                            </div>
-                                            <a class="btn btn-xs btn-success"
-                                                (click)="addEventToTeam($event, event)">Add Event</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <ul class="pager pull-right admin-teams-pager">
-                                        <li [ngClass]="{'disabled': !canGoPreviousNonTeamEvents()}">
-                                            <a href="javascript:void(0);"
-                                                (click)="canGoPreviousNonTeamEvents() && (nonTeamEventsPage = nonTeamEventsPage - 1)">&larr;
-                                                Previous</a>
-                                        </li>
-                                        <li [ngClass]="{'disabled': !canGoNextNonTeamEvents()}">
-                                            <a href="javascript:void(0);"
-                                                (click)="canGoNextNonTeamEvents() && (nonTeamEventsPage = nonTeamEventsPage + 1)">Next&rarr;</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row top-gap-l">
                         <div class="col-md-12">
                             <nav class="navbar navbar-default admin-dashboard-navbar">
                                 <div class="container-fluid">

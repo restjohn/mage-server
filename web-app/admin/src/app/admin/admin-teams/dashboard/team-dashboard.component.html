@@ -7,11 +7,17 @@
 </div>
 
 <div class="container bottom-gap-l">
-    <mage-card-navbar [title]="'Teams'" [isSearchable]="true" [searchPlaceholder]="'Search teams...'"
-        [actionButtons]="actionButtons" (searchTermChanged)="onSearchTermChanged($event)"
-        (searchCleared)="onSearchCleared()"></mage-card-navbar>
+    <div class="page-header">
+        <h2 class="page-title">Teams</h2>
+        <p class="page-subtitle">Manage and organize your teams</p>
+    </div>
 
-    <div class="col-md-12 mat-elevation-z1 w-100">
+    <div class="navbar-container">
+        <mage-card-navbar [isSearchable]="true" [searchPlaceholder]="'Search teams...'" [actionButtons]="actionButtons"
+            (searchTermChanged)="onSearchTermChanged($event)" (searchCleared)="onSearchCleared()"></mage-card-navbar>
+    </div>
+
+    <div class="table-wrapper mat-elevation-z2">
         <table mat-table [class.mat-table]="true" [dataSource]="dataSource" class="mat-table-even-columns">
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef>Name</th>
