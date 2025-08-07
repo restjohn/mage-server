@@ -156,14 +156,16 @@
         <ng-container matColumnDef="user">
           <th mat-header-cell *matHeaderCellDef>User</th>
           <td mat-cell *matCellDef="let login">
-            <a *ngIf="login?.user" (click)="gotoUser(login.user)">{{ login.user.displayName || 'Unknown User' }}</a>
+            <a *ngIf="login?.user;else unknown_user" (click)="gotoUser(login.user)">{{ login.user.displayName }}</a>
+            <ng-template #unknown_user>{{ 'Unknown User' }}</ng-template>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="device">
           <th mat-header-cell *matHeaderCellDef>Device</th>
           <td mat-cell *matCellDef="let login">
-            <a *ngIf="login?.device" (click)="gotoDevice(login.device)">{{ login.device.uid || 'Unknown Device' }}</a>
+            <a *ngIf="login?.device;else unknown_device" (click)="gotoDevice(login.device)">{{ login.device.uid }}</a>
+            <ng-template #unknown_device>{{ 'Unknown Device' }}</ng-template>
           </td>
         </ng-container>
 
