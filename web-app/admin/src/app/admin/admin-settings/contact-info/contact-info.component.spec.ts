@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick } from "@angular/core/testing";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
 import { ContactInfoComponent } from "./contact-info.component";
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -74,12 +74,15 @@ describe('ContactInfoComponent', () => {
         });
     });
 
-    it('should handle error in ngOnInit', async () => {
+    it('should handle error in ngOnInit', fakeAsync(() => {
         const consoleSpy = spyOn(console, 'log');
         spyOn(settingsService, 'query').and.returnValue({ $promise: Promise.reject('Error!') });
-        await component.ngOnInit();
+    
+        component.ngOnInit();
+        tick(); // flush pending promises
+    
         expect(consoleSpy).toHaveBeenCalledWith('Error!');
-    });
+    }));
 
     it('should call save() from ngOnChanges if beginSave changes and form is dirty', () => {
         const saveSpy = spyOn(component, 'save');
