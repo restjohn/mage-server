@@ -1,7 +1,6 @@
-import { Component, Inject, Injector, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { ApiService } from '../api/api.service';
-import { Router } from '@angular/router';
-import { Settings } from 'admin/src/app/upgrade/ajs-upgraded-providers';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'about',
@@ -19,47 +18,29 @@ export class AboutComponent implements OnInit {
   mongoVersion: string
   adminPhone: string = null;
   adminEmail: string = null;
+  showDevContact: boolean = false;
 
   constructor(
-    private router: Router,
+    private _location: Location,
     @Inject(ApiService) public apiService: ApiService,
-    private injector: Injector,
   ) {}
 
   ngOnInit(): void {
     this.apiService.getApi().subscribe(api =>{
-      this.mageVersion = api.version;
-      this.apk = api.apk;
-      this.nodeVersion = api.environment.nodeVersion;
-      this.mongoVersion = api.environment.mongodbVersion;
+      console.log(api)
+      this.mageVersion = api?.version;
+      this.apk = api?.apk;
+      this.nodeVersion = api.environment?.nodeVersion;
+      this.mongoVersion = api.environment?.mongodbVersion;
+      if (api.contactInfo) {
+        this.adminEmail = api.contactInfo?.email ?? null;
+        this.adminPhone = api.contactInfo?.phone ?? null;
+        this.showDevContact = api.contactInfo?.showDevContact ?? false;
+      }
     })
-
-  const injSettings = this.injector.get(Settings);
-
-  console.log(injSettings)
-
-    const settingsPromise = injSettings.query().$promise;
-
-    settingsPromise.then(result => {
-        const settings: any = {};
-
-        result.forEach(element => {
-            settings[element.type] = {};
-            Object.keys(element).forEach(key => {
-                if (key !== 'type') {
-                    settings[element.type][key] = element[key];
-                }
-            });
-        });
-
-        this.adminEmail = settings.contactinfo ? settings.contactinfo.settings.email : null;
-        this.adminPhone = settings.contactinfo ? settings.contactinfo.settings.phone : null;
-    }).catch(err => {
-        console.log(err);
-    });
   }
 
   onBack(): void {
-    this.router.navigate(['home']);
+    this._location.back();
   }
 }

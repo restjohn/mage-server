@@ -85,18 +85,22 @@
     </p>
   </section>
 
-  <section class="section">
+  <section class="section" *ngIf="adminPhone || adminEmail">
     <h3 class="section-title">
       <mat-icon class="section-icon">contact_mail</mat-icon>
       Contact Us
     </h3>
     <div class="contact-info">
-      <div><mat-icon>phone</mat-icon> {{adminPhone}}</div>
-      <div><mat-icon>email</mat-icon> <a href="mailto:magesuitesupport@nga.mil">{{adminEmail}}</a></div>
+      <div *ngIf="adminPhone">
+        <mat-icon>phone</mat-icon> {{adminPhone}}
+      </div>
+      <div *ngIf="adminEmail">
+        <mat-icon>email</mat-icon> <a href="mailto:{{adminEmail}}">{{adminEmail}}</a>
+      </div>
     </div>
-  </section>
-
-  <section class="section">
+  </section>  
+  
+  <section class="section" *ngIf="showDevContact">
     <h3 class="section-title">
       <mat-icon class="section-icon">contact_mail</mat-icon>
       Contact the Development Team 
@@ -105,5 +109,5 @@
       <div><mat-icon>phone</mat-icon> +1-571-557-1121</div>
       <div><mat-icon>email</mat-icon> <a href="mailto:magesuitesupport@nga.mil">magesuitesupport@nga.mil</a></div>
     </div>
-  </section>
+  </section>  
 </div>
