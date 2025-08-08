@@ -1,5 +1,4 @@
-import { InjectionToken, Injector } from "@angular/core";
-import * as angular from "angular";
+import { InjectionToken } from "@angular/core";
 export const MapService = new InjectionToken<any>('MapService');
 export const UserService = new InjectionToken<any>('UserService');
 export const FilterService = new InjectionToken<any>('FilterService');
@@ -112,23 +111,14 @@ export const locationServiceProvider = {
   deps: ['$injector']
 };
 
-
-export function settingsFactory(injector: Injector): any {
-  return () => {
-    const $injector = angular.element(document.body).injector();
-
-    if (!$injector) {
-      throw new Error('AngularJS $injector is not available yet');
-    }
-
-    return $injector.get('Settings');
-  };
+export function settingsFactory(i: any): any {
+  return i.get('Settings');
 }
 
 export const settingsProvider = {
   provide: Settings,
   useFactory: settingsFactory,
-  deps: [Injector]
+  deps: ['$injector']
 };
 
 export function teamFactory(i: any): any {

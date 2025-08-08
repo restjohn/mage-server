@@ -31,6 +31,6 @@ class AngularModule { }
     AngularModule,
     RouterModule.forChild(routes)
   ],
-  exports: [RouterModule],
+  exports: [RouterModule]
 })
 export class AboutModule { }
