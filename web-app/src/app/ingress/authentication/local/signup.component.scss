@@ -100,3 +100,8 @@ mat-form-field {
 .actions__button {
   flex: 1
 }
+
+.tooltip-wide {
+  white-space: pre-line;
+  max-width: 300px;
+}
