@@ -1,40 +1,18 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
+import { PageEvent } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { UserService } from '../../../upgrade/ajs-upgraded-providers';
 import { TeamsService } from '../teams-service';
 import { EventsService } from '../../admin-event/events.service';
 import { Team } from '../team';
+import { User } from '@ngageoint/mage.web-core-lib/user';
+import { Event } from 'src/app/filter/filter.types';
 import { DeleteTeamComponent } from '../delete-team/delete-team.component';
 import { CardActionButton } from '../../../core/card-navbar/card-navbar.component';
-
-interface Page<T> {
-  items: T[];
-  totalCount: number;
-}
-
-interface User {
-  id: string;
-  displayName: string;
-  username: string;
-  email: string;
-}
-
-interface TeamModel {
-  id: string;
-  name: string;
-  description: string;
-  userIds: string[];
-  acl: any;
-  $save: (params: any, callback: (team: TeamModel) => void) => void;
-}
-
-interface EventModel {
-  id: string;
-  name: string;
-  description: string;
-  teams: any[];
-}
+import { SearchModalComponent, SearchModalData, SearchModalResult, SearchModalColumn } from '../search-modal/search-modal.component';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'mage-team-details',
@@ -42,13 +20,11 @@ interface EventModel {
   styleUrls: ['./team-details.component.scss']
 })
 export class TeamDetailsComponent implements OnInit {
-  team: TeamModel;
+  team: Team;
   teamId: string;
   hasUpdatePermission = false;
   hasDeletePermission = false;
 
-  edit = false;
-  editEvent = false;
   editingDetails = false;
 
   // Form values for editing
@@ -57,40 +33,61 @@ export class TeamDetailsComponent implements OnInit {
     description: ''
   };
 
-  loadingMembers = false;
+  loadingMembers = true;
   membersPageIndex = 0;
   membersPageSize = 5;
-  membersPage: Page<User> = {
-    items: [],
-    totalCount: 0
-  };
   memberSearchTerm: string;
 
-  loadingNonMembers = false;
-  nonMembersPageIndex = 0;
-  nonMembersPageSize = 5;
-  nonMembersPage: Page<User> = {
-    items: [],
-    totalCount: 0
-  };
-  nonMemberSearchTerm: string;
+  // Material table properties for members
+  membersDataSource = new MatTableDataSource<User>();
+  membersDisplayedColumns = ['content'];
+  totalMembers = 0;
+  pageSizeOptions = [5, 10, 25];
 
-  teamEvents: EventModel[] = [];
-  nonTeamEvents: EventModel[] = [];
+  loadingEvents = true;
+  teamEvents: Event[] = [];
   teamEventsPage = 0;
-  nonTeamEventsPage = 0;
   eventsPerPage = 5;
   eventSearch: string;
   teamEventSearch: string;
 
-  filteredEvents: EventModel[] = [];
-  filteredNonTeamEvents: EventModel[] = [];
+  filteredEvents: Event[] = [];
 
-  actionButtons: CardActionButton[] = [{
-    label: 'Edit',
-    action: () => this.edit = true,
-    type: 'primary'
-  }];
+  // Material table properties for events
+  eventsDataSource = new MatTableDataSource<Event>();
+  eventsDisplayedColumns = ['content'];
+  totalEvents = 0;
+  eventsPageSize = 5;
+
+  actionButtons: CardActionButton[] = [];
+  memberActionButtons: CardActionButton[] = [];
+  eventActionButtons: CardActionButton[] = [];
+
+  private updateActionButtons(): void {
+    this.actionButtons = [];
+    this.memberActionButtons = [];
+    this.eventActionButtons = [];
+
+    if (this.hasUpdatePermission) {
+      this.actionButtons.push({
+        label: this.editingDetails ? 'Cancel' : 'Edit',
+        action: () => this.toggleEditDetails(),
+        type: this.editingDetails ? 'primary' : 'secondary'
+      });
+
+      this.memberActionButtons.push({
+        label: 'Add Member',
+        action: () => this.addMember(),
+        type: 'primary'
+      });
+
+      this.eventActionButtons.push({
+        label: 'Add Event',
+        action: () => this.addEventToTeam(),
+        type: 'primary'
+      });
+    }
+  }
 
   constructor(
     private stateService: StateService,
@@ -103,8 +100,7 @@ export class TeamDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.teamId = this.stateService.params.teamId;
     if (this.teamId) {
-      this.teamService.getTeamById(this.teamId).subscribe((team: TeamModel) => {
-        console.log('Team details:', team);
+      this.teamService.getTeamById(this.teamId).subscribe((team: Team) => {
         this.team = team;
 
         const myAccess = this.team.acl[this.UserService.myself.id];
@@ -112,214 +108,236 @@ export class TeamDetailsComponent implements OnInit {
 
         this.hasUpdatePermission = this.UserService.myself.role.permissions.includes('UPDATE_TEAM') || aclPermissions.includes('update');
         this.hasDeletePermission = this.UserService.myself.role.permissions.includes('DELETE_TEAM') || aclPermissions.includes('delete');
+
+        this.updateActionButtons();
+        this.getMembers();
+        this.getTeamEvents();
       });
-
-      this.getMembersPage();
-      // TODO: Replace non members page with modal
-      this.getNonMembersPage();
-
-      // Fetch team events
-      this.eventsService.getEvents({
-        omit_event_teams: true,
-        term: '',
-        start: '0',
-        sort: { name: 1 },
-        id: this.teamId
-      }).subscribe((results) => {
-        if (results?.length > 0) {
-          console.log('Fetched events:', results);
-          // this.teamEvents = results[0].items;
-          // this.nonTeamEvents = results[1].items;
-          // this.updateFilteredEvents();
-        }
-      });
-      // this.Event.query((events: EventModel[]) => {
-      //   this.teamEvents = events.filter(event => {
-      //     return event.teams.some(team => team.id === this.team.id);
-      //   });
-
-      //   this.nonTeamEvents = events.filter(event => {
-      //     return !event.teams.some(team => team.id === this.team.id);
-      //   });
-
-      //   this.updateFilteredEvents();
-      // });
     }
   }
 
-  getMembersPage(): void {
-    // this.loadingMembers = true;
-    // this.Team.getMembers({
-    //   id: this.team.id,
-    //   page: this.membersPageIndex,
-    //   page_size: this.membersPageSize,
-    //   total: true,
-    //   term: this.memberSearchTerm
-    // }, (page: Page<User>) => {
-    //   this.loadingMembers = false;
-    //   this.membersPage = page;
-    // });
-  }
+  getMembers(): void {
+    if (!this.team?.id) {
+      return;
+    }
 
-  getNonMembersPage(): void {
-    this.loadingNonMembers = true;
-    this.teamService.getNonMembers({
-      id: this.teamId,
-      term: this.nonMemberSearchTerm
-    }).subscribe((results) => {
-      this.loadingNonMembers = false;
-      console.log('Non-members:', results);
-      // this.nonMembersPage = {
-      //   items: results,
-      //   totalCount: results.length
-      // };
+    this.teamService.getMembers({
+      id: this.team.id,
+      term: this.memberSearchTerm,
+      page: this.membersPageIndex,
+      page_size: this.membersPageSize
+    }).subscribe({
+      next: (results) => {
+        this.loadingMembers = false;
+        this.membersDataSource.data = results.items || [];
+        this.totalMembers = results.totalCount || 0;
+      },
+      error: (error) => {
+        this.loadingMembers = false;
+        console.error('Error fetching members:', error);
+        this.membersDataSource.data = [];
+        this.totalMembers = 0;
+      }
     });
   }
 
-  hasNextMember(): boolean {
-    return (this.membersPageIndex + 1) * this.membersPageSize < this.membersPage.totalCount;
+  getTeamEvents(): void {
+    this.eventsService.getEvents({
+      term: this.teamEventSearch,
+      teamId: this.teamId,
+      page: this.teamEventsPage,
+      page_size: this.eventsPerPage
+    }).subscribe((results) => {
+      this.loadingEvents = false;
+      this.teamEvents = results.items || [];
+      this.eventsDataSource.data = results.items || [];
+      this.totalEvents = results.totalCount || 0;
+    });
   }
 
-  hasPreviousMember(): boolean {
-    return this.membersPageIndex > 0 && this.membersPage.totalCount > 0;
+  getNonTeamEvents(): void {
+    this.eventsService.getEvents({
+      term: '',
+      teamId: this.teamId,
+      page: 0,
+      page_size: 1000
+    }).subscribe((results) => {
+    });
   }
 
-  nextMemberPage(): void {
-    // if (this.hasNextMember()) {
-    //   this.membersPageIndex++;
-    //   this.getMembersPage();
-    // }
+  onMembersPageChange(event: PageEvent): void {
+    this.membersPageSize = event.pageSize;
+    this.membersPageIndex = event.pageIndex;
+    this.getMembers();
   }
 
-  previousMemberPage(): void {
-    // if (this.hasPreviousMember()) {
-    //   this.membersPageIndex--;
-    //   this.getMembersPage();
-    // }
-  }
-
-  searchMembers(): void {
+  onMembersSearchChange(searchTerm: string = ''): void {
     this.membersPageIndex = 0;
-    this.getMembersPage();
-  }
-
-  hasNextNonMember(): boolean {
-    return (this.nonMembersPageIndex + 1) * this.nonMembersPageSize < this.nonMembersPage.totalCount;
-  }
-
-  hasPreviousNonMember(): boolean {
-    return this.nonMembersPageIndex > 0 && this.nonMembersPage.totalCount > 0;
-  }
-
-  nextNonMemberPage(): void {
-    if (this.hasNextNonMember()) {
-      this.nonMembersPageIndex++;
-      this.getNonMembersPage();
-    }
-  }
-
-  previousNonMemberPage(): void {
-    if (this.hasPreviousNonMember()) {
-      this.nonMembersPageIndex--;
-      this.getNonMembersPage();
-    }
-  }
-
-  searchNonMember(): void {
-    this.nonMembersPageIndex = 0;
-    this.getNonMembersPage();
+    this.memberSearchTerm = searchTerm;
+    this.getMembers();
   }
 
   toggleEditDetails(): void {
     if (!this.editingDetails) {
-      // Entering edit mode - populate form with current values
       this.editForm.name = this.team.name;
       this.editForm.description = this.team.description;
     }
     this.editingDetails = !this.editingDetails;
+    this.updateActionButtons();
   }
 
   saveTeamDetails(): void {
-    // Update the team object with form values
-    this.team.name = this.editForm.name;
-    this.team.description = this.editForm.description;
+    const name = this.editForm.name;
+    const description = this.editForm.description;
 
-    // Save the team
     this.teamService.editTeam(this.team.id, {
-      name: this.team.name,
-      description: this.team.description
+      name: name,
+      description: description
     }).subscribe((updatedTeam: Team) => {
-      // this.team = updatedTeam;
+      this.team = updatedTeam;
       this.editingDetails = false;
-      // Optionally, refresh members and non-members
-      this.getMembersPage();
-      this.getNonMembersPage();
+      this.updateActionButtons();
     });
-    // this.team.$save(null, (team: TeamModel) => {
-    //   this.team = team;
-    //   this.editingDetails = false;
-    // });
   }
 
   cancelEditDetails(): void {
     this.editingDetails = false;
-    // Reset form values
-    this.editForm.name = this.team.name;
-    this.editForm.description = this.team.description;
+    this.updateActionButtons();
+
+    this.editForm.name = this.team?.name;
+    this.editForm.description = this.team?.description;
   }
 
   goToTeams(): void {
     this.stateService.go('admin.teams');
   }
 
-  addMember($event: MouseEvent, nonMember: User): void {
-    $event.stopPropagation();
-    this.team.userIds.push(nonMember.id);
-    this.saveTeam();
+  addMember(): void {
+    const dialogRef = this.dialog.open(SearchModalComponent, {
+      panelClass: 'search-modal-dialog',
+      data: {
+        title: 'Add Members to Team',
+        searchPlaceholder: 'Search for users to add...',
+        type: 'members',
+        teamId: this.team?.id,
+        searchFunction: (searchTerm: string, page: number, pageSize: number): Observable<any> => {
+          return this.teamService.getNonMembers({
+            id: this.team?.id || '',
+            term: searchTerm,
+            page: page,
+            page_size: pageSize
+          });
+        },
+        columns: [
+          {
+            key: 'name',
+            label: 'Name',
+            displayFunction: (user: User) => user.username || 'Unknown',
+            width: '40%'
+          },
+          {
+            key: 'displayName',
+            label: 'Display Name',
+            displayFunction: (user: User) => user.displayName || 'Unknown',
+            width: '35%'
+          },
+          {
+            key: 'email',
+            label: 'Email',
+            displayFunction: (user: User) => user.email || 'No email provided',
+            width: '35%'
+          }
+        ] as SearchModalColumn[]
+      } as SearchModalData
+    });
+
+    dialogRef.afterClosed().subscribe((result: SearchModalResult) => {
+      if (result && result.selectedItem) {
+        console.log('Selected user to add:', result.selectedItem);
+        this.teamService.addUserToTeam(this.team.id, result.selectedItem).subscribe({
+          next: () => {
+            this.getMembers();
+          }
+        });
+      }
+    });
   }
 
   removeMember($event: MouseEvent, user: User): void {
     $event.stopPropagation();
-    this.team.userIds = this.team.userIds.filter(id => id !== user.id);
-    this.saveTeam();
-  }
-
-  saveTeam(): void {
-    this.team.$save(null, (team: TeamModel) => {
-      this.team = team;
-      this.getMembersPage();
-      this.getNonMembersPage();
+    this.teamService.removeMember(this.team.id, user.id).subscribe({
+      next: () => {
+        this.getMembers();
+      },
+      error: (error) => {
+        console.error('Error removing member:', error);
+      }
     });
   }
 
-  editAccess(team: TeamModel): void {
-    this.stateService.go('admin.teams.access', { teamId: team.id });
+  goToUserProfile(user: User): void {
+    this.stateService.go('admin.user', { userId: user.id });
   }
 
-  gotoEvent(event: EventModel): void {
-    this.stateService.go('admin.events.detail', { eventId: event.id });
+  goToAccess(): void {
+    this.stateService.go('admin.teamAccess', { teamId: this.team.id });
   }
 
-  gotoUser(user: User): void {
-    this.stateService.go('admin.users.detail', { userId: user.id });
+  addEventToTeam(): void {
+    const dialogRef = this.dialog.open(SearchModalComponent, {
+      panelClass: 'search-modal-dialog',
+      data: {
+        title: 'Add Events to Team',
+        searchPlaceholder: 'Search for events to add...',
+        type: 'events',
+        searchFunction: (searchTerm: string, page: number, pageSize: number): Observable<any> => {
+          return this.eventsService.getEvents({
+            term: searchTerm,
+            page: page,
+            page_size: pageSize,
+          });
+        },
+        columns: [
+          {
+            key: 'name',
+            label: 'Event Name',
+            displayFunction: (event: any) => event.name || 'Unnamed Event',
+            width: '50%'
+          },
+          {
+            key: 'description',
+            label: 'Description',
+            displayFunction: (event: any) => event.description || 'No description',
+            width: '50%'
+          }
+        ] as SearchModalColumn[]
+      } as SearchModalData
+    });
+
+    dialogRef.afterClosed().subscribe((result: SearchModalResult) => {
+      if (result && result.selectedItem) {
+        console.log('Selected event to add:', result.selectedItem);
+        // TODO: Implement adding events to team
+        // For now, just refresh the events list
+        this.getTeamEvents();
+      }
+    });
   }
 
-  addEventToTeam($event: MouseEvent, event: EventModel): void {
-    // $event.stopPropagation();
-    // this.Event.addTeam({ id: event.id }, this.team, (updatedEvent: EventModel) => {
-    //   this.teamEvents.push(updatedEvent);
-    //   this.nonTeamEvents = this.nonTeamEvents.filter(e => e.id !== updatedEvent.id);
-    //   this.updateFilteredEvents();
-    // });
+  removeEventFromTeam($event: MouseEvent, event: Event): void {
+    $event.stopPropagation();
+    this.eventsService.removeEvent(event.id.toString()).subscribe({
+      next: () => {
+        this.getTeamEvents();
+      },
+      error: (error) => {
+        console.error('Error removing event:', error);
+      }
+    });
   }
 
-  removeEventFromTeam($event: MouseEvent, event: EventModel): void {
-    // $event.stopPropagation();
-    // this.Event.removeTeam({ id: event.id, teamId: this.team.id }, (updatedEvent: EventModel) => {
-    //   this.teamEvents = this.teamEvents.filter(e => e.id !== updatedEvent.id);
-    //   this.nonTeamEvents.push(updatedEvent);
-    //   this.updateFilteredEvents();
-    // });
+  goToEventPage(event: Event): void {
+    this.stateService.go('admin.event', { eventId: event.id });
   }
 
   deleteTeam(): void {
@@ -335,41 +353,15 @@ export class TeamDetailsComponent implements OnInit {
     });
   }
 
-  updateFilteredEvents(): void {
-    this.filteredEvents = this.teamEvents.filter(event =>
-      this.teamEventSearch ? event.name.toLowerCase().includes(this.teamEventSearch.toLowerCase()) : true
-    );
-    this.filteredNonTeamEvents = this.nonTeamEvents.filter(event =>
-      this.eventSearch ? event.name.toLowerCase().includes(this.eventSearch.toLowerCase()) : true
-    );
+  onEventsPageChange(event: PageEvent): void {
+    this.eventsPageSize = event.pageSize;
+    this.teamEventsPage = event.pageIndex;
+    this.getTeamEvents();
   }
 
-  onEventSearchChange(): void {
-    this.updateFilteredEvents();
-  }
-
-  onTeamEventSearchChange(): void {
-    this.updateFilteredEvents();
-  }
-
-  getPagedEvents(events: EventModel[], page: number): EventModel[] {
-    const start = page * this.eventsPerPage;
-    return events.slice(start, start + this.eventsPerPage);
-  }
-
-  canGoPreviousNonTeamEvents(): boolean {
-    return this.nonTeamEventsPage > 0;
-  }
-
-  canGoNextNonTeamEvents(): boolean {
-    return this.nonTeamEventsPage < Math.ceil(this.filteredNonTeamEvents.length / this.eventsPerPage) - 1;
-  }
-
-  canGoPreviousTeamEvents(): boolean {
-    return this.teamEventsPage > 0;
-  }
-
-  canGoNextTeamEvents(): boolean {
-    return this.teamEventsPage < Math.ceil(this.filteredEvents.length / this.eventsPerPage) - 1;
+  onTeamEventSearchChange(searchTerm?: string): void {
+    this.teamEventsPage = 0;
+    this.teamEventSearch = searchTerm;
+    this.getTeamEvents();
   }
 }

@@ -9,15 +9,15 @@
 <div class="container bottom-gap-l">
     <div class="page-header">
         <h2 class="page-title">Teams</h2>
-        <p class="page-subtitle">Manage and organize your teams</p>
-    </div>
-
-    <div class="navbar-container">
-        <mage-card-navbar [isSearchable]="true" [searchPlaceholder]="'Search teams...'" [actionButtons]="actionButtons"
-            (searchTermChanged)="onSearchTermChanged($event)" (searchCleared)="onSearchCleared()"></mage-card-navbar>
     </div>
 
     <div class="table-wrapper mat-elevation-z2">
+        <div class="integrated-navbar">
+            <mage-card-navbar [isSearchable]="true" [searchPlaceholder]="'Search teams...'"
+                [actionButtons]="actionButtons" (searchTermChanged)="onSearchTermChanged($event)"
+                (searchCleared)="onSearchCleared()"></mage-card-navbar>
+        </div>
+
         <table mat-table [class.mat-table]="true" [dataSource]="dataSource" class="mat-table-even-columns">
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef>Name</th>

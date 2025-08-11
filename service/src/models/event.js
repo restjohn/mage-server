@@ -321,7 +321,7 @@ exports.count = function (options, callback) {
   });
 };
 
-exports.getEvents = function (options, callback) {
+exports.getEvents = async function (options, callback) {
   if (typeof options === 'function') {
     callback = options;
     options = {};
@@ -331,6 +331,14 @@ exports.getEvents = function (options, callback) {
   const filter = options.filter || {};
   if (filter.complete === true) query.complete = true;
   if (filter.complete === false) query.complete = { $ne: true };
+  if (filter.teamId) query.teamIds = filter.teamId;
+  if (filter.searchTerm) {
+    const searchRegex = new RegExp(filter.searchTerm, 'i');
+    query['$or'] = [
+      { name: searchRegex },
+      { description: searchRegex }
+    ];
+  }
 
   let projection = {};
   if (options.projection) {
@@ -340,6 +348,8 @@ exports.getEvents = function (options, callback) {
     projection.acl = true;
     projection.teamIds = true;
   }
+
+  const totalCount = await Event.count(query).exec();
 
   Event.find(query, projection, function (err, events) {
     if (err) return callback(err);
@@ -375,13 +385,16 @@ exports.getEvents = function (options, callback) {
 
       if (options.populate) {
         Event.populate(events, [{ path: 'teamIds' }, { path: 'layerIds' }], function (err, events) {
-          callback(err, events);
+          callback(err, events, totalCount);
         });
       } else {
-        callback(null, events);
+        callback(null, events, totalCount);
       }
     });
-  });
+  })
+    .sort({ name: 1, _id: 1 })
+    .limit(options.limit || 1000)
+    .skip(options.start * options.limit || 0);
 };
 
 exports.getById = function (id, options, callback) {

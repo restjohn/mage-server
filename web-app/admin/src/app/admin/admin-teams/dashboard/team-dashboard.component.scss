@@ -32,6 +32,18 @@
     }
 }
 
+// Integrated navbar within table
+.integrated-navbar {
+    background-color: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+
+    mage-card-navbar {
+        background: transparent;
+        box-shadow: none;
+        border-radius: 0;
+    }
+}
+
 // Modern table wrapper
 .table-wrapper {
     border-radius: 12px;

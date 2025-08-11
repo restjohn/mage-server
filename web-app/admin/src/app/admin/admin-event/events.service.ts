@@ -2,15 +2,21 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '@ngageoint/mage.web-core-lib/user';
+import { Event } from 'src/app/filter/filter.types';
 
 export interface SearchOptions {
-    populate?: boolean;
-    limit?: number;
-    sort?: { [key: string]: 1 | -1 };
-    omit_event_teams?: boolean;
     term?: string;
-    start?: string;
+    teamId?: string;
     id?: string;
+    page?: number;
+    page_size?: number;
+}
+
+interface EventsResponse {
+    pageSize?: number;
+    page?: number;
+    items: Event[];
+    totalCount?: number;
 }
 
 @Injectable({
@@ -20,53 +26,28 @@ export class EventsService {
 
     constructor(private http: HttpClient) { }
 
-    getEvents(options: SearchOptions): Observable<any> {
+    getEvents(options: SearchOptions): Observable<EventsResponse> {
         let params = new HttpParams();
 
-        if (options.populate !== undefined) {
-            params = params.set('populate', String(options.populate));
-        }
-        if (options.limit !== undefined) {
-            params = params.set('limit', String(options.limit));
-        }
-        if (options.sort !== undefined) {
-            params = params.set('sort', JSON.stringify(options.sort));
-        }
-        if (options.omit_event_teams !== undefined) {
-            params = params.set('omit_event_teams', String(options.omit_event_teams));
-        }
         if (options.term !== undefined) {
             params = params.set('term', options.term);
         }
-        if (options.start !== undefined) {
-            params = params.set('start', options.start);
+        if (options.page !== undefined) {
+            params = params.set('start', String(options.page));
+        }
+        if (options.page_size !== undefined) {
+            params = params.set('limit', String(options.page_size));
+        }
+        if (options.teamId !== undefined) {
+            params = params.set('teamId', options.teamId);
         }
 
-        return this.http.get('/api/events', { params });
+        params = params.set('includePagination', 'true');
+
+        return this.http.get<EventsResponse>('/api/events', { params });
     }
 
-    getNonMembers(options: SearchOptions): Observable<User[]> {
-        let params = new HttpParams();
-
-        if (options.populate !== undefined) {
-            params = params.set('populate', String(options.populate));
-        }
-        if (options.limit !== undefined) {
-            params = params.set('limit', String(options.limit));
-        }
-        if (options.sort !== undefined) {
-            params = params.set('sort', JSON.stringify(options.sort));
-        }
-        if (options.omit_event_teams !== undefined) {
-            params = params.set('omit_event_teams', String(options.omit_event_teams));
-        }
-        if (options.term !== undefined) {
-            params = params.set('term', options.term);
-        }
-        if (options.start !== undefined) {
-            params = params.set('start', options.start);
-        }
-
-        return this.http.get<User[]>(`/api/events/${options.id}/nonMembers`, { params });
+    removeEvent(eventId: string): Observable<void> {
+        return this.http.delete<void>(`/api/events/${eventId}`);
     }
 }

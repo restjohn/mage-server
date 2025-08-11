@@ -1,72 +1,609 @@
-.admin-teams-table {
+.page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .page-title {
+        flex: 1;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 0;
+        line-height: 1.2;
+        letter-spacing: -0.025em;
+    }
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+}
+
+.header-title-section {
+    flex: 1;
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 0 0 0.5rem 0;
+        line-height: 1.2;
+        letter-spacing: -0.025em;
+    }
+
+    .page-subtitle {
+        font-size: 1rem;
+        color: #666;
+        margin: 0;
+        line-height: 1.5;
+        font-weight: 400;
+    }
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-shrink: 0;
+
+    @media (max-width: 768px) {
+        justify-content: center;
+    }
+}
+
+// --- Responsive header alignment override to keep actions on same line ---
+.page-header,
+.header-content {
+    flex-direction: row !important;
+    align-items: center !important;
+}
+
+.page-header {
+    flex-wrap: nowrap;
+}
+
+.page-header .header-title-section {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.page-header .header-actions {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.page-header .header-actions .action-button {
+    flex: 0 0 auto;
+}
+
+// Allow wrapping only on very narrow screens
+@media (max-width: 480px) {
+    .page-header .header-actions {
+        flex-wrap: wrap;
+        white-space: normal;
+    }
+}
+
+// ---------------------------------------------------------------------
+
+// Modern details section
+.details-section {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+.details-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+}
+
+.details-form {
+    .form-field {
+        margin-bottom: 1.5rem;
+
+        .field-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .field-content {
+            .field-value {
+                font-size: 1rem;
+                color: #111827;
+                line-height: 1.5;
+            }
+
+            .form-input {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                border: 1px solid #d1d5db;
+                border-radius: 8px;
+                font-size: 0.875rem;
+                background-color: #f9fafb;
+                transition: all 0.2s ease;
+
+                &:focus {
+                    outline: none;
+                    border-color: #3b82f6;
+                    background-color: white;
+                    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+                }
+            }
+        }
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 2rem;
+    }
+}
+
+.danger-zone-card {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+
+    .danger-zone-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #dc2626;
+        margin: 0 0 1rem 0;
+    }
+
+    .danger-zone-description {
+        font-size: 0.875rem;
+        color: #7f1d1d;
+        margin: 0 0 1.5rem 0;
+        line-height: 1.5;
+        flex: 1;
+    }
+
+    .action-button.btn-danger {
+        align-self: flex-end;
+        margin-top: auto;
+    }
+}
+
+// Modern sections container
+.sections-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+
+    @media (max-width: 968px) {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+.section-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+}
+
+// Integrated navbar within table
+.integrated-navbar {
+    background-color: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+
+    mage-card-navbar {
+        background: transparent;
+        box-shadow: none;
+        border-radius: 0;
+    }
+}
+
+// Modern table styling
+.modern-table-content {
     position: relative;
-    border: 1px solid #ccc;
-    border-top: 0;
-    height: 300px;
+    min-height: 300px;
+    max-height: 500px;
+    display: flex;
+    flex-direction: column;
 }
 
-.admin-teams-table-content {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    overflow: auto;
+.table-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 1.5rem;
 }
 
-.admin-teams-table-items {
-    padding: 10px;
+.table-item {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 1rem 0;
+
+    &:last-child {
+        border-bottom: none;
+    }
 }
 
-.admin-teams-table-item {
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
-}
-
-.admin-teams-table-item:last-child {
-    border-bottom: none;
-}
-
-.admin-teams-user {
+.item-content {
     display: flex;
     align-items: center;
+    gap: 1rem;
+    transition: background-color 0.2s ease;
+    padding: 0.5rem;
+    border-radius: 8px;
+
+    &.pointer {
+        cursor: pointer;
+
+        &:hover {
+            background-color: #f8fafc;
+        }
+    }
 }
 
-.admin-teams-user-detail {
-    flex-grow: 1;
+.item-icon {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f4f6;
+    border-radius: 8px;
+    color: #6b7280;
+
+    i {
+        font-size: 1.25rem;
+    }
 }
 
-.admin-teams-table-item-icon {
-    font-size: 35px;
-    padding-right: 10px;
-    color: #999;
+.item-info {
+    flex: 1;
+    min-width: 0;
+
+    .item-primary {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.25rem;
+
+        .item-name {
+            margin-right: 0.5rem;
+        }
+
+        .item-username {
+            color: #6b7280;
+            font-weight: 400;
+        }
+    }
+
+    .item-secondary {
+        font-size: 0.75rem;
+        color: #6b7280;
+        line-height: 1.4;
+    }
 }
 
-.admin-teams-pager {
-    margin-top: 0;
-    margin-bottom: 10px;
+.item-actions {
+    flex-shrink: 0;
 }
 
-.admin-teams-table-status {
+// Modern pagination
+.modern-pagination {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.pagination-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    color: #374151;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+        background-color: #f9fafb;
+        border-color: #9ca3af;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: #f9fafb;
+    }
+
+    i {
+        font-size: 0.75rem;
+    }
+}
+
+// Modern loading overlay
+.loading-overlay {
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: rgba(255, 255, 255, .8);
+    background-color: rgba(255, 255, 255, 0.9);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    border-radius: 12px;
 }
 
-.admin-teams-table-status-text {
-    font-size: 18px;
+.loading-content {
+    text-align: center;
+
+    .loading-text {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .loading-spinner {
+        font-size: 2rem;
+        color: #3b82f6;
+    }
+}
+
+// Modern action buttons
+.action-button {
+    padding: 0.75rem 1.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    color: #374151;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &:hover:not(:disabled) {
+        background-color: #f9fafb;
+        border-color: #9ca3af;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        border-color: #3b82f6;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    // Small button variant
+    &.btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+    }
+
+    // Primary button variant
+    &.btn-primary {
+        background-color: #3b82f6;
+        border-color: #3b82f6;
+        color: white;
+
+        &:hover:not(:disabled) {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
+    }
+
+    // Danger button variant
+    &.btn-danger {
+        background-color: #ef4444;
+        border-color: #ef4444;
+        color: white;
+
+        &:hover:not(:disabled) {
+            background-color: #dc2626;
+            border-color: #dc2626;
+        }
+    }
+}
+
+// Material table row styling to match existing design
+.mat-table-no-header {
+    .mat-header-row {
+        display: none;
+    }
+}
+
+.table-row-content {
+    padding: 0 !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+
+    &:last-child {
+        border-bottom: none !important;
+    }
+}
+
+.row-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    // min-height: var(--row-height);
+
+    &:hover {
+        background-color: #f8fafc;
+    }
+}
+
+.row-icon {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f4f6;
+    border-radius: 8px;
+    color: #6b7280;
+
+    i {
+        font-size: 1.25rem;
+    }
+}
+
+.row-info {
+    flex: 0 1 auto;
+    width: 60%;
+
+    @media (max-width: 768px) {
+        max-width: 50%;
+        width: 50%;
+    }
+
+    .row-primary {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 12rem;
+    }
+
+    .row-secondary {
+        font-size: 0.75rem;
+        color: #6b7280;
+        line-height: 1.4;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 12rem;
+    }
+}
+
+.row-actions {
+    flex: 0 0 auto;
+    /* Ensure actions don't shrink and maintain their space */
+    min-width: fit-content;
+}
+
+// Section table title styling
+.section-table-title {
+    font-size: 1rem;
     font-weight: 600;
-    padding-bottom: 10px;
+    padding: 1rem 1.5rem 0.5rem 1.5rem;
+    color: #111827;
 }
 
-.admin-teams-table-status-spinner {
-    font-size: 30px;
+// Table wrapper and fixed-height table area
+.table-wrapper {
+    --row-height: 73px;
+    --min-page-size: 5;
+    --base-table-height: calc(var(--row-height) * var(--min-page-size));
+
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+// Scrollable viewport for the table contents with fixed height
+.table-scroll {
+    height: var(--base-table-height);
+    max-height: var(--base-table-height);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+// Reset mat-table sizing; the scroll container controls overflow/height
+.table-wrapper .mat-table {
+    display: table; // use Material default table layout
+    width: 100%;
+    height: auto; // let content define intrinsic height
+    overflow: visible; // scrolling handled by parent .table-scroll
+}
+
+// Ensure paginator is always visible and positioned correctly
+.table-wrapper mat-paginator {
+    flex-shrink: 0; // prevent paginator from being compressed
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+// Empty state styles
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    min-height: 200px;
+
+    .empty-state-content {
+        text-align: center;
+
+        .empty-state-icon {
+            font-size: 3rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .empty-state-text {
+            font-size: 1.1rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+    }
 }

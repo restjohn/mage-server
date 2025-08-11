@@ -8,196 +8,190 @@
     </div>
 </div>
 
-<div class="container-fluid bottom-gap-l">
-    <div class="row">
-        <div class="col-md-offset-1 col-md-10" *ngIf="team">
+<div class="container bottom-gap-l" *ngIf="team">
+    <div class="page-header">
+        <div class="header-title-section">
+            <h2 class="page-title">{{team.name}}</h2>
+        </div>
+        <div class="header-actions" *ngIf="hasUpdatePermission">
+            <button class="action-button" (click)="goToAccess()">
+                <i class="fa" [ngClass]="'fa-shield'"></i>
+                Access
+            </button>
+            <button class="action-button" [ngClass]="editingDetails ? 'btn-primary' : ''" (click)="toggleEditDetails()">
+                <i class="fa" [ngClass]="editingDetails ? 'fa-times' : 'fa-edit'"></i>
+                {{editingDetails ? 'Cancel' : 'Edit'}}
+            </button>
+        </div>
+    </div>
 
-            <div class="row">
-                <div class="col-md-8">
-                    <h2>Team: {{team.name}}</h2>
-                </div>
-                <div class="col-md-4">
-                    <h2 *ngIf="hasUpdatePermission">
-                        <button class="btn btn-default pull-right" (click)="toggleEditDetails()">
-                            <i class="fa" [ngClass]="editingDetails ? 'fa-times' : 'fa-edit'"></i>
-                            {{editingDetails ? 'Cancel' : 'Edit'}}
+    <div class="container-fluid bottom-gap-l">
+        <div class="row">
+            <div class="col-12">
+                <div class="details-section">
+                    <div class="details-card">
+                        <div class="details-form">
+                            <div class="form-field">
+                                <label class="field-label">Name:</label>
+                                <div class="field-content">
+                                    <span *ngIf="!editingDetails" class="field-value">{{team.name}}</span>
+                                    <input *ngIf="editingDetails" type="text" class="form-input"
+                                        [(ngModel)]="editForm.name" placeholder="Team name">
+                                </div>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="field-label">Description:</label>
+                                <div class="field-content">
+                                    <span *ngIf="!editingDetails" class="field-value">{{team.description}}</span>
+                                    <textarea *ngIf="editingDetails" class="form-input" rows="3"
+                                        [(ngModel)]="editForm.description" placeholder="Team description"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-actions" *ngIf="editingDetails">
+                                <button class="action-button btn-primary" (click)="saveTeamDetails()">
+                                    <i class="fa fa-save"></i> Save
+                                </button>
+                                <button class="action-button" (click)="cancelEditDetails()">
+                                    <i class="fa fa-times"></i> Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="danger-zone-card" *ngIf="hasDeletePermission">
+                        <h3 class="danger-zone-title">Delete Team</h3>
+                        <p class="danger-zone-description">Deleting a team will remove all team information.
+                            This cannot
+                            be
+                            undone, and all team data will be unrecoverable. Users within the team will not be
+                            deleted.
+                        </p>
+                        <button class="action-button btn-danger" (click)="deleteTeam()">
+                            <i class="fa fa-trash-o"></i> Delete
                         </button>
-                        <button class="btn btn-default pull-right right-gap" (click)="editAccess(team)"><i
-                                class="fa fa-shield"></i> Access</button>
-                    </h2>
-                </div>
-            </div>
-
-            <hr>
-
-            <div class="row top-gap-l">
-                <div class="col-sm-6 col-xs-12">
-
-                    <div class="row top-gap-l">
-                        <div class="col-md-3">
-                            <span class="muted">Name:</span>
-                        </div>
-                        <div class="col-md-9">
-                            <span *ngIf="!editingDetails">{{team.name}}</span>
-                            <input *ngIf="editingDetails" type="text" class="form-control" [(ngModel)]="editForm.name"
-                                placeholder="Team name">
-                        </div>
-                    </div>
-
-                    <div class="row top-gap-s bottom-gap">
-                        <div class="col-md-3">
-                            <span class="muted">Description:</span>
-                        </div>
-                        <div class="col-md-9">
-                            <span *ngIf="!editingDetails">{{team.description}}</span>
-                            <textarea *ngIf="editingDetails" class="form-control" rows="3"
-                                [(ngModel)]="editForm.description" placeholder="Team description"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="row top-gap-s" *ngIf="editingDetails">
-                        <div class="col-md-offset-3 col-md-9">
-                            <button class="btn btn-primary right-gap" (click)="saveTeamDetails()">
-                                <i class="fa fa-save"></i> Save
-                            </button>
-                            <button class="btn btn-default" (click)="cancelEditDetails()">
-                                <i class="fa fa-times"></i> Cancel
-                            </button>
-                        </div>
                     </div>
                 </div>
 
-                <div class="col-sm-6" *ngIf="hasDeletePermission">
-                    <div class="card">
-                        <div class="card-content">
-                            <strong class="text-danger">Delete Team</strong>
-                            <p class="text-danger">Deleting a team will remove all team information. This cannot be
-                                undone, and
-                                all team data will be unrecoverable. Users within the team will not be deleted.</p>
-                            <button class="btn btn-danger top-gap" (click)="deleteTeam()"> <i class="fa fa-trash-o"></i>
-                                Delete</button>
-                        </div>
-                    </div>
-                </div>
+                <hr>
 
-            </div>
+                <div class="sections-container">
+                    <div class="section-card">
+                        <div class="table-wrapper mat-elevation-z2">
+                            <div class="section-table-title">Team Members</div>
+                            <div class="integrated-navbar">
+                                <mage-card-navbar [title]="'Team Members'" [isSearchable]="true"
+                                    [searchPlaceholder]="'Search members...'"
+                                    (searchTermChanged)="onMembersSearchChange($event)"
+                                    (searchCleared)="onMembersSearchChange()"
+                                    [actionButtons]="memberActionButtons"></mage-card-navbar>
+                            </div>
 
-            <hr>
-
-            <div class="row">
-                <div class="col-md-6 col-xs-12">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <mage-card-navbar [title]="'Team Members'" [isSearchable]="true"
-                                [searchPlaceholder]="'Search teams...'" (searchTermChanged)="searchMembers()"
-                                (searchCleared)="searchMembers()" [actionButtons]="actionButtons"></mage-card-navbar>
-
-                        </div>
-                    </div>
-                    <div class="admin-table admin-teams-table">
-                        <div class="admin-teams-table-content">
-                            <div class="admin-teams-table-items">
-                                <div class="admin-teams-table-item" *ngFor="let user of membersPage.items">
-                                    <div class="row pointer" (click)="gotoUser(user)">
-                                        <div class="admin-teams-user">
-                                            <!-- <user-avatar class="pull-left right-gap" [user]="user" [avatarWidth]="40"
-                                                [avatarHeight]="40"></user-avatar> -->
-                                            <div class="admin-teams-user-detail">
-                                                <div class="strong right-gap">
-                                                    <span class="right-gap">{{user.displayName}}</span>
-                                                    <span class="muted">({{user.username}})</span>
+                            <div class="table-scroll">
+                                <table mat-table [class.mat-table]="true" [dataSource]="membersDataSource"
+                                    class="mat-table-no-header" *ngIf="totalMembers > 0">
+                                    <ng-container matColumnDef="content">
+                                        <td mat-cell *matCellDef="let user" class="table-row-content">
+                                            <div class="row-item" (click)="goToUserProfile(user)">
+                                                <div class="row-icon">
+                                                    <i class="fa fa-user"></i>
                                                 </div>
-                                                <div class="muted">{{user.email}}</div>
-                                            </div>
-                                            <a class="btn btn-xs btn-danger" *ngIf="edit"
-                                                (click)="removeMember($event, user)">Remove Member</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <ul class="pager pull-right admin-teams-pager">
-                                        <li [ngClass]="{'disabled': !hasPreviousMember()}">
-                                            <a href="javascript:void(0);" (click)="previousMemberPage()">&larr;
-                                                Previous</a>
-                                        </li>
-                                        <li [ngClass]="{'disabled': !hasNextMember()}">
-                                            <a href="javascript:void(0);" (click)="nextMemberPage()">Next&rarr;</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="admin-teams-table-status" *ngIf="loadingMembers">
-                            <div class="admin-teams-table-status-text">Loading</div>
-                            <div>
-                                <i class="fa fa-spinner fa-spin admin-teams-table-status-spinner"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-xs-12">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <nav class="navbar navbar-default admin-dashboard-navbar">
-                                <div class="container-fluid">
-                                    <div class="navbar-header">
-                                        <a class="navbar-brand">Events for {{team.name}} <sup><span
-                                                    class="badge">{{filteredEvents.length}}</span></sup></a>
-                                    </div>
-
-                                    <form class="navbar-form navbar-left">
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" placeholder="Search"
-                                                [(ngModel)]="teamEventSearch" [ngModelOptions]="{standalone: true}"
-                                                (ngModelChange)="onTeamEventSearchChange()">
-                                        </div>
-                                    </form>
-                                    <div class="navbar-form navbar-right right-gap-s">
-                                        <button class="btn btn-default navbar-right"
-                                            (click)="editEvent = !editEvent">Edit</button>
-                                    </div>
-                                </div>
-                            </nav>
-                        </div>
-                    </div>
-
-                    <div class="admin-table admin-teams-table">
-                        <div class="admin-teams-table-content">
-                            <div class="admin-teams-table-items">
-                                <div class="admin-teams-table-item"
-                                    *ngFor="let event of getPagedEvents(filteredEvents, teamEventsPage)">
-                                    <div class="row pointer" (click)="gotoEvent(event)">
-                                        <div class="admin-teams-user">
-                                            <i class="fa fa-calendar admin-teams-table-item-icon"></i>
-                                            <div class="admin-teams-user-detail">
-                                                <div class="strong right-gap">
-                                                    <span class="right-gap">{{event.name}}</span>
+                                                <div class="row-info">
+                                                    <div class="row-primary">{{ user.displayName }}</div>
+                                                    <div class="row-secondary">{{ user.username }}</div>
                                                 </div>
-                                                <div class="muted">{{event.description}}</div>
+                                                <div class="row-actions" *ngIf="hasUpdatePermission">
+                                                    <button class="action-button btn-danger btn-sm"
+                                                        (click)="removeMember($event, user)" title="Remove Member">
+                                                        <i class="fa fa-trash"></i>
+                                                        Remove Member
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <a class="btn btn-xs btn-danger" *ngIf="editEvent"
-                                                (click)="removeEventFromTeam($event, event)">Remove Event</a>
-                                        </div>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-row *matRowDef="let row; columns: membersDisplayedColumns;" class="pointer">
+                                    </tr>
+                                </table>
+
+                                <div class="empty-state" *ngIf="totalMembers === 0 && !loadingMembers">
+                                    <div class="empty-state-content">
+                                        <i class="fa fa-users empty-state-icon"></i>
+                                        <div class="empty-state-text">No members for {{ team?.name }}</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <ul class="pager pull-right admin-teams-pager">
-                                        <li [ngClass]="{'disabled': !canGoPreviousTeamEvents()}">
-                                            <a href="javascript:void(0);"
-                                                (click)="canGoPreviousTeamEvents() && (teamEventsPage = teamEventsPage - 1)">&larr;
-                                                Previous</a>
-                                        </li>
-                                        <li [ngClass]="{'disabled': !canGoNextTeamEvents()}">
-                                            <a href="javascript:void(0);"
-                                                (click)="canGoNextTeamEvents() && (teamEventsPage = teamEventsPage + 1)">Next&rarr;</a>
-                                        </li>
-                                    </ul>
+                            <mat-paginator [length]="totalMembers" [pageSize]="membersPageSize"
+                                [pageSizeOptions]="pageSizeOptions" (page)="onMembersPageChange($event)">
+                            </mat-paginator>
+
+                            <div class="loading-overlay" *ngIf="loadingMembers">
+                                <div class="loading-content">
+                                    <div class="loading-text">Loading</div>
+                                    <i class="fa fa-spinner fa-spin loading-spinner"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-card">
+                        <div class="table-wrapper mat-elevation-z2">
+                            <div class="section-table-title">Events for {{ team.name }}</div>
+                            <div class="integrated-navbar">
+                                <mage-card-navbar [title]="'Events for ' + team.name" [isSearchable]="true"
+                                    [searchPlaceholder]="'Search events...'"
+                                    (searchTermChanged)="onTeamEventSearchChange($event)"
+                                    (searchCleared)="onTeamEventSearchChange()"
+                                    [actionButtons]="eventActionButtons"></mage-card-navbar>
+                            </div>
+
+                            <div class="table-scroll">
+                                <table mat-table [class.mat-table]="true" [dataSource]="eventsDataSource"
+                                    class="mat-table-no-header" *ngIf="totalEvents > 0">
+                                    <ng-container matColumnDef="content">
+                                        <td mat-cell *matCellDef="let event" class="table-row-content">
+                                            <div class="row-item" (click)="goToEventPage(event)">
+                                                <div class="row-icon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                                <div class="row-info">
+                                                    <div class="row-primary">{{ event.name }}</div>
+                                                    <div class="row-secondary">{{ event.description }}</div>
+                                                </div>
+                                                <div class="row-actions" *ngIf="hasUpdatePermission">
+                                                    <button class="action-button btn-danger btn-sm"
+                                                        (click)="removeEventFromTeam($event, event)"
+                                                        title="Remove Event">
+                                                        <i class="fa fa-trash"></i>
+                                                        Remove Event
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-row *matRowDef="let row; columns: eventsDisplayedColumns;" class="pointer">
+                                    </tr>
+                                </table>
+
+                                <div class="empty-state" *ngIf="totalEvents === 0 && !loadingEvents">
+                                    <div class="empty-state-content">
+                                        <i class="fa fa-calendar empty-state-icon"></i>
+                                        <div class="empty-state-text">No events for {{ team?.name }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <mat-paginator [length]="totalEvents" [pageSize]="eventsPageSize"
+                                [pageIndex]="teamEventsPage" [pageSizeOptions]="pageSizeOptions"
+                                (page)="onEventsPageChange($event)">
+                            </mat-paginator>
+
+                            <div class="loading-overlay" *ngIf="loadingEvents">
+                                <div class="loading-content">
+                                    <div class="loading-text">Loading</div>
+                                    <i class="fa fa-spinner fa-spin loading-spinner"></i>
                                 </div>
                             </div>
                         </div>
@@ -206,4 +200,3 @@
             </div>
         </div>
     </div>
-</div>

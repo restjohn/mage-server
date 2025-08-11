@@ -8,6 +8,9 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { TeamDashboardComponent } from './dashboard/team-dashboard.component';
 import { CreateTeamDialogComponent } from './create-team/create-team.component';
@@ -16,13 +19,15 @@ import { EventsService } from '../admin-event/events.service';
 import { TeamDetailsComponent } from './team-details/team-details.component';
 import { CoreModule } from '../../core/core.module';
 import { DeleteTeamComponent } from './delete-team/delete-team.component';
+import { SearchModalComponent } from './search-modal/search-modal.component';
 
 @NgModule({
     declarations: [
         TeamDashboardComponent,
         CreateTeamDialogComponent,
         TeamDetailsComponent,
-        DeleteTeamComponent
+        DeleteTeamComponent,
+        SearchModalComponent
     ],
     imports: [
         CommonModule,
@@ -35,7 +40,10 @@ import { DeleteTeamComponent } from './delete-team/delete-team.component';
         MatDialogModule,
         MatFormFieldModule,
         MatInputModule,
-        MatButtonModule
+        MatButtonModule,
+        MatCheckboxModule,
+        MatIconModule,
+        MatProgressSpinnerModule
     ],
     providers: [
         TeamsService,
@@ -43,7 +51,8 @@ import { DeleteTeamComponent } from './delete-team/delete-team.component';
     ],
     entryComponents: [
         CreateTeamDialogComponent,
-        DeleteTeamComponent
+        DeleteTeamComponent,
+        SearchModalComponent
     ]
 })
 export class AdminTeamsModule { }
