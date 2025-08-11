@@ -139,6 +139,7 @@ import { AdminEventFormPreviewDialogComponent } from './admin/admin-event/admin-
 import { AdminMapComponent } from './admin/admin-map/admin-map.component';
 import { AdminTeamsModule } from './admin/admin-teams/admin-teams.module';
 import { AdminDashboardModule } from './admin/admin-dashboard/admin-dashboard.module';
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
   declarations: [
@@ -218,6 +219,7 @@ import { AdminDashboardModule } from './admin/admin-dashboard/admin-dashboard.mo
     MatTooltipModule,
     MatTabsModule,
     MatButtonModule,
+    MatMenuModule,
     MatCardModule,
     MatGridListModule,
     MatProgressSpinnerModule,
