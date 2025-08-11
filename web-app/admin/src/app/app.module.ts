@@ -76,7 +76,11 @@ import {
   teamProvider,
   eventProvider,
   authenticationConfigurationServiceProvider,
-  userPagingServiceProvider
+  userPagingServiceProvider,
+  deviceServiceProvider,
+  devicePagingServiceProvider,
+  loginServiceProvider,
+  layerServiceProvider,
 } from './upgrade/ajs-upgraded-providers';
 
 import {
@@ -134,6 +138,7 @@ import { AdminEventFormPreviewComponent } from './admin/admin-event/admin-event-
 import { AdminEventFormPreviewDialogComponent } from './admin/admin-event/admin-event-form/admin-event-form-preview/admin-event-form-preview-dialog.component';
 import { AdminMapComponent } from './admin/admin-map/admin-map.component';
 import { AdminTeamsModule } from './admin/admin-teams/admin-teams.module';
+import { AdminDashboardModule } from './admin/admin-dashboard/admin-dashboard.module';
 
 @NgModule({
   declarations: [
@@ -255,7 +260,8 @@ import { AdminTeamsModule } from './admin/admin-teams/admin-teams.module';
     AdminBreadcrumbModule,
     MatSlideToggleModule,
     MatStepperModule,
-    InputMaskModule.forRoot()
+    InputMaskModule.forRoot(),
+    AdminDashboardModule,
   ],
   providers: [
     mapServiceProvider,
@@ -272,6 +278,10 @@ import { AdminTeamsModule } from './admin/admin-teams/admin-teams.module';
     eventProvider,
     authenticationConfigurationServiceProvider,
     userPagingServiceProvider,
+    deviceServiceProvider,
+    devicePagingServiceProvider,
+    loginServiceProvider,
+    layerServiceProvider,
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptorService, multi: true }
   ]
 })
