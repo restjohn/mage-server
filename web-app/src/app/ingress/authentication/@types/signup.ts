@@ -8,11 +8,15 @@ export interface PasswordHelpTextTemplate {
     specialChars?: string;
     maxConChars?: string;
     restrictSpecialChars?: string;
+    minChars?: string;
   }
 
 export interface PasswordPolicy {
     passwordMinLengthEnabled: boolean;
     passwordMinLength: number;
+
+    minCharsEnabled: boolean;
+    minChars: number;
   
     lowLettersEnabled: boolean;
     lowLetters: number;

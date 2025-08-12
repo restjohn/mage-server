@@ -116,6 +116,17 @@
             )
           }}
         </mat-error>
+        <mat-error
+          *ngIf="signup.controls.password.hasError('minChars')"
+        >
+          Must
+          {{
+            passwordPolicy.helpTextTemplate.minChars?.replace(
+              '#',
+              passwordPolicy.minChars
+            )
+          }}
+        </mat-error>
         <mat-error *ngIf="signup.controls.password.hasError('maxConChars')">
           Must
           {{

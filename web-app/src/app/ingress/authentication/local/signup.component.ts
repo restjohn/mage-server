@@ -130,6 +130,11 @@ export class SignupComponent {
         `• At least ${this.passwordPolicy.passwordMinLength} characters`
       );
     }
+    if (this.passwordPolicy.minCharsEnabled) {
+      rules.push(
+        `• At least ${this.passwordPolicy.minChars} letters [aA-zZ]`
+      );
+    }
     if (this.passwordPolicy.lowLettersEnabled) {
       rules.push(
         `• Minimum ${this.passwordPolicy.lowLetters} lowercase letter(s)`
@@ -255,6 +260,13 @@ export class SignupComponent {
         (password.match(/[a-z]/g) || []).length < this.passwordPolicy.lowLetters
       ) {
         errors.lowLetters = true;
+      }
+
+      if (
+        this.passwordPolicy.minCharsEnabled &&
+        (password.match(/[a-z]/gi) || []).length < this.passwordPolicy.minChars
+      ) {
+        errors.minChars = true;
       }
 
       if (
