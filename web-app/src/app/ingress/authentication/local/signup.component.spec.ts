@@ -7,6 +7,7 @@ import { of, throwError } from 'rxjs';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { User } from 'core-lib-src/user';
 import { HttpErrorResponse } from '@angular/common/http';
+import { PasswordPolicy } from '../@types/signup';
 
 describe('SignupComponent', () => {
   let component: SignupComponent;
@@ -15,7 +16,7 @@ describe('SignupComponent', () => {
   let mockApiService: any;
   let mockUserService: any;
 
-  const mockPasswordPolicy = {
+  const mockPasswordPolicy: PasswordPolicy = {
     passwordMinLengthEnabled: true,
     passwordMinLength: 8,
     lowLettersEnabled: true,
@@ -29,7 +30,9 @@ describe('SignupComponent', () => {
     maxConCharsEnabled: true,
     maxConChars: 2,
     restrictSpecialCharsEnabled: true,
-    restrictSpecialChars: "!@#"
+    restrictSpecialChars: "!@#",
+    minCharsEnabled: true,
+    minChars: 2
   };
 
   const mockUser: User = 
@@ -246,5 +249,18 @@ describe('SignupComponent', () => {
     component.showConfirmPassword = true;
     expect(component.showConfirmPassword).toBeTrue();
   });  
+
+  it('should validate minChars rule for mixed-case letters (case-insensitive)', () => {
+    const validator = component.passwordPolicyValidator();
+  
+    let control = { value: '1!' } as any;
+    let result = validator(control);
+    expect(result?.minChars).toBeTrue();
+  
+    control = { value: 'A1a!' } as any;
+    result = validator(control);
+    expect(result?.minChars).toBeFalsy();
+  });
+  
 
 });
