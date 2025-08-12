@@ -7,93 +7,239 @@
   <form class="signup" [formGroup]="signup">
     <mat-form-field appearance="fill">
       <mat-label>Username</mat-label>
-      <input matInput placeholder="Username" formControlName="username" (blur)="getCaptcha()" required>
-      <mat-error *ngIf="signup.controls.username.hasError('required')">
-        Username is required
-      </mat-error>
-      <mat-error *ngIf="signup.controls.username.hasError('exists')">
-        Username already exists
-      </mat-error>
+      <input
+        matInput
+        placeholder="Username"
+        formControlName="username"
+        (blur)="getCaptcha()"
+        required
+      />
+      <div
+        class="password-error-popover"
+        *ngIf="
+          signup.controls.username.invalid && signup.controls.username.touched
+        "
+      >
+        <mat-error *ngIf="signup.controls.username.hasError('required')">
+          Username is required
+        </mat-error>
+        <mat-error *ngIf="signup.controls.username.hasError('exists')">
+          Username already exists
+        </mat-error>
+      </div>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
       <mat-label>Display Name</mat-label>
-      <input matInput placeholder="Display Name" formControlName="displayName" required>
-      <mat-error *ngIf="signup.controls.displayName.hasError('required')">
-        Display name is required
-      </mat-error>
+      <input
+        matInput
+        placeholder="Display Name"
+        formControlName="displayName"
+        required
+      />
+      <div
+        class="password-error-popover"
+        *ngIf="
+          signup.controls.displayName.invalid &&
+          signup.controls.displayName.touched
+        "
+      >
+        <mat-error *ngIf="signup.controls.displayName.hasError('required')">
+          Display name is required
+        </mat-error>
+      </div>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
       <mat-label>Email</mat-label>
-      <input matInput placeholder="Email" formControlName="email">
-      <mat-error *ngIf="signup.controls.email.hasError('email')">
-        Must be a valid email address
-      </mat-error>
+      <input matInput placeholder="Email" formControlName="email" />
+      <div
+        class="password-error-popover"
+        *ngIf="signup.controls.email.invalid && signup.controls.email.touched"
+      >
+        <mat-error *ngIf="signup.controls.email.hasError('email')">
+          Must be a valid email address
+        </mat-error>
+      </div>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
       <mat-label>Phone</mat-label>
-      <input matInput placeholder="Phone" formControlName="phone">
+      <input matInput placeholder="Phone" formControlName="phone" />
     </mat-form-field>
 
     <mat-form-field appearance="fill">
       <mat-label>Password</mat-label>
-      <input matInput type="password" placeholder="Password" formControlName="password" required>
-      <button mat-icon-button matTooltip="{{ passwordTooltipText }}" matTooltipClass="tooltip-wide" matSuffix>
+      <input
+        matInput
+        [type]="showPassword ? 'text' : 'password'"
+        placeholder="Password"
+        formControlName="password"
+        required
+      />
+      <button
+        mat-icon-button
+        type="button"
+        matSuffix
+        (click)="showPassword = !showPassword"
+      >
+        <mat-icon>{{
+          showPassword ? 'visibility_off' : 'visibility'
+        }}</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        matTooltip="{{ passwordTooltipText }}"
+        matTooltipClass="tooltip-wide"
+        matSuffix
+      >
         <mat-icon>info</mat-icon>
       </button>
-    
-      <mat-error *ngIf="signup.controls.password.hasError('required')">
-        Password is required
-      </mat-error>
-      <mat-error *ngIf="signup.controls.password.hasError('passwordMinLength')">
-        Must {{ passwordPolicy.helpTextTemplate.passwordMinLength?.replace('#', passwordPolicy.passwordMinLength) }}
-      </mat-error>
-      <mat-error *ngIf="signup.controls.password.hasError('lowLetters')">
-        Must {{ passwordPolicy.helpTextTemplate.lowLetters?.replace('#', passwordPolicy.lowLetters) }}
-      </mat-error>
-      <mat-error *ngIf="signup.controls.password.hasError('highLetters')">
-        Must {{ passwordPolicy.helpTextTemplate.highLetters?.replace('#', passwordPolicy.highLetters) }}
-      </mat-error>
-      <mat-error *ngIf="signup.controls.password.hasError('numbers')">
-        Must {{ passwordPolicy.helpTextTemplate.numbers?.replace('#', passwordPolicy.numbers) }}
-      </mat-error>
-      <mat-error *ngIf="signup.controls.password.hasError('specialChars')">
-        Must {{ passwordPolicy.helpTextTemplate.specialChars?.replace('#', passwordPolicy.specialChars) }}
-      </mat-error>
-      <mat-error *ngIf="signup.controls.password.hasError('restrictSpecialChars')">
-        Must {{ passwordPolicy.helpTextTemplate.restrictSpecialChars?.replace('#', passwordPolicy.restrictSpecialChars) }}
-      </mat-error>
+
+      <div
+        class="password-error-popover"
+        *ngIf="
+          signup.controls.password.invalid && signup.controls.password.touched
+        "
+      >
+        <mat-error *ngIf="signup.controls.password.hasError('required')">
+          Password is required
+        </mat-error>
+        <mat-error
+          *ngIf="signup.controls.password.hasError('passwordMinLength')"
+        >
+          Must
+          {{
+            passwordPolicy.helpTextTemplate.passwordMinLength?.replace(
+              '#',
+              passwordPolicy.passwordMinLength
+            )
+          }}
+        </mat-error>
+        <mat-error *ngIf="signup.controls.password.hasError('maxConChars')">
+          Must
+          {{
+            passwordPolicy.helpTextTemplate.maxConChars?.replace(
+              '#',
+              passwordPolicy.maxConChars
+            )
+          }}
+        </mat-error>
+        <mat-error *ngIf="signup.controls.password.hasError('lowLetters')">
+          Must
+          {{
+            passwordPolicy.helpTextTemplate.lowLetters?.replace(
+              '#',
+              passwordPolicy.lowLetters
+            )
+          }}
+        </mat-error>
+        <mat-error *ngIf="signup.controls.password.hasError('highLetters')">
+          Must
+          {{
+            passwordPolicy.helpTextTemplate.highLetters?.replace(
+              '#',
+              passwordPolicy.highLetters
+            )
+          }}
+        </mat-error>
+        <mat-error *ngIf="signup.controls.password.hasError('numbers')">
+          Must
+          {{
+            passwordPolicy.helpTextTemplate.numbers?.replace(
+              '#',
+              passwordPolicy.numbers
+            )
+          }}
+        </mat-error>
+        <mat-error *ngIf="signup.controls.password.hasError('specialChars')">
+          Must
+          {{
+            passwordPolicy.helpTextTemplate.specialChars?.replace(
+              '#',
+              passwordPolicy.specialChars
+            )
+          }}
+        </mat-error>
+        <mat-error
+          *ngIf="signup.controls.password.hasError('restrictSpecialChars')"
+        >
+          Must
+          {{
+            passwordPolicy.helpTextTemplate.restrictSpecialChars?.replace(
+              '#',
+              passwordPolicy.restrictSpecialChars
+            )
+          }}
+        </mat-error>
+      </div>
     </mat-form-field>
-    
+
     <mat-form-field appearance="fill">
       <mat-label>Confirm Password</mat-label>
-      <input matInput type="password" placeholder="Confirm Password" formControlName="passwordconfirm" required>
-      <mat-error *ngIf="signup.controls.passwordconfirm.hasError('required')">
-        Password confirmation is required
-      </mat-error>
-      <mat-error *ngIf="signup.controls.passwordconfirm.hasError('match')">
-        Passwords must match
-      </mat-error>
+      <input
+        matInput
+        [type]="showConfirmPassword ? 'text' : 'password'"
+        placeholder="Confirm Password"
+        formControlName="passwordconfirm"
+        required
+      />
+      <button
+        mat-icon-button
+        type="button"
+        matSuffix
+        (click)="showConfirmPassword = !showConfirmPassword"
+      >
+        <mat-icon>{{
+          showConfirmPassword ? 'visibility_off' : 'visibility'
+        }}</mat-icon>
+      </button>
+      <div
+        class="password-error-popover"
+        *ngIf="
+          signup.controls.passwordconfirm.invalid &&
+          signup.controls.passwordconfirm.touched
+        "
+      >
+        <mat-error *ngIf="signup.controls.passwordconfirm.hasError('required')">
+          Password confirmation is required
+        </mat-error>
+        <mat-error *ngIf="signup.controls.passwordconfirm.hasError('match')">
+          Passwords must match
+        </mat-error>
+      </div>
     </mat-form-field>
-    
+
     <div class="password-strength">
       <div class="mat-body-1">Password Strength</div>
       <div class="mat-body-2">{{ passwordStrength?.text }}</div>
-      <mat-progress-bar mode="determinate" [value]="passwordStrength?.value"></mat-progress-bar>
+      <mat-progress-bar
+        mode="determinate"
+        [value]="passwordStrength?.value"
+        [ngStyle]="{ '--password-bar-color': passwordStrength?.color }"
+        class="custom-password-bar"
+      >
+      </mat-progress-bar>
     </div>
 
     <div class="auth-captcha-container">
       <div *ngIf="loadingCaptcha" class="auth-captcha-progress">
         <div class="auth-captcha-progress__container">
           <div class="auth-captcha-progress-text">Generating Captcha...</div>
-          <mat-progress-bar mode="indeterminate" class="auth-captcha-progressbar"></mat-progress-bar>
+          <mat-progress-bar
+            mode="indeterminate"
+            class="auth-captcha-progressbar"
+          ></mat-progress-bar>
         </div>
       </div>
 
       <div class="auth-captcha" *ngIf="captcha.uri && !loadingCaptcha">
-        <img [src]="captcha.uri" alt="captcha image" width="100%" height="100%">
+        <img
+          [src]="captcha.uri"
+          alt="captcha image"
+          width="100%"
+          height="100%"
+        />
       </div>
 
       <div class="auth-captcha-refresh" *ngIf="captcha.uri">
@@ -105,14 +251,45 @@
 
     <mat-form-field appearance="fill">
       <mat-label>Captcha</mat-label>
-      <input matInput placeholder="Captcha" formControlName="captchaText" required>
-      <mat-error *ngIf="signup.controls.captchaText.hasError('required')">Captcha is required</mat-error>
-      <mat-error *ngIf="signup.controls.captchaText.hasError('invalid')">Invalid captcha</mat-error>
+      <input
+        matInput
+        placeholder="Captcha"
+        formControlName="captchaText"
+        required
+      />
+      <div
+        class="password-error-popover"
+        *ngIf="
+          signup.controls.captchaText.invalid &&
+          signup.controls.captchaText.touched
+        "
+      >
+        <mat-error *ngIf="signup.controls.captchaText.hasError('required')"
+          >Captcha is required</mat-error
+        >
+        <mat-error *ngIf="signup.controls.captchaText.hasError('invalid')"
+          >Invalid captcha</mat-error
+        >
+      </div>
     </mat-form-field>
 
     <div class="actions">
-      <button mat-stroked-button type="button" class="actions__button" (click)="onCancel()">Cancel</button>
-      <button mat-flat-button color="primary" class="actions__button" type="submit" [disabled]="signup.invalid" (click)="onSignup()">
+      <button
+        mat-stroked-button
+        type="button"
+        class="actions__button"
+        (click)="onCancel()"
+      >
+        Cancel
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        class="actions__button"
+        type="submit"
+        [disabled]="signup.invalid"
+        (click)="onSignup()"
+      >
         Signup
       </button>
     </div>
