@@ -1,4 +1,4 @@
-.modern-dialog {
+.dialog-modal {
     display: flex;
     flex-direction: column;
     min-width: 700px;
@@ -57,22 +57,19 @@
     }
 }
 
-// Dialog content
 .dialog-content {
     padding: 2rem 3rem;
     flex: 1;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 0; // Remove gap since navbar is integrated into results container
+    gap: 0;
 }
 
-// Integrated navbar styling
 .integrated-navbar {
     flex-shrink: 0;
 }
 
-// Results container
 .results-container {
     flex: 1;
     overflow: hidden;
@@ -81,15 +78,10 @@
     border: 1px solid #e5e7eb;
     border-radius: 12px;
     background-color: white;
-    min-height: 280px; // Reduced from 350px
+    min-height: 280px;
 
     .search-results-table {
         flex: 1;
-        overflow: visible; // Remove scrolling
-
-        ::ng-deep .mat-table {
-            background: transparent;
-        }
 
         ::ng-deep .mat-header-cell {
             background-color: #f9fafb;
@@ -100,7 +92,7 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             padding: 1rem 1.25rem;
-            height: 48px; // Reduced from 60px
+            height: 48px;
         }
 
         ::ng-deep .mat-cell {
@@ -112,11 +104,7 @@
 
         ::ng-deep .mat-row {
             transition: background-color 0.15s ease;
-            cursor: pointer; // Make it clear the row is clickable
-            user-select: none; // Prevent text selection
-            -webkit-user-select: none; // Safari
-            -moz-user-select: none; // Firefox
-            -ms-user-select: none; // IE/Edge
+            cursor: pointer;
 
             &:hover {
                 background-color: #f9fafb;
@@ -124,7 +112,7 @@
 
             &.selected {
                 background-color: #eff6ff;
-                border-left: 4px solid #3b82f6; // Add left border for selected items
+                border-left: 4px solid #3b82f6;
                 border-color: #dbeafe;
             }
 
@@ -134,10 +122,7 @@
         }
 
         .content-cell {
-            user-select: none; // Prevent text selection
-            -webkit-user-select: none; // Safari
-            -moz-user-select: none; // Firefox
-            -ms-user-select: none; // IE/Edge
+            user-select: none;
 
             .item-content {
                 .item-title {
@@ -158,6 +143,10 @@
                 color: #111827;
                 line-height: 1.4;
                 padding: 0.25rem 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 100%;
             }
         }
 
@@ -178,7 +167,7 @@
         padding: 2.5rem 2rem;
         gap: 1rem;
         color: #6b7280;
-        min-height: 150px; // Reduced from 200px
+        min-height: 150px;
 
         ::ng-deep .mat-spinner circle {
             stroke: #3b82f6;
@@ -198,10 +187,10 @@
         padding: 2.5rem 2rem;
         gap: 1rem;
         color: #9ca3af;
-        min-height: 150px; // Reduced from 200px
+        min-height: 150px;
 
         i {
-            font-size: 2.5rem; // Reduced from 3rem
+            font-size: 2.5rem;
             color: #d1d5db;
         }
 
@@ -215,10 +204,10 @@
         border-top: 1px solid #e5e7eb;
         background-color: #f9fafb;
         color: #374151;
-        min-height: 48px; // Reduce overall height
+        min-height: 48px;
 
         .mat-paginator-container {
-            padding: 0.5rem 1rem; // Reduced from 1rem 1.25rem
+            padding: 0.5rem 1rem;
             min-height: 48px;
         }
 
@@ -226,7 +215,7 @@
         .mat-paginator-range-label {
             font-size: 0.75rem;
             color: #6b7280;
-            line-height: 1.2; // Tighter line height
+            line-height: 1.2;
         }
 
         .mat-select-value {
@@ -235,8 +224,8 @@
         }
 
         .mat-icon-button {
-            width: 1.75rem; // Reduced from 2rem
-            height: 1.75rem; // Reduced from 2rem
+            width: 1.75rem;
+            height: 1.75rem;
             color: #6b7280;
 
             &:hover {
@@ -248,7 +237,7 @@
             }
 
             .mat-icon {
-                font-size: 1rem; // Smaller icons
+                font-size: 1rem;
                 width: 1rem;
                 height: 1rem;
             }
@@ -256,35 +245,32 @@
     }
 }
 
-// Dialog actions
 .dialog-actions {
-    padding: 1.5rem 3rem 2rem 3rem; // Reduced top/bottom padding
+    padding: 1.5rem 3rem 2rem 3rem;
     border-top: 1px solid #e5e7eb;
     background-color: #f9fafb;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 1.25rem; // Increased gap between elements
+    gap: 1.25rem;
 
     .selected-count {
         font-size: 0.875rem;
         color: #6b7280;
         font-weight: 500;
-        margin-right: auto; // Push buttons to the right
+        margin-right: auto;
     }
 
-    // Direct button styling for mat-button and mat-raised-button
     button {
-        margin-left: 0.75rem; // Add space between buttons
+        margin-left: 0.75rem;
 
         &:first-of-type {
-            margin-left: 0; // Remove margin from first button
+            margin-left: 0;
         }
     }
 }
 
-// Action buttons
 .action-button {
     padding: 0.75rem 1.5rem;
     border: 1px solid #d1d5db;
@@ -339,7 +325,6 @@
     }
 }
 
-// Override Material Dialog styles
 ::ng-deep .search-modal-dialog {
     .mat-dialog-container {
         padding: 0;

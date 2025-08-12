@@ -1,4 +1,4 @@
-<div class="modern-dialog">
+<div class="dialog-modal">
     <div class="dialog-header">
         <h2 mat-dialog-title>Search and Select</h2>
         <button mat-icon-button mat-dialog-close class="close-button">
@@ -39,7 +39,6 @@
             </div>
 
             <div class="no-results" *ngIf="!loading && dataSource.data.length === 0">
-                <mat-icon>search_off</mat-icon>
                 <span>No results found</span>
             </div>
 

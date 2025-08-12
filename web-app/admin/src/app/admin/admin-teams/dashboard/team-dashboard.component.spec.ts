@@ -18,9 +18,9 @@ describe('TeamDashboardComponent', () => {
   let mockDialog: jasmine.SpyObj<MatDialog>;
 
   const mockTeams: Team[] = [
-    { id: '1', name: 'Team Alpha', description: 'First team description', teamEventId: '507f1f77bcf86cd799439011' },
-    { id: '2', name: 'Team Beta', description: 'Second team description with much longer text that might wrap', teamEventId: '507f191e810c19729de860ea' },
-    { id: '3', name: 'Team Gamma', description: 'Third team', teamEventId: '507f1f77bcf86cd799439012' }
+    { id: '1', name: 'Team Alpha', description: 'First team description', teamEventId: '507f1f77bcf86cd799439011', users: [] as any, acl: {} as any },
+    { id: '2', name: 'Team Beta', description: 'Second team description with much longer text that might wrap', teamEventId: '507f191e810c19729de860ea', users: [] as any, acl: {} as any },
+    { id: '3', name: 'Team Gamma', description: 'Third team', teamEventId: '507f1f77bcf86cd799439012', users: [] as any, acl: {} as any }
   ];
 
   const mockTeamsResponse = [{

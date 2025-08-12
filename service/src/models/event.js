@@ -331,13 +331,18 @@ exports.getEvents = async function (options, callback) {
   const filter = options.filter || {};
   if (filter.complete === true) query.complete = true;
   if (filter.complete === false) query.complete = { $ne: true };
-  if (filter.teamId) query.teamIds = filter.teamId;
   if (filter.searchTerm) {
     const searchRegex = new RegExp(filter.searchTerm, 'i');
     query['$or'] = [
       { name: searchRegex },
       { description: searchRegex }
     ];
+  }
+  if (filter.excludeTeamId != null) {
+    query.teamIds = { $nin: [filter.excludeTeamId] };
+  }
+  if (filter.teamId != null) {
+    query.teamIds = { ...query.teamIds, $in: filter.teamId };
   }
 
   let projection = {};

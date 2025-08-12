@@ -1,5 +1,7 @@
 <div class="modern-navbar">
     <div class="navbar-container">
+        <div class="navbar-brand" *ngIf="title">{{ title }}</div>
+
         <div class="search-section" *ngIf="isSearchable">
             <div class="search-input-container">
                 <input type="text" class="search-input" [placeholder]="searchPlaceholder" [(ngModel)]="searchTerm"

@@ -1,5 +1,4 @@
-// Modern dialog styling
-.modern-dialog {
+.dialog-modal {
     display: flex;
     flex-direction: column;
     min-width: 500px;
@@ -13,7 +12,6 @@
     }
 }
 
-// Dialog header with warning icon
 .dialog-header {
     padding: 1.5rem 2rem 1rem 2rem;
     border-bottom: 1px solid #e5e7eb;
@@ -60,7 +58,6 @@
     }
 }
 
-// Dialog content
 .dialog-content {
     padding: 1.5rem 2rem;
     flex: 1;
@@ -68,7 +65,6 @@
     min-height: 0;
 }
 
-// Warning message
 .warning-message {
     padding: 1rem;
     background-color: #fef2f2;
@@ -89,12 +85,10 @@
     }
 }
 
-// Form field
 .form-field {
     margin-bottom: 1.5rem;
 }
 
-// Custom checkbox styling
 .checkbox-field {
     display: flex;
     align-items: flex-start;
@@ -119,7 +113,6 @@
     }
 }
 
-// Danger zone styling
 .danger-zone {
     background-color: #fef2f2;
     border: 2px solid #fecaca;
@@ -165,7 +158,6 @@
     }
 }
 
-// Confirmation field
 .confirmation-field {
     .field-label {
         display: block;
@@ -200,7 +192,6 @@
     }
 }
 
-// Dialog actions
 .dialog-actions {
     padding: 1rem 2rem 1.5rem 2rem;
     border-top: 1px solid #e5e7eb;
@@ -211,7 +202,6 @@
     flex-shrink: 0;
 }
 
-// Action buttons
 .action-button {
     padding: 0.75rem 1.5rem;
     border: 1px solid #d1d5db;
@@ -244,7 +234,6 @@
         background-color: #f9fafb;
     }
 
-    // Danger button variant
     &.btn-danger {
         background-color: #dc2626;
         border-color: #dc2626;
@@ -276,7 +265,6 @@
     }
 }
 
-// Override Material Dialog styles
 ::ng-deep .mat-dialog-container {
     padding: 0 !important;
     border-radius: 12px !important;

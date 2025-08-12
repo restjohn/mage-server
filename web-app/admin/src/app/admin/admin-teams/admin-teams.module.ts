@@ -19,15 +19,13 @@ import { EventsService } from '../admin-event/events.service';
 import { TeamDetailsComponent } from './team-details/team-details.component';
 import { CoreModule } from '../../core/core.module';
 import { DeleteTeamComponent } from './delete-team/delete-team.component';
-import { SearchModalComponent } from './search-modal/search-modal.component';
 
 @NgModule({
     declarations: [
         TeamDashboardComponent,
         CreateTeamDialogComponent,
         TeamDetailsComponent,
-        DeleteTeamComponent,
-        SearchModalComponent
+        DeleteTeamComponent
     ],
     imports: [
         CommonModule,
@@ -51,8 +49,7 @@ import { SearchModalComponent } from './search-modal/search-modal.component';
     ],
     entryComponents: [
         CreateTeamDialogComponent,
-        DeleteTeamComponent,
-        SearchModalComponent
+        DeleteTeamComponent
     ]
 })
 export class AdminTeamsModule { }

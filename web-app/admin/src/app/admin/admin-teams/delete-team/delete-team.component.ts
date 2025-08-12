@@ -5,6 +5,10 @@ import { Team } from '../team';
 import { TeamsService } from '../teams-service';
 import { UserService } from 'admin/src/app/upgrade/ajs-upgraded-providers';
 
+/**
+ * Modal component for confirming team deletion.
+ * Provides options to delete the team and optionally delete all associated users.
+ */
 @Component({
   selector: 'mage-delete-team',
   templateUrl: './delete-team.component.html',
@@ -16,6 +20,13 @@ export class DeleteTeamComponent implements OnInit {
   deleting = false;
   confirm: { text?: string } = {};
 
+  /**
+   * Constructor - initializes the component with injected services and team data.
+   * @param dialogRef - Reference to the dialog for closing and returning results
+   * @param data - Injected data containing the team to delete
+   * @param teamsService - Service for team operations
+   * @param UserService - Service for user operations
+   */
   constructor(
     public dialogRef: MatDialogRef<DeleteTeamComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { team: Team },
@@ -25,9 +36,15 @@ export class DeleteTeamComponent implements OnInit {
     this.team = data.team;
   }
 
+  /**
+   * Component initialization lifecycle hook.
+   */
   ngOnInit(): void {
   }
 
+  /**
+   * Deletes the team and optionally its users if the option is selected.
+   */
   deleteTeam(): void {
     this.deleting = true;
 
@@ -46,10 +63,16 @@ export class DeleteTeamComponent implements OnInit {
     });
   }
 
+  /**
+   * Cancels the deletion and closes the dialog without any action.
+   */
   cancel(): void {
     this.dialogRef.close();
   }
 
+  /**
+   * Deletes all users associated with the team.
+   */
   private deleteUsers(): void {
     const users = this.team.users || [];
 

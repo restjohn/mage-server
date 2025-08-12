@@ -204,6 +204,7 @@ function EventRoutes(app: express.Application, security: { authentication: authe
       const filter = {
         complete: req.parameters!.complete,
         teamId: req.query.teamId as string | undefined,
+        excludeTeamId: req.query.excludeTeamId as string | undefined,
         searchTerm: req.query.term as string | undefined
       } as any
       if (req.parameters!.userId) {

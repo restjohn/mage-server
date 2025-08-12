@@ -67,7 +67,6 @@
     }
 }
 
-// --- Responsive header alignment override to keep actions on same line ---
 .page-header,
 .header-content {
     flex-direction: row !important;
@@ -96,7 +95,6 @@
     flex: 0 0 auto;
 }
 
-// Allow wrapping only on very narrow screens
 @media (max-width: 480px) {
     .page-header .header-actions {
         flex-wrap: wrap;
@@ -104,9 +102,6 @@
     }
 }
 
-// ---------------------------------------------------------------------
-
-// Modern details section
 .details-section {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -204,7 +199,6 @@
     }
 }
 
-// Modern sections container
 .sections-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -224,7 +218,6 @@
     border: 1px solid #e5e7eb;
 }
 
-// Integrated navbar within table
 .integrated-navbar {
     background-color: #f9fafb;
     border-bottom: 2px solid #e5e7eb;
@@ -236,7 +229,6 @@
     }
 }
 
-// Modern table styling
 .modern-table-content {
     position: relative;
     min-height: 300px;
@@ -324,7 +316,6 @@
     flex-shrink: 0;
 }
 
-// Modern pagination
 .modern-pagination {
     padding: 1rem 1.5rem;
     border-top: 1px solid #e5e7eb;
@@ -360,7 +351,6 @@
     }
 }
 
-// Modern loading overlay
 .loading-overlay {
     position: absolute;
     top: 0;
@@ -391,7 +381,6 @@
     }
 }
 
-// Modern action buttons
 .action-button {
     padding: 0.75rem 1.5rem;
     border: 1px solid #d1d5db;
@@ -423,13 +412,11 @@
         cursor: not-allowed;
     }
 
-    // Small button variant
     &.btn-sm {
         padding: 0.5rem 1rem;
         font-size: 0.75rem;
     }
 
-    // Primary button variant
     &.btn-primary {
         background-color: #3b82f6;
         border-color: #3b82f6;
@@ -441,7 +428,6 @@
         }
     }
 
-    // Danger button variant
     &.btn-danger {
         background-color: #ef4444;
         border-color: #ef4444;
@@ -454,7 +440,6 @@
     }
 }
 
-// Material table row styling to match existing design
 .mat-table-no-header {
     .mat-header-row {
         display: none;
@@ -477,7 +462,6 @@
     padding: 1rem 1.5rem;
     transition: background-color 0.2s ease;
     cursor: pointer;
-    // min-height: var(--row-height);
 
     &:hover {
         background-color: #f8fafc;
@@ -533,11 +517,9 @@
 
 .row-actions {
     flex: 0 0 auto;
-    /* Ensure actions don't shrink and maintain their space */
     min-width: fit-content;
 }
 
-// Section table title styling
 .section-table-title {
     font-size: 1rem;
     font-weight: 600;
@@ -545,7 +527,6 @@
     color: #111827;
 }
 
-// Table wrapper and fixed-height table area
 .table-wrapper {
     --row-height: 73px;
     --min-page-size: 5;
@@ -556,7 +537,6 @@
     position: relative;
 }
 
-// Scrollable viewport for the table contents with fixed height
 .table-scroll {
     height: var(--base-table-height);
     max-height: var(--base-table-height);
@@ -567,22 +547,19 @@
     border-bottom: 1px solid #e5e7eb;
 }
 
-// Reset mat-table sizing; the scroll container controls overflow/height
 .table-wrapper .mat-table {
-    display: table; // use Material default table layout
+    display: table;
     width: 100%;
-    height: auto; // let content define intrinsic height
-    overflow: visible; // scrolling handled by parent .table-scroll
+    height: auto;
+    overflow: visible;
 }
 
-// Ensure paginator is always visible and positioned correctly
 .table-wrapper mat-paginator {
-    flex-shrink: 0; // prevent paginator from being compressed
+    flex-shrink: 0;
     border-top: 1px solid #e5e7eb;
     background: #f9fafb;
 }
 
-// Empty state styles
 .empty-state {
     display: flex;
     align-items: center;

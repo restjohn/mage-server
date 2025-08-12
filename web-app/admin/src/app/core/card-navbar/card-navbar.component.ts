@@ -20,6 +20,7 @@ export interface CardActionButton {
   styleUrls: ['./card-navbar.component.scss']
 })
 export class CardNavbarComponent implements OnInit, OnDestroy {
+  @Input() title?: string;
   @Input() isSearchable = false;
   @Input() searchPlaceholder = 'Search...';
   @Input() actionButtons: CardActionButton[] = [];

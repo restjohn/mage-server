@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { User } from '@ngageoint/mage.web-core-lib/user';
 import { Event } from 'src/app/filter/filter.types';
+import { Team } from '../admin-teams/team';
 
 export interface SearchOptions {
     term?: string;
     teamId?: string;
+    excludeTeamId?: string;
     id?: string;
     page?: number;
     page_size?: number;
@@ -41,13 +42,20 @@ export class EventsService {
         if (options.teamId !== undefined) {
             params = params.set('teamId', options.teamId);
         }
+        if (options.excludeTeamId !== undefined) {
+            params = params.set('excludeTeamId', options.excludeTeamId);
+        }
 
         params = params.set('includePagination', 'true');
 
         return this.http.get<EventsResponse>('/api/events', { params });
     }
 
-    removeEvent(eventId: string): Observable<void> {
-        return this.http.delete<void>(`/api/events/${eventId}`);
+    addTeamToEvent(eventId: string, team: Team): Observable<Event> {
+        return this.http.post<Event>(`/api/events/${eventId}/teams`, team);
+    }
+
+    removeEventFromTeam(eventId: string, teamId: string): Observable<void> {
+        return this.http.delete<void>(`/api/events/${eventId}/teams/${teamId}`);
     }
 }
