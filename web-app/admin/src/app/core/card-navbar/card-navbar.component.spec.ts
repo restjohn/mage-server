@@ -25,7 +25,6 @@ describe('CardNavbarComponent', () => {
     });
 
     it('should initialize with default values', () => {
-      expect(component.title).toBeUndefined();
       expect(component.isSearchable).toBe(false);
       expect(component.searchPlaceholder).toBe('Search...');
       expect(component.actionButtons).toEqual([]);
@@ -37,14 +36,6 @@ describe('CardNavbarComponent', () => {
   describe('Template Rendering', () => {
     beforeEach(() => {
       fixture.detectChanges();
-    });
-
-    it('should display the title', () => {
-      component.title = 'Test Title';
-      fixture.detectChanges();
-
-      const titleElement = fixture.debugElement.query(By.css('.navbar-brand'));
-      expect(titleElement.nativeElement.textContent.trim()).toBe('Test Title');
     });
 
     it('should show search input when isSearchable is true', () => {
@@ -283,12 +274,6 @@ describe('CardNavbarComponent', () => {
   });
 
   describe('Input Properties', () => {
-    it('should accept title input', () => {
-      const testTitle = 'My Component Title';
-      component.title = testTitle;
-      expect(component.title).toBe(testTitle);
-    });
-
     it('should accept isSearchable input', () => {
       component.isSearchable = true;
       expect(component.isSearchable).toBe(true);
