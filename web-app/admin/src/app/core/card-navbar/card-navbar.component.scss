@@ -1,16 +1,11 @@
-// Modern navbar styling
-.modern-navbar {
-    background: white;
-}
-
 .navbar-container {
+    background: white;
     display: flex;
     align-items: center;
     padding: 1rem 1.5rem;
     gap: 1.5rem;
     min-height: 4rem;
 
-    /* Keep navbar content on one horizontal line (like page header) */
     flex-direction: row !important;
     flex-wrap: nowrap;
 }
@@ -37,7 +32,6 @@
     min-width: 200px;
     max-width: 400px;
 
-    /* Keep search section flexible */
     flex: 1 1 auto;
     min-width: 0;
 }
@@ -98,7 +92,6 @@
     gap: 0.75rem;
     margin-left: auto;
 
-    /* Keep actions section from wrapping */
     flex: 0 0 auto;
     flex-wrap: nowrap;
     white-space: nowrap;
@@ -116,7 +109,6 @@
     transition: all 0.2s ease;
     white-space: nowrap;
 
-    /* Keep action buttons from growing or shrinking */
     flex: 0 0 auto;
 
     &:hover:not(:disabled) {
@@ -135,7 +127,6 @@
         cursor: not-allowed;
     }
 
-    // Primary button variant
     &.btn-primary {
         background-color: #3b82f6;
         border-color: #3b82f6;
@@ -147,7 +138,6 @@
         }
     }
 
-    // Success button variant
     &.btn-success {
         background-color: #10b981;
         border-color: #10b981;
@@ -159,7 +149,6 @@
         }
     }
 
-    // Danger button variant
     &.btn-danger {
         background-color: #ef4444;
         border-color: #ef4444;
@@ -172,7 +161,6 @@
     }
 }
 
-// Responsive behavior
 @media (max-width: 768px) {
     .navbar-container {
         flex-direction: column;
@@ -229,7 +217,6 @@
     }
 }
 
-/* Allow wrap only on very narrow viewports */
 @media (max-width: 480px) {
     .modern-navbar .navbar-container {
         flex-wrap: wrap;

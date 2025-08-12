@@ -96,7 +96,7 @@ export class SearchModalComponent implements OnInit, OnDestroy {
                 next: (results) => {
                     this.loading = false;
                     this.dataSource.data = results.items || results || [];
-                    this.totalCount = this.dataSource.data.length;
+                    this.totalCount = results.totalCount || this.dataSource.data.length;
                 },
                 error: (error) => {
                     this.loading = false;

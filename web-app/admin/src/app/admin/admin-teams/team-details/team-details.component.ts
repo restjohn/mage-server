@@ -400,8 +400,7 @@ export class TeamDetailsComponent implements OnInit {
    */
   deleteTeam(): void {
     const dialogRef = this.dialog.open(DeleteTeamComponent, {
-      data: { team: this.team },
-      width: '40rem'
+      data: { team: this.team }
     });
 
     dialogRef.afterClosed().subscribe(result => {

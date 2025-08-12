@@ -1,19 +1,13 @@
 <div class="dialog-modal">
     <div class="dialog-header">
         <h2 mat-dialog-title>Search and Select</h2>
-        <button mat-icon-button mat-dialog-close class="close-button">
-            <mat-icon>close</mat-icon>
-        </button>
     </div>
 
     <div class="dialog-content" mat-dialog-content>
         <div class="results-container">
-            <div class="integrated-navbar">
-                <mage-card-navbar [title]="data.title" [isSearchable]="true"
-                    [searchPlaceholder]="data.searchPlaceholder" (searchTermChanged)="onSearchTermChanged($event)"
-                    (searchCleared)="onSearchCleared()">
-                </mage-card-navbar>
-            </div>
+            <mage-card-navbar [title]="data.title" [isSearchable]="true" [searchPlaceholder]="data.searchPlaceholder"
+                (searchTermChanged)="onSearchTermChanged($event)" (searchCleared)="onSearchCleared()">
+            </mage-card-navbar>
 
             <mat-table [dataSource]="dataSource" class="search-results-table">
                 <ng-container *ngFor="let column of columns" [matColumnDef]="column.key">
@@ -33,11 +27,6 @@
                 </mat-row>
             </mat-table>
 
-            <div class="loading-container" *ngIf="loading">
-                <mat-spinner diameter="40"></mat-spinner>
-                <span>Searching...</span>
-            </div>
-
             <div class="no-results" *ngIf="!loading && dataSource.data.length === 0">
                 <span>No results found</span>
             </div>
@@ -48,8 +37,9 @@
         </div>
     </div>
 
-    <div class="dialog-actions" mat-dialog-actions>
-        <button mat-raised-button color="primary" (click)="onConfirm()" [disabled]="getSelectedCount() === 0">
+    <div class="dialog-actions">
+        <button class="action-button" mat-dialog-close>Cancel</button>
+        <button class="action-button btn-primary" (click)="onConfirm()" [disabled]="getSelectedCount() === 0">
             Add Selected
         </button>
     </div>

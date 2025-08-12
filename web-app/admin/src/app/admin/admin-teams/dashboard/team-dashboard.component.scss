@@ -1,4 +1,3 @@
-// Modern page header styling
 .page-header {
     margin-bottom: 2rem;
     padding: 0;
@@ -21,7 +20,6 @@
     }
 }
 
-// Modern navbar container
 .navbar-container {
     margin-bottom: 1.5rem;
 
@@ -32,7 +30,6 @@
     }
 }
 
-// Integrated navbar within table
 .integrated-navbar {
     background-color: #f9fafb;
     border-bottom: 2px solid #e5e7eb;
@@ -44,7 +41,6 @@
     }
 }
 
-// Modern table wrapper
 .table-wrapper {
     border-radius: 12px;
     overflow: hidden;
@@ -118,7 +114,6 @@
     }
 }
 
-// Modern paginator styling
 ::ng-deep .mat-paginator {
     border-top: 1px solid #e5e7eb;
     background-color: #f9fafb;
