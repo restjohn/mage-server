@@ -9,7 +9,7 @@
                 (searchTermChanged)="onSearchTermChanged($event)" (searchCleared)="onSearchCleared()">
             </mage-card-navbar>
 
-            <mat-table [dataSource]="dataSource" class="search-results-table">
+            <mat-table [dataSource]="dataSource" class="search-results-table" data-testid="search-results-table">
                 <ng-container *ngFor="let column of columns" [matColumnDef]="column.key">
                     <mat-header-cell *matHeaderCellDef [style.width]="column.width">
                         <span class="column-header">{{ column.label }}</span>
@@ -27,19 +27,20 @@
                 </mat-row>
             </mat-table>
 
-            <div class="no-results" *ngIf="!loading && dataSource.data.length === 0">
+            <div class="no-results" *ngIf="dataSource.data.length === 0" data-testid="no-results">
                 <span>No results found</span>
             </div>
 
             <mat-paginator *ngIf="totalCount > 0" [length]="totalCount" [pageSize]="pageSize" [pageSizeOptions]="[]"
-                (page)="onPageChange($event)">
+                (page)="onPageChange($event)" data-testid="paginator">
             </mat-paginator>
         </div>
     </div>
 
     <div class="dialog-actions">
-        <button class="action-button" mat-dialog-close>Cancel</button>
-        <button class="action-button btn-primary" (click)="onConfirm()" [disabled]="getSelectedCount() === 0">
+        <button class="action-button" mat-dialog-close data-testid="cancel-button">Cancel</button>
+        <button class="action-button btn-primary" (click)="onConfirm()" [disabled]="getSelectedCount() === 0"
+            data-testid="confirm-button">
             Add Selected
         </button>
     </div>

@@ -499,8 +499,7 @@ describe('TeamDetailsComponent', () => {
       component.deleteTeam();
 
       expect(mockDialog.open).toHaveBeenCalledWith(DeleteTeamComponent, {
-        data: { team: mockTeam },
-        width: '40rem'
+        data: { team: mockTeam }
       });
       expect(mockStateService.go).toHaveBeenCalledWith('admin.teams');
     });

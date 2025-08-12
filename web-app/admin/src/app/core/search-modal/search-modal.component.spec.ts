@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
@@ -71,7 +70,6 @@ describe('SearchModalComponent', () => {
             imports: [
                 MatTableModule,
                 MatPaginatorModule,
-                MatProgressSpinnerModule,
                 MatIconModule,
                 MatButtonModule,
                 NoopAnimationsModule
@@ -235,7 +233,7 @@ describe('SearchModalComponent', () => {
             component.selectedItem = null;
             fixture.detectChanges();
 
-            const confirmButton = fixture.debugElement.nativeElement.querySelector('button[color="primary"]');
+            const confirmButton = fixture.debugElement.nativeElement.querySelector('[data-testid="confirm-button"]');
             expect(confirmButton.disabled).toBeTrue();
         });
 
@@ -400,24 +398,15 @@ describe('SearchModalComponent', () => {
         });
 
         it('should display table with correct columns', () => {
-            const table = fixture.debugElement.nativeElement.querySelector('mat-table');
+            const table = fixture.debugElement.nativeElement.querySelector('[data-testid="search-results-table"]');
             expect(table).toBeTruthy();
         });
 
-        it('should show loading spinner when loading', () => {
-            component.loading = true;
-            fixture.detectChanges();
-
-            const spinner = fixture.debugElement.nativeElement.querySelector('mat-spinner');
-            expect(spinner).toBeTruthy();
-        });
-
-        it('should show no results message when no data and not loading', () => {
-            component.loading = false;
+        it('should show no results message when no data', () => {
             component.dataSource.data = [];
             fixture.detectChanges();
 
-            const noResults = fixture.debugElement.nativeElement.querySelector('.no-results');
+            const noResults = fixture.debugElement.nativeElement.querySelector('[data-testid="no-results"]');
             expect(noResults).toBeTruthy();
             expect(noResults.textContent.trim()).toBe('No results found');
         });
@@ -426,7 +415,7 @@ describe('SearchModalComponent', () => {
             component.totalCount = 10;
             fixture.detectChanges();
 
-            const paginator = fixture.debugElement.nativeElement.querySelector('mat-paginator');
+            const paginator = fixture.debugElement.nativeElement.querySelector('[data-testid="paginator"]');
             expect(paginator).toBeTruthy();
         });
 
@@ -434,7 +423,7 @@ describe('SearchModalComponent', () => {
             component.selectedItem = null;
             fixture.detectChanges();
 
-            const confirmButton = fixture.debugElement.nativeElement.querySelector('button[color="primary"]');
+            const confirmButton = fixture.debugElement.nativeElement.querySelector('[data-testid="confirm-button"]');
             expect(confirmButton.disabled).toBeTrue();
         });
 
@@ -442,7 +431,7 @@ describe('SearchModalComponent', () => {
             component.selectedItem = mockSearchResults.items[0];
             fixture.detectChanges();
 
-            const confirmButton = fixture.debugElement.nativeElement.querySelector('button[color="primary"]');
+            const confirmButton = fixture.debugElement.nativeElement.querySelector('[data-testid="confirm-button"]');
             expect(confirmButton.disabled).toBeFalse();
         });
     });

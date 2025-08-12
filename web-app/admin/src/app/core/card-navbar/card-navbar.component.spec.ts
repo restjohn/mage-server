@@ -42,8 +42,8 @@ describe('CardNavbarComponent', () => {
       component.isSearchable = true;
       fixture.detectChanges();
 
-      const searchContainer = fixture.debugElement.query(By.css('.search-container'));
-      const searchInput = fixture.debugElement.query(By.css('.search-input'));
+      const searchContainer = fixture.debugElement.query(By.css('[data-testid="search-section"]'));
+      const searchInput = fixture.debugElement.query(By.css('[data-testid="search-input"]'));
 
       expect(searchContainer).toBeTruthy();
       expect(searchInput).toBeTruthy();
@@ -53,7 +53,7 @@ describe('CardNavbarComponent', () => {
       component.isSearchable = false;
       fixture.detectChanges();
 
-      const searchContainer = fixture.debugElement.query(By.css('.search-container'));
+      const searchContainer = fixture.debugElement.query(By.css('[data-testid="search-section"]'));
       expect(searchContainer).toBeFalsy();
     });
 
@@ -62,7 +62,7 @@ describe('CardNavbarComponent', () => {
       component.searchPlaceholder = 'Custom placeholder';
       fixture.detectChanges();
 
-      const searchInput = fixture.debugElement.query(By.css('.search-input'));
+      const searchInput = fixture.debugElement.query(By.css('[data-testid="search-input"]'));
       expect(searchInput.nativeElement.placeholder).toBe('Custom placeholder');
     });
 
@@ -74,7 +74,7 @@ describe('CardNavbarComponent', () => {
       component.actionButtons = mockButtons;
       fixture.detectChanges();
 
-      const buttons = fixture.debugElement.queryAll(By.css('.action-button'));
+      const buttons = fixture.debugElement.queryAll(By.css('[data-testid="action-button"]'));
       expect(buttons.length).toBe(2);
       expect(buttons[0].nativeElement.textContent.trim()).toBe('Button 1');
       expect(buttons[1].nativeElement.textContent.trim()).toBe('Button 2');
@@ -84,8 +84,8 @@ describe('CardNavbarComponent', () => {
       component.actionButtons = [];
       fixture.detectChanges();
 
-      const form = fixture.debugElement.query(By.css('.navbar-form.navbar-right'));
-      expect(form).toBeFalsy();
+      const actionsSection = fixture.debugElement.query(By.css('[data-testid="actions-section"]'));
+      expect(actionsSection).toBeFalsy();
     });
 
     it('should apply correct CSS classes to action buttons', () => {
@@ -97,7 +97,7 @@ describe('CardNavbarComponent', () => {
       component.actionButtons = mockButtons;
       fixture.detectChanges();
 
-      const buttons = fixture.debugElement.queryAll(By.css('.action-button'));
+      const buttons = fixture.debugElement.queryAll(By.css('[data-testid="action-button"]'));
       expect(buttons[0].nativeElement.classList).toContain('primary');
       expect(buttons[1].nativeElement.classList).toContain('secondary');
       expect(buttons[2].nativeElement.classList).toContain('tertiary');
@@ -111,7 +111,7 @@ describe('CardNavbarComponent', () => {
       component.actionButtons = mockButtons;
       fixture.detectChanges();
 
-      const buttons = fixture.debugElement.queryAll(By.css('.action-button'));
+      const buttons = fixture.debugElement.queryAll(By.css('[data-testid="action-button"]'));
       expect(buttons[0].nativeElement.disabled).toBe(false);
       expect(buttons[1].nativeElement.disabled).toBe(true);
     });
@@ -176,12 +176,12 @@ describe('CardNavbarComponent', () => {
     it('should trigger clearSearch when clear button is clicked', () => {
       spyOn(component, 'clearSearch');
 
-      const searchInput = fixture.debugElement.query(By.css('.search-input'));
+      const searchInput = fixture.debugElement.query(By.css('[data-testid="search-input"]'));
       searchInput.nativeElement.value = 'test';
       searchInput.nativeElement.dispatchEvent(new Event('input'));
       fixture.detectChanges();
 
-      const clearButton = fixture.debugElement.query(By.css('.clear-search-btn'));
+      const clearButton = fixture.debugElement.query(By.css('[data-testid="clear-search-btn"]'));
       clearButton.nativeElement.click();
 
       expect(component.clearSearch).toHaveBeenCalled();
@@ -190,7 +190,7 @@ describe('CardNavbarComponent', () => {
     it('should trigger onSearchChange when input value changes', fakeAsync(() => {
       spyOn(component, 'onSearchChange');
 
-      const searchInput = fixture.debugElement.query(By.css('.search-input'));
+      const searchInput = fixture.debugElement.query(By.css('[data-testid="search-input"]'));
       searchInput.nativeElement.value = 'test input';
       searchInput.nativeElement.dispatchEvent(new Event('input'));
 
@@ -233,7 +233,7 @@ describe('CardNavbarComponent', () => {
       component.actionButtons = mockButtons;
       fixture.detectChanges();
 
-      const button = fixture.debugElement.query(By.css('.action-button'));
+      const button = fixture.debugElement.query(By.css('[data-testid="action-button"]'));
       button.nativeElement.click();
 
       expect(mockAction).toHaveBeenCalled();

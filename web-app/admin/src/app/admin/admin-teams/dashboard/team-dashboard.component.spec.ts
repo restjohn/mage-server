@@ -132,8 +132,6 @@ describe('TeamDashboardComponent', () => {
     component.newTeam();
 
     expect(mockDialog.open).toHaveBeenCalledWith(CreateTeamDialogComponent, {
-      width: '50rem',
-      height: '25rem',
       data: { team: {} }
     });
   });

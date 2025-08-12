@@ -107,8 +107,10 @@
             font-weight: 500;
         }
     }
+}
 
-    ::ng-deep .mat-paginator {
+::ng-deep .search-modal-dialog {
+    .mat-paginator {
         border-top: 1px solid #e5e7eb;
         background-color: #f9fafb;
         color: #374151;
@@ -131,9 +133,7 @@
             color: #374151;
         }
     }
-}
 
-::ng-deep .search-modal-dialog {
     .mat-dialog-container {
         padding: 0;
         border-radius: 12px;

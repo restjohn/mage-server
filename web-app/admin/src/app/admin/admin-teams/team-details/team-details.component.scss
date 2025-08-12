@@ -69,8 +69,8 @@
 
 .page-header,
 .header-content {
-    flex-direction: row !important;
-    align-items: center !important;
+    flex-direction: row;
+    align-items: center;
 }
 
 .page-header {
@@ -447,11 +447,11 @@
 }
 
 .table-row-content {
-    padding: 0 !important;
-    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 0;
+    border-bottom: 1px solid #f1f5f9;
 
     &:last-child {
-        border-bottom: none !important;
+        border-bottom: none;
     }
 }
 
