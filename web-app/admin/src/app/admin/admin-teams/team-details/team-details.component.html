@@ -14,10 +14,6 @@
             <h2 class="page-title">{{team.name}}</h2>
         </div>
         <div class="header-actions" *ngIf="hasUpdatePermission">
-            <button class="action-button" (click)="goToAccess()">
-                <i class="fa" [ngClass]="'fa-shield'"></i>
-                Access
-            </button>
             <button class="action-button" [ngClass]="editingDetails ? 'btn-primary' : ''" (click)="toggleEditDetails()">
                 <i class="fa" [ngClass]="editingDetails ? 'fa-times' : 'fa-edit'"></i>
                 {{editingDetails ? 'Cancel' : 'Edit Team'}}
@@ -101,7 +97,20 @@
                                                     <div class="row-primary">{{ user.displayName }}</div>
                                                     <div class="row-secondary">{{ user.username }}</div>
                                                 </div>
-                                                <div class="row-actions" *ngIf="hasUpdatePermission">
+                                                <div class="row-role">
+                                                    <span *ngIf="!editingMembers" [class]="getRoleClass(user)">
+                                                        {{ getUserRole(user) }}
+                                                    </span>
+                                                    <select *ngIf="hasUpdatePermission && editingMembers"
+                                                        class="role-select" [value]="getUserRole(user)"
+                                                        (change)="updateUserRole(user, $event)"
+                                                        (click)="$event.stopPropagation()">
+                                                        <option value="GUEST">Guest</option>
+                                                        <option value="MANAGER">Manager</option>
+                                                        <option value="OWNER">Owner</option>
+                                                    </select>
+                                                </div>
+                                                <div class="row-actions" *ngIf="hasUpdatePermission && editingMembers">
                                                     <button class="action-button btn-danger btn-sm"
                                                         (click)="removeMember($event, user)" title="Remove Member">
                                                         <i class="fa fa-trash"></i>
@@ -160,7 +169,7 @@
                                                     <div class="row-primary">{{ event.name }}</div>
                                                     <div class="row-secondary">{{ event.description }}</div>
                                                 </div>
-                                                <div class="row-actions" *ngIf="hasUpdatePermission">
+                                                <div class="row-actions" *ngIf="hasUpdatePermission && editingEvents">
                                                     <button class="action-button btn-danger btn-sm"
                                                         (click)="removeEventFromTeam($event, event)"
                                                         title="Remove Event">

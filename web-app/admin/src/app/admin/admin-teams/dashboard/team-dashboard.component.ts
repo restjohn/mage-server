@@ -28,7 +28,7 @@ export class TeamDashboardComponent implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<Team>();
   displayedColumns = ['name', 'description'];
 
-  actionButtons: CardActionButton[] = [{ label: 'New Team', type: 'primary', action: () => this.newTeam() }];
+  actionButtons: CardActionButton[] = [{ label: 'New Team', type: 'btn-secondary', action: () => this.newTeam() }];
 
   private destroy$ = new Subject<void>();
 

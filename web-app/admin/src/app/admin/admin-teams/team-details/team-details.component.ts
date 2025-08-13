@@ -30,6 +30,8 @@ export class TeamDetailsComponent implements OnInit {
   hasUpdatePermission = false;
   hasDeletePermission = false;
   editingDetails = false;
+  editingMembers = false;
+  editingEvents = false;
   editForm = {
     name: '',
     description: ''
@@ -72,19 +74,31 @@ export class TeamDetailsComponent implements OnInit {
       this.actionButtons.push({
         label: this.editingDetails ? 'Cancel' : 'Edit',
         action: () => this.toggleEditDetails(),
-        type: this.editingDetails ? 'primary' : 'secondary'
+        type: this.editingDetails ? 'btn-primary' : 'btn-secondary'
+      });
+
+      this.memberActionButtons.push({
+        label: this.editingMembers ? 'Done' : 'Edit Members',
+        action: () => this.toggleEditRoles(),
+        type: this.editingMembers ? 'btn-primary' : 'btn-secondary'
       });
 
       this.memberActionButtons.push({
         label: 'Add Member',
         action: () => this.addMember(),
-        type: 'primary'
+        type: 'btn-secondary'
+      });
+
+      this.eventActionButtons.push({
+        label: this.editingEvents ? 'Done' : 'Edit Events',
+        action: () => this.toggleEditEvents(),
+        type: this.editingEvents ? 'btn-primary' : 'btn-secondary'
       });
 
       this.eventActionButtons.push({
         label: 'Add Event',
         action: () => this.addEventToTeam(),
-        type: 'primary'
+        type: 'btn-secondary'
       });
     }
   }
@@ -319,6 +333,62 @@ export class TeamDetailsComponent implements OnInit {
    */
   goToAccess(): void {
     this.stateService.go('admin.teamAccess', { teamId: this.team.id });
+  }
+
+  /**
+   * Toggles the editing state for user roles.
+   */
+  toggleEditRoles(): void {
+    this.editingMembers = !this.editingMembers;
+    this.updateActionButtons();
+  }
+
+  /**
+   * Toggles the editing state for events.
+   */
+  toggleEditEvents(): void {
+    this.editingEvents = !this.editingEvents;
+    this.updateActionButtons();
+  }
+
+  /**
+   * Gets the role of a user in the current team.
+   * @param user - The user to get the role for
+   * @returns The user's role in the team or 'GUEST' as default
+   */
+  getUserRole(user: User): string {
+    const userAcl = this.team?.acl[user.id];
+    return userAcl?.role || 'GUEST';
+  }
+
+  /**
+   * Gets the CSS class for a user's role badge.
+   * @param user - The user to get the role class for
+   * @returns The CSS class for the role badge
+   */
+  getRoleClass(user: User): string {
+    const role = this.getUserRole(user);
+    return `user-role-badge role-${role.toLowerCase()}`;
+  }
+
+  /**
+   * Updates a user's role in the team.
+   * @param user - The user whose role to update
+   * @param event - The change event containing the new role
+   */
+  updateUserRole(user: User, event: any): void {
+    const newRole = event.target.value;
+    console.log(`Updating user ${user.displayName} role to ${newRole}`);
+
+    this.teamService.updateUserRole(this.team.id, user.id, newRole).subscribe({
+      next: (updatedTeam: Team) => {
+        this.team = updatedTeam;
+        this.getMembers();
+      },
+      error: (error) => {
+        console.error('Error updating user role:', error);
+      }
+    });
   }
 
   /**

@@ -4,7 +4,7 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 export interface CardActionButton {
   label: string;
-  type: 'primary' | 'secondary' | 'tertiary';
+  type: 'btn-primary' | 'btn-secondary' | 'btn-tertiary';
   disabled?: boolean;
   action: () => void;
 }

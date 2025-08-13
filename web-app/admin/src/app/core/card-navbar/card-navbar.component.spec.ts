@@ -68,8 +68,8 @@ describe('CardNavbarComponent', () => {
 
     it('should display action buttons when provided', () => {
       const mockButtons: CardActionButton[] = [
-        { label: 'Button 1', type: 'primary', action: jasmine.createSpy('action1') },
-        { label: 'Button 2', type: 'secondary', action: jasmine.createSpy('action2') }
+        { label: 'Button 1', type: 'btn-primary', action: jasmine.createSpy('action1') },
+        { label: 'Button 2', type: 'btn-secondary', action: jasmine.createSpy('action2') }
       ];
       component.actionButtons = mockButtons;
       fixture.detectChanges();
@@ -90,23 +90,23 @@ describe('CardNavbarComponent', () => {
 
     it('should apply correct CSS classes to action buttons', () => {
       const mockButtons: CardActionButton[] = [
-        { label: 'Primary', type: 'primary', action: jasmine.createSpy() },
-        { label: 'Secondary', type: 'secondary', action: jasmine.createSpy() },
-        { label: 'Tertiary', type: 'tertiary', action: jasmine.createSpy() }
+        { label: 'btn-primary', type: 'btn-primary', action: jasmine.createSpy() },
+        { label: 'btn-secondary', type: 'btn-secondary', action: jasmine.createSpy() },
+        { label: 'btn-tertiary', type: 'btn-tertiary', action: jasmine.createSpy() }
       ];
       component.actionButtons = mockButtons;
       fixture.detectChanges();
 
       const buttons = fixture.debugElement.queryAll(By.css('[data-testid="action-button"]'));
-      expect(buttons[0].nativeElement.classList).toContain('primary');
-      expect(buttons[1].nativeElement.classList).toContain('secondary');
-      expect(buttons[2].nativeElement.classList).toContain('tertiary');
+      expect(buttons[0].nativeElement.classList).toContain('btn-primary');
+      expect(buttons[1].nativeElement.classList).toContain('btn-secondary');
+      expect(buttons[2].nativeElement.classList).toContain('btn-tertiary');
     });
 
     it('should disable buttons when disabled property is true', () => {
       const mockButtons: CardActionButton[] = [
-        { label: 'Enabled', type: 'primary', action: jasmine.createSpy() },
-        { label: 'Disabled', type: 'primary', disabled: true, action: jasmine.createSpy() }
+        { label: 'Enabled', type: 'btn-primary', action: jasmine.createSpy() },
+        { label: 'Disabled', type: 'btn-primary', disabled: true, action: jasmine.createSpy() }
       ];
       component.actionButtons = mockButtons;
       fixture.detectChanges();
@@ -206,7 +206,7 @@ describe('CardNavbarComponent', () => {
       const mockAction = jasmine.createSpy('mockAction');
       const button: CardActionButton = {
         label: 'Test Button',
-        type: 'primary',
+        type: 'btn-primary',
         action: mockAction
       };
 
@@ -218,7 +218,7 @@ describe('CardNavbarComponent', () => {
     it('should not throw error when button action is undefined', () => {
       const button: CardActionButton = {
         label: 'Test Button',
-        type: 'primary',
+        type: 'btn-primary',
         action: undefined as any
       };
 
@@ -228,7 +228,7 @@ describe('CardNavbarComponent', () => {
     it('should trigger onActionButtonClick when button is clicked', () => {
       const mockAction = jasmine.createSpy('mockAction');
       const mockButtons: CardActionButton[] = [
-        { label: 'Test Button', type: 'primary', action: mockAction }
+        { label: 'Test Button', type: 'btn-primary', action: mockAction }
       ];
       component.actionButtons = mockButtons;
       fixture.detectChanges();
@@ -287,7 +287,7 @@ describe('CardNavbarComponent', () => {
 
     it('should accept actionButtons input', () => {
       const buttons: CardActionButton[] = [
-        { label: 'Button', type: 'primary', action: () => { } }
+        { label: 'Button', type: 'btn-primary', action: () => { } }
       ];
       component.actionButtons = buttons;
       expect(component.actionButtons).toBe(buttons);

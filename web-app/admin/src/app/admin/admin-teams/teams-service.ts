@@ -149,4 +149,17 @@ export class TeamsService {
     removeMember(teamId: string, userId: string): Observable<any> {
         return this.http.delete(`/api/teams/${teamId}/users/${userId}`);
     }
+
+    /**
+     * Updates a user's role in a team.
+     * This is a placeholder implementation that will be completed later.
+     * 
+     * @param teamId - The ID of the team
+     * @param userId - The ID of the user
+     * @param role - The new role for the user ('OWNER', 'MANAGER', or 'GUEST')
+     * @returns Observable that will emit the updated team
+     */
+    updateUserRole(teamId: string, userId: string, role: string): Observable<Team> {
+        return this.http.put<Team>(`/api/teams/${teamId}/acl/${userId}`, { role });
+    }
 }

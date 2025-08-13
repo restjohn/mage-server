@@ -180,27 +180,9 @@ function config($httpProvider, $stateProvider, $urlRouterProvider, $animateProvi
     resolve: resolveAdmin()
   });
 
-  $stateProvider.state('admin.createTeam', {
-    url: '/teams/new',
-    component: "adminTeamEdit",
-    resolve: resolveAdmin()
-  });
-
   $stateProvider.state('admin.team', {
     url: '/teams/:teamId',
     component: "adminTeamDetails",
-    resolve: resolveAdmin()
-  });
-
-  $stateProvider.state('admin.editTeam', {
-    url: '/teams/:teamId/edit',
-    component: "adminTeamEdit",
-    resolve: resolveAdmin()
-  });
-
-  $stateProvider.state('admin.teamAccess', {
-    url: '/teams/:teamId/access',
-    component: "adminTeamAccess",
     resolve: resolveAdmin()
   });
 

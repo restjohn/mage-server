@@ -16,5 +16,4 @@ require('./users');
 require('./devices');
 require('./events');
 require('./layers');
-require('./teams');
 require('./feeds');

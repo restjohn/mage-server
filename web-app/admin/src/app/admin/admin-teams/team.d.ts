@@ -7,4 +7,14 @@ export interface Team {
     teamEventId: number | string;
     users: ObjectId[];
     acl: Records<ObjectId, string>;
+    permissions?: string[];
 }
+
+export interface TeamAcl {
+    [userId: string]: {
+        role: 'OWNER' | 'MANAGER' | 'GUEST';
+        permissions: string[];
+    };
+}
+
+export type TeamMemberRole = 'OWNER' | 'MANAGER' | 'GUEST';
