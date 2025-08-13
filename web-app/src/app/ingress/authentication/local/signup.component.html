@@ -102,87 +102,11 @@
           signup.controls.password.invalid && signup.controls.password.touched
         "
       >
-        <mat-error *ngIf="signup.controls.password.hasError('required')">
-          Password is required
-        </mat-error>
-        <mat-error
-          *ngIf="signup.controls.password.hasError('passwordMinLength')"
-        >
-          Must
-          {{
-            passwordPolicy.helpTextTemplate.passwordMinLength?.replace(
-              '#',
-              passwordPolicy.passwordMinLength
-            )
-          }}
-        </mat-error>
-        <mat-error
-          *ngIf="signup.controls.password.hasError('minChars')"
-        >
-          Must
-          {{
-            passwordPolicy.helpTextTemplate.minChars?.replace(
-              '#',
-              passwordPolicy.minChars
-            )
-          }}
-        </mat-error>
-        <mat-error *ngIf="signup.controls.password.hasError('maxConChars')">
-          Must
-          {{
-            passwordPolicy.helpTextTemplate.maxConChars?.replace(
-              '#',
-              passwordPolicy.maxConChars
-            )
-          }}
-        </mat-error>
-        <mat-error *ngIf="signup.controls.password.hasError('lowLetters')">
-          Must
-          {{
-            passwordPolicy.helpTextTemplate.lowLetters?.replace(
-              '#',
-              passwordPolicy.lowLetters
-            )
-          }}
-        </mat-error>
-        <mat-error *ngIf="signup.controls.password.hasError('highLetters')">
-          Must
-          {{
-            passwordPolicy.helpTextTemplate.highLetters?.replace(
-              '#',
-              passwordPolicy.highLetters
-            )
-          }}
-        </mat-error>
-        <mat-error *ngIf="signup.controls.password.hasError('numbers')">
-          Must
-          {{
-            passwordPolicy.helpTextTemplate.numbers?.replace(
-              '#',
-              passwordPolicy.numbers
-            )
-          }}
-        </mat-error>
-        <mat-error *ngIf="signup.controls.password.hasError('specialChars')">
-          Must
-          {{
-            passwordPolicy.helpTextTemplate.specialChars?.replace(
-              '#',
-              passwordPolicy.specialChars
-            )
-          }}
-        </mat-error>
-        <mat-error
-          *ngIf="signup.controls.password.hasError('restrictSpecialChars')"
-        >
-          Must
-          {{
-            passwordPolicy.helpTextTemplate.restrictSpecialChars?.replace(
-              '#',
-              passwordPolicy.restrictSpecialChars
-            )
-          }}
-        </mat-error>
+      <mat-error *ngIf="signup.controls.password.errors as errors">
+        <div *ngFor="let msg of getPasswordErrorMessages(errors)">
+          {{ msg }}
+        </div>
+      </mat-error>      
       </div>
     </mat-form-field>
 

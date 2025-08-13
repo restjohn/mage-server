@@ -36,6 +36,7 @@ export class SignupComponent {
   showPassword: boolean = false;
 
   showConfirmPassword: boolean = false;
+  passwordErrorMessages: string[] = [];
 
   signup = new FormGroup({
     username: new FormControl<string>('', [Validators.required]),
@@ -244,7 +245,11 @@ export class SignupComponent {
   passwordPolicyValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const password: string = control.value;
+
       if (!password) return null;
+
+      const templates = this.passwordPolicy.helpTextTemplate;
+      let currentErrors:string[] = [];
 
       const errors: ValidationErrors = {};
 
@@ -253,6 +258,7 @@ export class SignupComponent {
         password.length < this.passwordPolicy.passwordMinLength
       ) {
         errors.passwordMinLength = true;
+        currentErrors.push(`Must ${templates.passwordMinLength?.replace('#', this.passwordPolicy.passwordMinLength.toString())}`);
       }
 
       if (
@@ -260,6 +266,7 @@ export class SignupComponent {
         (password.match(/[a-z]/g) || []).length < this.passwordPolicy.lowLetters
       ) {
         errors.lowLetters = true;
+        currentErrors.push(`Must ${templates.lowLetters?.replace('#', this.passwordPolicy.lowLetters.toString())}`);
       }
 
       if (
@@ -267,6 +274,7 @@ export class SignupComponent {
         (password.match(/[a-z]/gi) || []).length < this.passwordPolicy.minChars
       ) {
         errors.minChars = true;
+        currentErrors.push(`Must ${templates.minChars?.replace('#', this.passwordPolicy.minChars.toString())}`);
       }
 
       if (
@@ -275,6 +283,7 @@ export class SignupComponent {
           this.passwordPolicy.highLetters
       ) {
         errors.highLetters = true;
+        currentErrors.push(`Must ${templates.highLetters?.replace('#', this.passwordPolicy.highLetters.toString())}`);
       }
 
       if (
@@ -282,6 +291,7 @@ export class SignupComponent {
         (password.match(/[0-9]/g) || []).length < this.passwordPolicy.numbers
       ) {
         errors.numbers = true;
+        currentErrors.push(`Must ${templates.numbers?.replace('#', this.passwordPolicy.numbers.toString())}`);
       }
 
       if (
@@ -290,6 +300,7 @@ export class SignupComponent {
           this.passwordPolicy.specialChars
       ) {
         errors.specialChars = true;
+        currentErrors.push(`Must ${templates.specialChars?.replace('#', this.passwordPolicy.specialChars.toString())}`);
       }
 
       if (this.passwordPolicy.maxConCharsEnabled) {
@@ -299,6 +310,7 @@ export class SignupComponent {
       
         if (regex.test(password)) {
           errors.maxConChars = true;
+          currentErrors.push(`Must ${templates.maxConChars?.replace('#', this.passwordPolicy.maxConChars.toString())}`);
         }
       }
       
@@ -308,12 +320,24 @@ export class SignupComponent {
         const specialMatches = password.match(/[^a-zA-Z0-9]/g) || [];
         if (specialMatches.some((char) => !allowed.includes(char))) {
           errors.restrictSpecialChars = true;
+          currentErrors.push(`Must ${templates.restrictSpecialChars?.replace('#', this.passwordPolicy.restrictSpecialChars.toString())}`);
         }
       }
+
+      this.passwordErrorMessages = currentErrors;
 
       return Object.keys(errors).length ? errors : null;
     };
   }
+
+  getPasswordErrorMessages(errors: any): string[] {
+    if (errors['required']) {
+      return ['Password is required'];
+    }
+  
+    return this.passwordErrorMessages;
+  }
+  
 
   /**
    * Creates a validator that checks whether the password confirmation matches the original password.
