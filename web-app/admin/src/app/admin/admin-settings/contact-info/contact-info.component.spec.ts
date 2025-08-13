@@ -5,7 +5,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SimpleChange } from "@angular/core";
 import { Settings } from "../../../../app/upgrade/ajs-upgraded-providers";
 
-// ===== MOCK DATA =====
 const MOCK_CONTACT_INFO = {
     phone: '123-456-7890',
     email: 'test@example.com',
@@ -27,7 +26,7 @@ class MockSettings {
     }
 
     update(params: any, data: any, success: Function, failure: Function): void {
-        success(); // default to success path
+        success();
     }
 }
 
@@ -79,7 +78,7 @@ describe('ContactInfoComponent', () => {
         spyOn(settingsService, 'query').and.returnValue({ $promise: Promise.reject('Error!') });
     
         component.ngOnInit();
-        tick(); // flush pending promises
+        tick();
     
         expect(consoleSpy).toHaveBeenCalledWith('Error!');
     }));
