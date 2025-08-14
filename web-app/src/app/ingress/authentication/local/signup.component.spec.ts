@@ -8,6 +8,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { User } from 'core-lib-src/user';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PasswordPolicy } from '../@types/signup';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 describe('SignupComponent', () => {
   let component: SignupComponent;
@@ -81,7 +82,7 @@ describe('SignupComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [SignupComponent],
-      imports: [ReactiveFormsModule, HttpClientTestingModule],
+      imports: [ReactiveFormsModule, HttpClientTestingModule, MatFormFieldModule],
       providers: [
         { provide: ApiService, useValue: mockApiService },
         { provide: UserService, useValue: mockUserService }
