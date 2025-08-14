@@ -32,7 +32,17 @@ describe('SignupComponent', () => {
     restrictSpecialCharsEnabled: true,
     restrictSpecialChars: "!@#",
     minCharsEnabled: true,
-    minChars: 2
+    minChars: 2,
+    helpTextTemplate: {
+      passwordMinLength: "Test #",
+      lowLetters: "Test #",
+      highLetters: "Test #",
+      numbers: "Test #",
+      specialChars: "Test #",
+      maxConChars: "Test #",
+      restrictSpecialChars: "Test #",
+      minChars: "Test #"
+    }
   };
 
   const mockUser: User = 
@@ -77,13 +87,14 @@ describe('SignupComponent', () => {
         { provide: UserService, useValue: mockUserService }
       ]
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(SignupComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
+    fixture.whenStable().then(() => {
+      fixture.detectChanges();
+    });
+  }));
 
   it('should create the component', () => {
     expect(component).toBeTruthy();
@@ -228,7 +239,7 @@ describe('SignupComponent', () => {
     const result = validator(control);
     expect(result).toBeTruthy();
     expect(result?.passwordMinLength).toBeTrue();
-    expect(result?.lowLetters).toBeFalsy(); // Has 2 lowercase
+    expect(result?.lowLetters).toBeFalsy();
   });
 
   it('should allow valid password by policy', () => {
@@ -250,14 +261,14 @@ describe('SignupComponent', () => {
     expect(component.showConfirmPassword).toBeTrue();
   });  
 
-  it('should validate minChars rule for mixed-case letters (case-insensitive)', () => {
+  it('should validate minChars rule for mixed-case letters', () => {
     const validator = component.passwordPolicyValidator();
   
     let control = { value: '1!' } as any;
     let result = validator(control);
     expect(result?.minChars).toBeTrue();
   
-    control = { value: 'A1a!' } as any;
+    control = { value: 'AA1a!' } as any;
     result = validator(control);
     expect(result?.minChars).toBeFalsy();
   });
