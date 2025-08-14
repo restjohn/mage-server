@@ -9,6 +9,10 @@ import { User } from 'core-lib-src/user';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PasswordPolicy } from '../@types/signup';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { CommonModule } from '@angular/common';
+import { BrowserModule } from '@angular/platform-browser';
+import { MatInputModule } from '@angular/material/input';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('SignupComponent', () => {
   let component: SignupComponent;
@@ -31,58 +35,71 @@ describe('SignupComponent', () => {
     maxConCharsEnabled: true,
     maxConChars: 2,
     restrictSpecialCharsEnabled: true,
-    restrictSpecialChars: "!@#",
+    restrictSpecialChars: '!@#',
     minCharsEnabled: true,
     minChars: 2,
     helpTextTemplate: {
-      passwordMinLength: "Test #",
-      lowLetters: "Test #",
-      highLetters: "Test #",
-      numbers: "Test #",
-      specialChars: "Test #",
-      maxConChars: "Test #",
-      restrictSpecialChars: "Test #",
-      minChars: "Test #"
+      passwordMinLength: 'Test #',
+      lowLetters: 'Test #',
+      highLetters: 'Test #',
+      numbers: 'Test #',
+      specialChars: 'Test #',
+      maxConChars: 'Test #',
+      restrictSpecialChars: 'Test #',
+      minChars: 'Test #'
     }
   };
 
-  const mockUser: User = 
-    {
-      id: "1",
-      username: "ranma77",
-      displayName: "Ranma Saotome",
-      active: true,
-      enabled: true,
-      authentication: "LOCAL",
-      createdAt: new Date().toDateString(),
-      lastUpdated: new Date().toDateString(),
-      recentEventIds: [],
-      role: "martial artist",
-      email: "ranma@example.com",
-      phones: [],
-    };
+  const mockUser: User = {
+    id: '1',
+    username: 'ranma77',
+    displayName: 'Ranma Saotome',
+    active: true,
+    enabled: true,
+    authentication: 'LOCAL',
+    createdAt: new Date().toDateString(),
+    lastUpdated: new Date().toDateString(),
+    recentEventIds: [],
+    role: 'martial artist',
+    email: 'ranma@example.com',
+    phones: []
+  };
 
   beforeEach(waitForAsync(() => {
     mockApiService = {
-      getApi: jasmine.createSpy().and.returnValue(of({
-        authenticationStrategies: {
-          local: {
-            settings: {
-              passwordPolicy: mockPasswordPolicy
+      getApi: jasmine.createSpy().and.returnValue(
+        of({
+          authenticationStrategies: {
+            local: {
+              settings: {
+                passwordPolicy: mockPasswordPolicy
+              }
             }
           }
-        }
-      }))
+        })
+      )
     };
 
     mockUserService = {
-      signup: jasmine.createSpy().and.returnValue(of({ captcha: 'captcha-uri', token: 'captcha-token' })),
+      signup: jasmine
+        .createSpy()
+        .and.returnValue(
+          of({ captcha: 'captcha-uri', token: 'captcha-token' })
+        ),
       signupVerify: jasmine.createSpy().and.returnValue(of(mockUser))
     };
 
     TestBed.configureTestingModule({
       declarations: [SignupComponent],
-      imports: [ReactiveFormsModule, HttpClientTestingModule, MatFormFieldModule],
+      imports: [
+        ReactiveFormsModule,
+        HttpClientTestingModule,
+        MatFormFieldModule,
+        MatInputModule,
+        CommonModule,
+        BrowserModule,
+        NoopAnimationsModule
+      ],
       providers: [
         { provide: ApiService, useValue: mockApiService },
         { provide: UserService, useValue: mockUserService }
@@ -146,8 +163,8 @@ describe('SignupComponent', () => {
     expect(mockUserService.signupVerify).toHaveBeenCalled();
     expect(component.complete.emit).toHaveBeenCalledWith({
       reason: 'signup',
-      user:  mockUser, 
-      });
+      user: mockUser
+    });
   });
 
   it('should set error if passwords do not match', () => {
@@ -165,7 +182,14 @@ describe('SignupComponent', () => {
 
   it('should handle 401 error and call getCaptcha()', () => {
     const getCaptchaSpy = spyOn(component, 'getCaptcha');
-    mockUserService.signupVerify = jasmine.createSpy().and.returnValue(throwError(() => new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' })));
+    mockUserService.signupVerify = jasmine
+      .createSpy()
+      .and.returnValue(
+        throwError(
+          () =>
+            new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' })
+        )
+      );
 
     component.signup.patchValue({
       username: mockUser.username,
@@ -184,7 +208,13 @@ describe('SignupComponent', () => {
   });
 
   it('should set captcha error on 403', () => {
-    mockUserService.signupVerify = jasmine.createSpy().and.returnValue(throwError(() => new HttpErrorResponse({ status: 403, statusText: 'Forbidden' })));
+    mockUserService.signupVerify = jasmine
+      .createSpy()
+      .and.returnValue(
+        throwError(
+          () => new HttpErrorResponse({ status: 403, statusText: 'Forbidden' })
+        )
+      );
 
     component.signup.patchValue({
       username: mockUser.username,
@@ -203,7 +233,13 @@ describe('SignupComponent', () => {
   });
 
   it('should set username error on 409', () => {
-    mockUserService.signupVerify = jasmine.createSpy().and.returnValue(throwError(() => new HttpErrorResponse({ status: 409, statusText: 'Conflict' })));
+    mockUserService.signupVerify = jasmine
+      .createSpy()
+      .and.returnValue(
+        throwError(
+          () => new HttpErrorResponse({ status: 409, statusText: 'Conflict' })
+        )
+      );
 
     component.signup.patchValue({
       username: mockUser.username,
@@ -255,24 +291,22 @@ describe('SignupComponent', () => {
     component.showPassword = true;
     expect(component.showPassword).toBeTrue();
   });
-  
+
   it('should toggle showConfirmPassword flag', () => {
     expect(component.showConfirmPassword).toBeFalse();
     component.showConfirmPassword = true;
     expect(component.showConfirmPassword).toBeTrue();
-  });  
+  });
 
   it('should validate minChars rule for mixed-case letters', () => {
     const validator = component.passwordPolicyValidator();
-  
+
     let control = { value: '1!' } as any;
     let result = validator(control);
     expect(result?.minChars).toBeTrue();
-  
+
     control = { value: 'AA1a!' } as any;
     result = validator(control);
     expect(result?.minChars).toBeFalsy();
   });
-  
-
 });
