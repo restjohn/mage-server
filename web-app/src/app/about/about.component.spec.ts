@@ -3,6 +3,8 @@ import { AboutComponent } from './about.component';
 import { ApiService } from '../api/api.service';
 import { of } from 'rxjs';
 import { Location } from '@angular/common';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
 
 describe('AboutComponent', () => {
   let component: AboutComponent;
@@ -44,6 +46,7 @@ describe('AboutComponent', () => {
     mockLocation = jasmine.createSpyObj('Location', ['back']);
 
     TestBed.configureTestingModule({
+      imports: [MatToolbarModule, MatIconModule],
       declarations: [AboutComponent],
       providers: [
         { provide: ApiService, useValue: mockApiService },
@@ -83,8 +86,12 @@ describe('AboutComponent', () => {
 
     expect(component.mageVersion).toEqual(MOCK_API_RESPONSE_NO_CONTACT.version);
     expect(component.apk).toBe(MOCK_API_RESPONSE_NO_CONTACT.apk);
-    expect(component.nodeVersion).toBe(MOCK_API_RESPONSE_NO_CONTACT.environment.nodeVersion);
-    expect(component.mongoVersion).toBe(MOCK_API_RESPONSE_NO_CONTACT.environment.mongodbVersion);
+    expect(component.nodeVersion).toBe(
+      MOCK_API_RESPONSE_NO_CONTACT.environment.nodeVersion
+    );
+    expect(component.mongoVersion).toBe(
+      MOCK_API_RESPONSE_NO_CONTACT.environment.mongodbVersion
+    );
     expect(component.adminEmail).toBeNull();
     expect(component.adminPhone).toBeNull();
     expect(component.showDevContact).toBeFalse();
@@ -94,5 +101,4 @@ describe('AboutComponent', () => {
     component.onBack();
     expect(mockLocation.back).toHaveBeenCalled();
   });
-
 });
