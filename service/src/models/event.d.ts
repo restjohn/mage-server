@@ -53,7 +53,7 @@ export type FormFieldChoiceDocument = FormFieldChoice & mongoose.Document & {
 }
 
 export type TODO = any
-export type Callback<Result = unknown> = (err: Error | null, result?: Result) => void
+export type Callback<Result = unknown> = (err: Error | null, result?: Result, totalCount?: number) => void
 
 export declare function count(options: TODO, callback: Callback<number>): void
 export declare function getEvents(options: TODO, callback: Callback<MageEventDocument[]>): void

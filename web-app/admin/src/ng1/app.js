@@ -26,6 +26,7 @@ import { AdminFeedEditComponent } from '../app/admin/admin-feeds/admin-feed/admi
 import { AuthenticationCreateComponent } from '../app/admin/admin-authentication/admin-authentication-create/admin-authentication-create.component';
 import { AdminEventFormPreviewComponent } from '../app/admin/admin-event/admin-event-form/admin-event-form-preview/admin-event-form-preview.component';
 import { TeamDashboardComponent } from '../app/admin/admin-teams/dashboard/team-dashboard.component';
+import { TeamDetailsComponent } from '../app/admin/admin-teams/team-details/team-details.component';
 
 
 require('angular-minicolors');
@@ -67,6 +68,7 @@ app
   .directive('contact', downgradeComponent({ component: ContactComponent }))
   .directive('adminEventFormPreview', downgradeComponent({ component: AdminEventFormPreviewComponent }))
   .directive('adminTeams', downgradeComponent({ component: TeamDashboardComponent }))
+  .directive('adminTeamDetails', downgradeComponent({ component: TeamDetailsComponent }))
   .directive('adminDashboard', downgradeComponent({ component: AdminDashboardComponent }));
 
 app
@@ -178,27 +180,9 @@ function config($httpProvider, $stateProvider, $urlRouterProvider, $animateProvi
     resolve: resolveAdmin()
   });
 
-  $stateProvider.state('admin.createTeam', {
-    url: '/teams/new',
-    component: "adminTeamEdit",
-    resolve: resolveAdmin()
-  });
-
   $stateProvider.state('admin.team', {
     url: '/teams/:teamId',
-    component: "adminTeam",
-    resolve: resolveAdmin()
-  });
-
-  $stateProvider.state('admin.editTeam', {
-    url: '/teams/:teamId/edit',
-    component: "adminTeamEdit",
-    resolve: resolveAdmin()
-  });
-
-  $stateProvider.state('admin.teamAccess', {
-    url: '/teams/:teamId/access',
-    component: "adminTeamAccess",
+    component: "adminTeamDetails",
     resolve: resolveAdmin()
   });
 

@@ -5,7 +5,16 @@ export interface Team {
     name: string;
     description: string;
     teamEventId: number | string;
-    userIds?: ObjectId[];
-    acl?: Records<ObjectId, string>;
+    users: ObjectId[];
+    acl: Records<ObjectId, string>;
     permissions?: string[];
 }
+
+export interface TeamAcl {
+    [userId: string]: {
+        role: 'OWNER' | 'MANAGER' | 'GUEST';
+        permissions: string[];
+    };
+}
+
+export type TeamMemberRole = 'OWNER' | 'MANAGER' | 'GUEST';

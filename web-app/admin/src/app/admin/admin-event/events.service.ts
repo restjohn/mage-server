@@ -1,0 +1,61 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Event } from 'src/app/filter/filter.types';
+import { Team } from '../admin-teams/team';
+
+export interface SearchOptions {
+    term?: string;
+    teamId?: string;
+    excludeTeamId?: string;
+    id?: string;
+    page?: number;
+    page_size?: number;
+}
+
+interface EventsResponse {
+    pageSize?: number;
+    page?: number;
+    items: Event[];
+    totalCount?: number;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class EventsService {
+
+    constructor(private http: HttpClient) { }
+
+    getEvents(options: SearchOptions): Observable<EventsResponse> {
+        let params = new HttpParams();
+
+        if (options.term !== undefined) {
+            params = params.set('term', options.term);
+        }
+        if (options.page !== undefined) {
+            params = params.set('start', String(options.page));
+        }
+        if (options.page_size !== undefined) {
+            params = params.set('limit', String(options.page_size));
+        }
+        if (options.teamId !== undefined) {
+            params = params.set('teamId', options.teamId);
+        }
+        if (options.excludeTeamId !== undefined) {
+            params = params.set('excludeTeamId', options.excludeTeamId);
+        }
+
+        params = params.set('includePagination', 'true');
+
+        return this.http.get<EventsResponse>('/api/events', { params });
+    }
+
+    addTeamToEvent(eventId: string, team: Team): Observable<Event> {
+        return this.http.post<Event>(`/api/events/${eventId}/teams`, team);
+    }
+
+    removeEventFromTeam(eventId: string, teamId: string): Observable<void> {
+        return this.http.delete<void>(`/api/events/${eventId}/teams/${teamId}`);
+    }
+}

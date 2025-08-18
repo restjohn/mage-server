@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Routes } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -9,23 +8,24 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { TeamDashboardComponent } from './dashboard/team-dashboard.component';
 import { CreateTeamDialogComponent } from './create-team/create-team.component';
 import { TeamsService } from './teams-service';
+import { EventsService } from '../admin-event/events.service';
+import { TeamDetailsComponent } from './team-details/team-details.component';
 import { CoreModule } from '../../core/core.module';
-
-const routes: Routes = [
-    {
-        path: '',
-        component: TeamDashboardComponent
-    }
-];
+import { DeleteTeamComponent } from './delete-team/delete-team.component';
 
 @NgModule({
     declarations: [
         TeamDashboardComponent,
-        CreateTeamDialogComponent
+        CreateTeamDialogComponent,
+        TeamDetailsComponent,
+        DeleteTeamComponent
     ],
     imports: [
         CommonModule,
@@ -39,13 +39,17 @@ const routes: Routes = [
         MatFormFieldModule,
         MatInputModule,
         MatButtonModule,
-        RouterModule.forChild(routes)
+        MatCheckboxModule,
+        MatIconModule,
+        MatProgressSpinnerModule
     ],
     providers: [
-        TeamsService
+        TeamsService,
+        EventsService
     ],
     entryComponents: [
-        CreateTeamDialogComponent
+        CreateTeamDialogComponent,
+        DeleteTeamComponent
     ]
 })
 export class AdminTeamsModule { }

@@ -25,7 +25,6 @@ describe('CardNavbarComponent', () => {
     });
 
     it('should initialize with default values', () => {
-      expect(component.title).toBeUndefined();
       expect(component.isSearchable).toBe(false);
       expect(component.searchPlaceholder).toBe('Search...');
       expect(component.actionButtons).toEqual([]);
@@ -39,20 +38,12 @@ describe('CardNavbarComponent', () => {
       fixture.detectChanges();
     });
 
-    it('should display the title', () => {
-      component.title = 'Test Title';
-      fixture.detectChanges();
-
-      const titleElement = fixture.debugElement.query(By.css('.navbar-brand'));
-      expect(titleElement.nativeElement.textContent.trim()).toBe('Test Title');
-    });
-
     it('should show search input when isSearchable is true', () => {
       component.isSearchable = true;
       fixture.detectChanges();
 
-      const searchContainer = fixture.debugElement.query(By.css('.search-container'));
-      const searchInput = fixture.debugElement.query(By.css('.search-input'));
+      const searchContainer = fixture.debugElement.query(By.css('[data-testid="search-section"]'));
+      const searchInput = fixture.debugElement.query(By.css('[data-testid="search-input"]'));
 
       expect(searchContainer).toBeTruthy();
       expect(searchInput).toBeTruthy();
@@ -62,7 +53,7 @@ describe('CardNavbarComponent', () => {
       component.isSearchable = false;
       fixture.detectChanges();
 
-      const searchContainer = fixture.debugElement.query(By.css('.search-container'));
+      const searchContainer = fixture.debugElement.query(By.css('[data-testid="search-section"]'));
       expect(searchContainer).toBeFalsy();
     });
 
@@ -71,19 +62,19 @@ describe('CardNavbarComponent', () => {
       component.searchPlaceholder = 'Custom placeholder';
       fixture.detectChanges();
 
-      const searchInput = fixture.debugElement.query(By.css('.search-input'));
+      const searchInput = fixture.debugElement.query(By.css('[data-testid="search-input"]'));
       expect(searchInput.nativeElement.placeholder).toBe('Custom placeholder');
     });
 
     it('should display action buttons when provided', () => {
       const mockButtons: CardActionButton[] = [
-        { label: 'Button 1', type: 'primary', action: jasmine.createSpy('action1') },
-        { label: 'Button 2', type: 'secondary', action: jasmine.createSpy('action2') }
+        { label: 'Button 1', type: 'btn-primary', action: jasmine.createSpy('action1') },
+        { label: 'Button 2', type: 'btn-secondary', action: jasmine.createSpy('action2') }
       ];
       component.actionButtons = mockButtons;
       fixture.detectChanges();
 
-      const buttons = fixture.debugElement.queryAll(By.css('.action-button'));
+      const buttons = fixture.debugElement.queryAll(By.css('[data-testid="action-button"]'));
       expect(buttons.length).toBe(2);
       expect(buttons[0].nativeElement.textContent.trim()).toBe('Button 1');
       expect(buttons[1].nativeElement.textContent.trim()).toBe('Button 2');
@@ -93,34 +84,34 @@ describe('CardNavbarComponent', () => {
       component.actionButtons = [];
       fixture.detectChanges();
 
-      const form = fixture.debugElement.query(By.css('.navbar-form.navbar-right'));
-      expect(form).toBeFalsy();
+      const actionsSection = fixture.debugElement.query(By.css('[data-testid="actions-section"]'));
+      expect(actionsSection).toBeFalsy();
     });
 
     it('should apply correct CSS classes to action buttons', () => {
       const mockButtons: CardActionButton[] = [
-        { label: 'Primary', type: 'primary', action: jasmine.createSpy() },
-        { label: 'Secondary', type: 'secondary', action: jasmine.createSpy() },
-        { label: 'Tertiary', type: 'tertiary', action: jasmine.createSpy() }
+        { label: 'btn-primary', type: 'btn-primary', action: jasmine.createSpy() },
+        { label: 'btn-secondary', type: 'btn-secondary', action: jasmine.createSpy() },
+        { label: 'btn-tertiary', type: 'btn-tertiary', action: jasmine.createSpy() }
       ];
       component.actionButtons = mockButtons;
       fixture.detectChanges();
 
-      const buttons = fixture.debugElement.queryAll(By.css('.action-button'));
-      expect(buttons[0].nativeElement.classList).toContain('primary');
-      expect(buttons[1].nativeElement.classList).toContain('secondary');
-      expect(buttons[2].nativeElement.classList).toContain('tertiary');
+      const buttons = fixture.debugElement.queryAll(By.css('[data-testid="action-button"]'));
+      expect(buttons[0].nativeElement.classList).toContain('btn-primary');
+      expect(buttons[1].nativeElement.classList).toContain('btn-secondary');
+      expect(buttons[2].nativeElement.classList).toContain('btn-tertiary');
     });
 
     it('should disable buttons when disabled property is true', () => {
       const mockButtons: CardActionButton[] = [
-        { label: 'Enabled', type: 'primary', action: jasmine.createSpy() },
-        { label: 'Disabled', type: 'primary', disabled: true, action: jasmine.createSpy() }
+        { label: 'Enabled', type: 'btn-primary', action: jasmine.createSpy() },
+        { label: 'Disabled', type: 'btn-primary', disabled: true, action: jasmine.createSpy() }
       ];
       component.actionButtons = mockButtons;
       fixture.detectChanges();
 
-      const buttons = fixture.debugElement.queryAll(By.css('.action-button'));
+      const buttons = fixture.debugElement.queryAll(By.css('[data-testid="action-button"]'));
       expect(buttons[0].nativeElement.disabled).toBe(false);
       expect(buttons[1].nativeElement.disabled).toBe(true);
     });
@@ -185,12 +176,12 @@ describe('CardNavbarComponent', () => {
     it('should trigger clearSearch when clear button is clicked', () => {
       spyOn(component, 'clearSearch');
 
-      const searchInput = fixture.debugElement.query(By.css('.search-input'));
+      const searchInput = fixture.debugElement.query(By.css('[data-testid="search-input"]'));
       searchInput.nativeElement.value = 'test';
       searchInput.nativeElement.dispatchEvent(new Event('input'));
       fixture.detectChanges();
 
-      const clearButton = fixture.debugElement.query(By.css('.clear-search-btn'));
+      const clearButton = fixture.debugElement.query(By.css('[data-testid="clear-search-btn"]'));
       clearButton.nativeElement.click();
 
       expect(component.clearSearch).toHaveBeenCalled();
@@ -199,7 +190,7 @@ describe('CardNavbarComponent', () => {
     it('should trigger onSearchChange when input value changes', fakeAsync(() => {
       spyOn(component, 'onSearchChange');
 
-      const searchInput = fixture.debugElement.query(By.css('.search-input'));
+      const searchInput = fixture.debugElement.query(By.css('[data-testid="search-input"]'));
       searchInput.nativeElement.value = 'test input';
       searchInput.nativeElement.dispatchEvent(new Event('input'));
 
@@ -215,7 +206,7 @@ describe('CardNavbarComponent', () => {
       const mockAction = jasmine.createSpy('mockAction');
       const button: CardActionButton = {
         label: 'Test Button',
-        type: 'primary',
+        type: 'btn-primary',
         action: mockAction
       };
 
@@ -227,7 +218,7 @@ describe('CardNavbarComponent', () => {
     it('should not throw error when button action is undefined', () => {
       const button: CardActionButton = {
         label: 'Test Button',
-        type: 'primary',
+        type: 'btn-primary',
         action: undefined as any
       };
 
@@ -237,12 +228,12 @@ describe('CardNavbarComponent', () => {
     it('should trigger onActionButtonClick when button is clicked', () => {
       const mockAction = jasmine.createSpy('mockAction');
       const mockButtons: CardActionButton[] = [
-        { label: 'Test Button', type: 'primary', action: mockAction }
+        { label: 'Test Button', type: 'btn-primary', action: mockAction }
       ];
       component.actionButtons = mockButtons;
       fixture.detectChanges();
 
-      const button = fixture.debugElement.query(By.css('.action-button'));
+      const button = fixture.debugElement.query(By.css('[data-testid="action-button"]'));
       button.nativeElement.click();
 
       expect(mockAction).toHaveBeenCalled();
@@ -283,12 +274,6 @@ describe('CardNavbarComponent', () => {
   });
 
   describe('Input Properties', () => {
-    it('should accept title input', () => {
-      const testTitle = 'My Component Title';
-      component.title = testTitle;
-      expect(component.title).toBe(testTitle);
-    });
-
     it('should accept isSearchable input', () => {
       component.isSearchable = true;
       expect(component.isSearchable).toBe(true);
@@ -302,7 +287,7 @@ describe('CardNavbarComponent', () => {
 
     it('should accept actionButtons input', () => {
       const buttons: CardActionButton[] = [
-        { label: 'Button', type: 'primary', action: () => { } }
+        { label: 'Button', type: 'btn-primary', action: () => { } }
       ];
       component.actionButtons = buttons;
       expect(component.actionButtons).toBe(buttons);
