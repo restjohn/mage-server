@@ -56,7 +56,6 @@ export class LocalAuthenticationComponent implements OnInit {
       this.router.navigate(['home']);
     }
     this.apiService.getApi().subscribe((api: any) => {
-      console.log(api)
       this.api = api
     })
   }
