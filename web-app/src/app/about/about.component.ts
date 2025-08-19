@@ -27,7 +27,6 @@ export class AboutComponent implements OnInit {
 
   ngOnInit(): void {
     this.apiService.getApi().subscribe(api =>{
-      console.log(api)
       this.mageVersion = api?.version;
       this.apk = api?.apk;
       this.nodeVersion = api.environment?.nodeVersion;

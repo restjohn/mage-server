@@ -69,7 +69,7 @@ describe('ObservationEditCheckboxComponent', () => {
     expect(label.textContent).toContain('*')
   })
  
-  it('should be checked', async () => {
+  it('should be not checked', async () => {
     component.definition.value = false;
     fixture.detectChanges();
   
@@ -79,7 +79,7 @@ describe('ObservationEditCheckboxComponent', () => {
     expect(checkboxDebugEl).withContext('MatCheckbox not found').toBeTruthy();
   
     const checkbox = checkboxDebugEl.componentInstance as MatCheckbox;
-    expect(checkbox.checked).withContext('Checkbox should be checked').toBeFalse();
+    expect(checkbox.checked).withContext('Checkbox should be not checked').toBeFalse();
   });
   
   
