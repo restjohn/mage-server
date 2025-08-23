@@ -27,6 +27,7 @@ import { AuthenticationCreateComponent } from '../app/admin/admin-authentication
 import { AdminEventFormPreviewComponent } from '../app/admin/admin-event/admin-event-form/admin-event-form-preview/admin-event-form-preview.component';
 import { TeamDashboardComponent } from '../app/admin/admin-teams/dashboard/team-dashboard.component';
 import { TeamDetailsComponent } from '../app/admin/admin-teams/team-details/team-details.component';
+import { UserDetailsComponent } from '../app/admin/admin-users/user-details/user-details.component';
 
 
 require('angular-minicolors');
@@ -69,6 +70,7 @@ app
   .directive('adminEventFormPreview', downgradeComponent({ component: AdminEventFormPreviewComponent }))
   .directive('adminTeams', downgradeComponent({ component: TeamDashboardComponent }))
   .directive('adminTeamDetails', downgradeComponent({ component: TeamDetailsComponent }))
+  .directive('adminUserDetails', downgradeComponent({ component: UserDetailsComponent }))
   .directive('adminDashboard', downgradeComponent({ component: AdminDashboardComponent }));
 
 app
@@ -163,7 +165,7 @@ function config($httpProvider, $stateProvider, $urlRouterProvider, $animateProvi
 
   $stateProvider.state('admin.user', {
     url: '/users/:userId',
-    component: "adminUser",
+    component: "adminUserDetails",
     resolve: resolveAdmin()
   });
 

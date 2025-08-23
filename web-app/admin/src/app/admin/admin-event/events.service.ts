@@ -11,6 +11,8 @@ export interface SearchOptions {
     id?: string;
     page?: number;
     page_size?: number;
+    // Added: fetch events for a specific user
+    userId?: string;
 }
 
 interface EventsResponse {
@@ -44,6 +46,9 @@ export class EventsService {
         }
         if (options.excludeTeamId !== undefined) {
             params = params.set('excludeTeamId', options.excludeTeamId);
+        }
+        if (options.userId !== undefined) {
+            params = params.set('userId', options.userId);
         }
 
         params = params.set('includePagination', 'true');
