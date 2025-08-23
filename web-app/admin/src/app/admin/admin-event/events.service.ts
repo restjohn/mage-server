@@ -11,7 +11,6 @@ export interface SearchOptions {
     id?: string;
     page?: number;
     page_size?: number;
-    // Added: fetch events for a specific user
     userId?: string;
 }
 

@@ -12,7 +12,6 @@ export interface SearchOptions {
     term?: string;
     start?: string;
     id?: string;
-    // Filter helpers supported by backend
     with_members?: string[];
     without_members?: string[];
 }

@@ -29,7 +29,6 @@ import { TeamDashboardComponent } from '../app/admin/admin-teams/dashboard/team-
 import { TeamDetailsComponent } from '../app/admin/admin-teams/team-details/team-details.component';
 import { UserDetailsComponent } from '../app/admin/admin-users/user-details/user-details.component';
 
-
 require('angular-minicolors');
 require('select2');
 
