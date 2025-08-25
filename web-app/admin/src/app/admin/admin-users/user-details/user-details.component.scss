@@ -1,4 +1,3 @@
-// Page header styles
 .page-header {
     margin-bottom: 2rem;
     padding-bottom: 1rem;
@@ -51,14 +50,11 @@
     }
 }
 
-// Details section layout
 .details-section {
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 2rem;
     margin-bottom: 3rem;
-
-    // Ensure grid items stretch to equal height
     align-items: stretch;
 
     @media (max-width: 768px) {
@@ -67,15 +63,13 @@
     }
 }
 
-// Right column container for action/danger cards next to details
 .side-cards {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem; // smaller gap between cards
+    gap: 0.75rem;
     align-self: stretch;
     min-height: 100%;
 
-    // Make both cards share the available height evenly
     >.action-card,
     >.danger-zone-card {
         flex: 1 1 0;
@@ -89,8 +83,6 @@
     border: 1px solid #e5e7eb;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     padding: 1.25rem;
-
-    // Ensure the details card also fills the grid row height for visual parity
     height: 100%;
 }
 
@@ -142,7 +134,6 @@
             }
         }
 
-        // Avatar specific styles
         .avatar-display {
             display: flex;
             align-items: center;
@@ -181,7 +172,6 @@
         margin-top: 2rem;
     }
 
-    // Ensure styles apply to the correct element: `.form-field.map-icon-field`
     .map-icon-field {
         .map-icon-header {
             display: flex;
@@ -226,7 +216,6 @@
             color: #9ca3af;
         }
 
-        // Constrain dropdown width so it isn't full width
         .map-icon-type-select {
             display: flex;
             flex-direction: column;
@@ -238,7 +227,6 @@
             }
         }
 
-        // Make create inputs compact
         .create-grid {
             display: grid;
             grid-template-columns: auto auto;
@@ -259,16 +247,14 @@
                 letter-spacing: 0.05em;
             }
 
-            // Limit text input width (Initials)
             input[type="text"].form-input {
                 width: 100px;
                 max-width: 100px;
             }
 
-            // Proper size and visible swatch for color input
             input[type="color"].color-input {
                 width: 48px;
-                height: 42px; // about 2.625rem
+                height: 42px;
                 padding: 0;
                 border: 1px solid #d1d5db;
                 border-radius: 8px;
@@ -312,7 +298,6 @@
         }
     }
 
-    // New container styles for icon editor hierarchy
     .map-icon-container {
         border: 1px solid #e5e7eb;
         border-radius: 12px;
@@ -352,7 +337,6 @@
     }
 }
 
-// Action cards section
 .action-cards-section {
     display: flex;
     flex-direction: column;
@@ -367,15 +351,15 @@
     overflow: hidden;
 
     &.warning {
-        background: #fffbeb; // lighter amber (50)
-        border-color: #fef3c7; // amber-100
+        background: #fffbeb;
+        border-color: #fef3c7;
 
         .action-card-title {
-            color: #a16207; // amber-700 (slightly lighter than 800)
+            color: #a16207;
         }
 
         .action-card-description {
-            color: #a16207; // amber-700
+            color: #a16207;
         }
     }
 }
@@ -457,13 +441,11 @@
         flex: 1;
     }
 
-    // Buttons align bottom-right consistently
     .action-button {
         margin-top: auto;
         align-self: flex-end;
     }
 
-    // Warning variant for disable card
     &.warning {
         background: #fffbeb;
         border-color: #fde68a;
@@ -477,13 +459,11 @@
         }
     }
 
-    // Helper to stick to bottom of the column when needed
     &.sticky-bottom {
         margin-top: auto;
     }
 }
 
-// Sections container for teams and events
 .sections-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -555,7 +535,6 @@
     background: #f9fafb;
 }
 
-// Action button styles
 .action-button {
     display: inline-flex;
     align-items: center;
@@ -616,12 +595,12 @@
     }
 
     &.btn-warning {
-        background-color: #fbbf24; // lighter amber (400)
+        background-color: #fbbf24;
         border-color: #fbbf24;
         color: white;
 
         &:hover:not(:disabled) {
-            background-color: #f59e0b; // amber-500 on hover
+            background-color: #f59e0b;
             border-color: #f59e0b;
         }
     }
@@ -638,7 +617,6 @@
     }
 }
 
-// Material table styles
 .mat-table-no-header {
     .mat-header-row {
         display: none;
@@ -646,7 +624,7 @@
 }
 
 .table-row-content {
-    padding: 0;
+    padding: 0 !important;
     border-bottom: 1px solid #f1f5f9;
 
     &:last-child {
@@ -685,7 +663,7 @@
 
 .row-info {
     flex: 1;
-    min-width: 0; // Allow shrinking
+    min-width: 0;
 
     @media (max-width: 768px) {
         flex: 1;
@@ -718,7 +696,6 @@
     min-width: fit-content;
 }
 
-// Empty state styles
 .empty-state {
     display: flex;
     align-items: center;
@@ -744,7 +721,6 @@
     }
 }
 
-// Loading overlay styles
 .loading-overlay {
     position: absolute;
     top: 0;
@@ -779,7 +755,6 @@
     }
 }
 
-// Login section specific styles
 .login-filters {
     padding: 1rem 1.5rem;
     background: #f9fafb;
@@ -1024,7 +999,6 @@
         font-size: 0.8em;
     }
 
-    // Icon styles
     .admin-desktop-icon-xs,
     .admin-android-icon-xs,
     .admin-apple-icon-xs,
@@ -1049,7 +1023,6 @@
     }
 }
 
-// Responsive adjustments
 @media (max-width: 768px) {
     .admin-main {
         .col-md-offset-1 {

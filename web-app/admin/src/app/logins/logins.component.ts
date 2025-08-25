@@ -14,7 +14,6 @@ import {
   Login,
   LoginFilter,
   LoginPage,
-  LoginSearchResults,
   DevicesResponse,
   UsersResponse,
 } from "admin/src/@types/dashboard/admin-dashboard";
@@ -50,14 +49,11 @@ export class LoginsComponent implements OnInit {
   filter: LoginFilter = {};
   user: User = null;
   device: Device[] = [];
-  // New: free-text device filter to match current styling
   deviceText: string = '';
-  // New: free-text user search input (Dashboard only)
   userText: string = '';
 
   toggleFilters = false;
 
-  // Paging state for fetching users/devices when not supplied by parent
   private userStateAndData: UsersResponse;
   private userState: keyof UsersResponse = 'all';
   private deviceStateAndData: DevicesResponse;
@@ -80,16 +76,13 @@ export class LoginsComponent implements OnInit {
    * Initialize filters, suggestion sources, and load the initial login page.
    */
   ngOnInit(): void {
-    // Initialize user filter when provided
     if (this.userId) {
       this.filter.user = { id: this.userId } as any;
     }
 
-    // Ensure we have sources for user/device suggestions
     this.initUserSourceIfNeeded();
     this.initDeviceSourceIfNeeded();
 
-    // Always load initial logins on component load
     this.loadInitialLogins();
   }
 
@@ -99,7 +92,6 @@ export class LoginsComponent implements OnInit {
     this.userStateAndData = this.userPagingService.constructDefault();
     this.userPagingService.refresh(this.userStateAndData).then(() => {
       const initial = this.userPagingService.users(this.userStateAndData[this.userState]);
-      // keep local cache for client-side fallback and initial suggestions
       this.users = initial || [];
     });
   }
@@ -155,21 +147,18 @@ export class LoginsComponent implements OnInit {
    * Filter logins based on selected user, device, and date range.
    */
   async filterLogins() {
-    // Lock to provided userId if any, else use selected user
     if (this.userId) {
       this.filter.user = { id: this.userId } as any;
     } else {
       this.filter.user = this.user as any;
     }
 
-    // Only consider explicitly selected devices
     if (this.device && this.device.length > 0) {
       this.filter.deviceIds = this.device.map((d) => d.id).join(",");
     } else {
       this.filter.deviceIds = null;
     }
 
-    // Dates
     this.filter.startDate = this.login.startDate;
     if (this.login.endDate) {
       this.filter.endDate = moment(this.login.endDate).endOf("day").toDate();
@@ -177,7 +166,6 @@ export class LoginsComponent implements OnInit {
       this.filter.endDate = null;
     }
 
-    // If no filters are selected, reload the default (initial) results
     const hasUser = !!(this.filter.user && (this.filter.user as any).id);
     const hasDevice = !!(this.filter.deviceIds && this.filter.deviceIds.length);
     const hasDate = !!(this.filter.startDate || this.filter.endDate);
@@ -205,12 +193,10 @@ export class LoginsComponent implements OnInit {
 
   /** Bound to user text input */
   onUserSearchChange(term: string) {
-    // When typing, clear selected user until an item is chosen
     this.userText = term;
     this.user = null;
     this.onUserInputChange(term);
     if (!term) {
-      // If cleared, also refresh the table to default results
       this.loginSearchResults = [];
       this.filterLogins();
     }
@@ -219,12 +205,10 @@ export class LoginsComponent implements OnInit {
   /** Device search input change - search suggestions only, no login query */
   async onDeviceSearchChange(term: string) {
     this.deviceText = term;
-    // Clear explicit selection while typing
     this.device = [];
 
     if (!term) {
       this.loginDeviceSearchResults = [];
-      // If cleared, refresh the table (default results or filtered by other criteria)
       this.filterLogins();
       return;
     }
@@ -239,7 +223,6 @@ export class LoginsComponent implements OnInit {
       return;
     }
 
-    // Fallback to local filter
     if (this.devices?.length) {
       const lower = term.toLowerCase();
       this.loginDeviceSearchResults = this.devices.filter(d =>
@@ -271,7 +254,6 @@ export class LoginsComponent implements OnInit {
   searchLoginsAgainstUsers(searchString: string | null) {
     if (this.userId) return Promise.resolve([]);
 
-    // Use paging service when available for server-side search
     if (this.userStateAndData) {
       const term = !searchString || searchString === '.*' ? '' : searchString;
       return this.userPagingService
@@ -282,7 +264,6 @@ export class LoginsComponent implements OnInit {
         });
     }
 
-    // Fallback to in-memory filter if parent supplied users
     if (!searchString || searchString === ".*") {
       this.loginSearchResults = (this.users || []).slice(0, 10);
       return Promise.resolve(this.loginSearchResults);

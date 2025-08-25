@@ -5,7 +5,7 @@
     -webkit-overflow-scrolling: touch;
 
     @media (max-width: 959px) {
-      overflow-y: auto;
+      overflow: auto;
     }
   }
 
@@ -45,7 +45,7 @@
   flex-direction: column;
   gap: 10px;
   padding: 10px;
-  overflow: visible; // prevent clipping of content like the logins section
+  overflow: hidden;
 
   .mat-card-title {
     font-size: 15px;
@@ -239,7 +239,6 @@
     }
   }
 
-  // Shared section styles to match User Details layout
   .section-card {
     background: white;
     border-radius: 12px;

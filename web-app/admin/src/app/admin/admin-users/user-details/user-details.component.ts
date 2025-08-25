@@ -111,12 +111,10 @@ export class UserDetailsComponent implements OnInit {
     3: { type: 'primary', text: 'Strong' },
     4: { type: 'success', text: 'Excellent' }
   };
-  // Track save/error and permissions (restored)
   saving = false;
   error: string | null = null;
   canEditRole = false;
   canUpdatePassword = false;
-  // Password change UI state
   passwordStrengthType: string | null = null;
   passwordStrength: string | null = null;
   passwordStatus: { status: 'success' | 'danger' | null; msg: string | null } = { status: null, msg: null };
@@ -125,33 +123,27 @@ export class UserDetailsComponent implements OnInit {
   newPasswordConfirm = '';
   updatingPassword = false;
 
-  // Preview/edit state for map icon
   iconPreviewUrl: string | null = null;
   removeIconSelected = false;
   iconMetadata: IconMetadata = { type: 'none' };
   @ViewChild('mapIconCanvas') mapIconCanvasRef?: ElementRef<HTMLCanvasElement>;
 
-  // Material Design table data sources
   teamsDataSource = new MatTableDataSource<any>();
   eventsDataSource = new MatTableDataSource<any>();
   teamsDisplayedColumns = ['teamContent'];
   eventsDisplayedColumns = ['eventContent'];
 
-  // Loading states
   loadingTeams = true;
   loadingEvents = true;
 
-  // Pagination properties
   totalUserTeams = 0;
   totalUserEvents = 0;
   userTeamsPageSize = 5;
   userEventsPageSize = 5;
-  // New: page indexes
   userTeamsPageIndex = 0;
   userEventsPageIndex = 0;
   pageSizeOptions = [5, 10, 25];
 
-  // Action buttons for the navbar
   teamActionButtons: any[] = [];
   eventActionButtons: any[] = [];
 
@@ -167,7 +159,6 @@ export class UserDetailsComponent implements OnInit {
     @Inject(EventsService) private eventsService: EventsService
   ) {
     this.deviceStateAndData = this.devicePagingService.constructDefault();
-    // Note: TeamPagingService not available in current upgrade, will need alternative implementation
   }
 
   /**
@@ -181,24 +172,19 @@ export class UserDetailsComponent implements OnInit {
       user: { id: userId }
     };
 
-    // Check permissions
     this.hasUserEditPermission = this.userService.myself?.role?.permissions?.includes('UPDATE_USER') || false;
     this.hasUserDeletePermission = this.userService.myself?.role?.permissions?.includes('DELETE_USER') || false;
     this.canEditRole = this.userService.myself?.role?.permissions?.includes('UPDATE_USER_ROLE') || false;
     this.canUpdatePassword = this.userService.myself?.role?.permissions?.includes('UPDATE_USER_ROLE') || false;
 
-    // Load roles
     this.userService.getRoles().then((roles: any[]) => {
       this.roles = roles;
-      // Ensure role select is prefilled once roles are available
       this.setSelectedRoleFromUser();
     });
 
-    // Load user data
     this.userService.getUser(userId).then((user: User) => {
       this.user = user;
 
-      // Initialize icon metadata from existing user
       const anyUser: any = user as any;
       if (anyUser.icon && (anyUser.icon.type === 'create')) {
         this.iconMetadata = {
@@ -212,16 +198,13 @@ export class UserDetailsComponent implements OnInit {
         this.iconMetadata = { type: 'none' };
       }
 
-      // Load user teams/events using REST services
       this.loadUserTeams();
       this.loadUserEvents();
       this.setupActionButtons();
 
-      // If editing already started before user loaded (edge case), sync role
       this.setSelectedRoleFromUser();
     });
 
-    // Load login data
     this.loginService.query({ filter: this.filter, limit: this.loginResultsLimit }).then((loginPage: LoginPage) => {
       this.loginPage = loginPage;
       if (loginPage.logins.length) {
@@ -229,7 +212,6 @@ export class UserDetailsComponent implements OnInit {
       }
     });
 
-    // Load device data
     delete this.deviceStateAndData['registered'];
     delete this.deviceStateAndData['unregistered'];
 
@@ -237,7 +219,6 @@ export class UserDetailsComponent implements OnInit {
       this.devices = this.devicePagingService.devices(this.deviceStateAndData[this.deviceState]);
     });
 
-    // Configure zxcvbn options for password strength (once per component instance)
     try {
       zxcvbnOptions.setOptions({
         dictionary: {
@@ -247,10 +228,9 @@ export class UserDetailsComponent implements OnInit {
         graphs: zxcvbnCommonPackage.adjacencyGraphs,
         translations: zxcvbnEnPackage.translations
       });
-    } catch { /* noop */ }
+    } catch { }
   }
 
-  // Fetch teams that include this user, with pagination and search
   /**
    * Load teams that include the current user using pagination and optional search.
    */
@@ -265,7 +245,6 @@ export class UserDetailsComponent implements OnInit {
       populate: true
     }).subscribe({
       next: (results: any) => {
-        // When paginated, API returns an array whose first element is a page object containing items
         if (Array.isArray(results) && results.length && results[0]?.items) {
           const page = results[0];
           this.userTeams = page.items || [];
@@ -274,7 +253,6 @@ export class UserDetailsComponent implements OnInit {
           this.userTeams = results;
           this.totalUserTeams = results.length;
         } else if (results?.items) {
-          // In case backend returns a page object directly
           this.userTeams = results.items || [];
           this.totalUserTeams = results.totalCount ?? this.userTeams.length;
         } else {
@@ -293,7 +271,6 @@ export class UserDetailsComponent implements OnInit {
     });
   }
 
-  // Fetch events the user can access, with pagination and search
   /**
    * Load events the current user can access using pagination and optional search.
    */
@@ -380,66 +357,6 @@ export class UserDetailsComponent implements OnInit {
   }
 
   /**
-   * Whether there is a next page of teams (placeholder implementation).
-   * @returns False until server-side pagination is implemented.
-   */
-  hasNextUserTeam(): boolean {
-    return false; // Simplified - would need proper pagination implementation
-  }
-
-  /**
-   * Navigate to the next page of teams (placeholder).
-   */
-  nextUserTeam(): void {
-    // Simplified pagination
-  }
-
-  /**
-   * Whether there is a previous page of teams (placeholder implementation).
-   * @returns False until server-side pagination is implemented.
-   */
-  hasPreviousUserTeam(): boolean {
-    return false; // Simplified - would need proper pagination implementation
-  }
-
-  /**
-   * Navigate to the previous page of teams (placeholder).
-   */
-  previousUserTeam(): void {
-    // Simplified pagination
-  }
-
-  /**
-   * Whether there is a next page of events (placeholder implementation).
-   * @returns False until server-side pagination is implemented.
-   */
-  hasNextUserEvent(): boolean {
-    return false; // Simplified - would need proper pagination implementation
-  }
-
-  /**
-   * Navigate to the next page of events (placeholder).
-   */
-  nextUserEvent(): void {
-    // Simplified pagination
-  }
-
-  /**
-   * Whether there is a previous page of events (placeholder implementation).
-   * @returns False until server-side pagination is implemented.
-   */
-  hasPreviousUserEvent(): boolean {
-    return false; // Simplified - would need proper pagination implementation
-  }
-
-  /**
-   * Navigate to the previous page of events (placeholder).
-   */
-  previousUserEvent(): void {
-    // Simplified pagination
-  }
-
-  /**
    * Search the user's teams by name and reset pagination.
    * @param searchTerm - Text to filter team names
    */
@@ -467,7 +384,6 @@ export class UserDetailsComponent implements OnInit {
   searchNonUserTeams(searchString: string): Promise<any[]> {
     this.isSearching = true;
 
-    // Simplified search - would need proper implementation with available services
     this.nonUserTeamSearchResults = [];
     if (this.nonUserTeamSearchResults.length === 0) {
       const noTeam = {
@@ -529,22 +445,18 @@ export class UserDetailsComponent implements OnInit {
    */
   startEdit(): void {
     this.isEditingUser = true;
-    this.editUser = { ...this.user } as EditableUser; // Create a copy for editing
+    this.editUser = { ...this.user } as EditableUser;
 
-    // Reset icon edit state
     this.iconPreviewUrl = null;
     this.removeIconSelected = false;
 
-    // Ensure icon metadata has sane defaults
     if (!this.iconMetadata) this.iconMetadata = { type: 'none' };
     if (this.iconMetadata.type === 'create') {
-      // Default initials/color if missing
       if (!this.iconMetadata.text) this.setIconInitials(this.user.displayName);
       if (!this.iconMetadata.color) this.iconMetadata.color = this.randomColor();
       setTimeout(() => this.updateMapIconCanvas(), 0);
     }
 
-    // Prefill selectedRole when possible
     this.setSelectedRoleFromUser();
 
     this.error = null;
@@ -562,7 +474,6 @@ export class UserDetailsComponent implements OnInit {
     this.removeIconSelected = false;
   }
 
-  // Return the phone number from various possible shapes on the user model
   /**
    * Get the current editable phone number from either the edit buffer or legacy fields.
    * @returns The phone number string or empty string
@@ -576,7 +487,6 @@ export class UserDetailsComponent implements OnInit {
     );
   }
 
-  // Keep update logic the same, but it will initialize phones[] if needed
   /**
    * Update the editable phone number, initializing array structures as needed.
    * @param value - Phone number text
@@ -595,7 +505,6 @@ export class UserDetailsComponent implements OnInit {
     (this.editUser.phones as any)[0].number = value;
   }
 
-  // Helper to set selected role based on current user's role once roles are loaded
   /**
    * Set the selected role in the edit model based on the user's existing role.
    */
@@ -618,7 +527,6 @@ export class UserDetailsComponent implements OnInit {
     }
   }
 
-  // Map Icon create/edit helpers
   /**
    * Handle changes to the map icon type (none/create/upload) and sync UI state.
    */
@@ -626,15 +534,13 @@ export class UserDetailsComponent implements OnInit {
     if (this.iconMetadata.type === 'create') {
       this.setIconInitials(this.user.displayName);
       if (!this.iconMetadata.color) this.iconMetadata.color = this.randomColor();
-      // clear upload state
       if (this.editUser) (this.editUser as any).icon = null;
       this.iconPreviewUrl = null;
       this.removeIconSelected = false;
       setTimeout(() => this.updateMapIconCanvas(), 0);
     } else if (this.iconMetadata.type === 'upload') {
-      // keep current upload preview or show existing
       this.removeIconSelected = false;
-    } else { // none
+    } else {
       this.iconPreviewUrl = null;
       if (this.editUser) { (this.editUser as any).icon = null; }
       this.removeIconSelected = true;
@@ -778,7 +684,7 @@ export class UserDetailsComponent implements OnInit {
       return;
     }
 
-    this.editUser.icon = file as any; // backend expects FormData field 'icon'
+    this.editUser.icon = file as any;
     this.removeIconSelected = false;
     this.iconMetadata.type = 'upload';
 
@@ -794,11 +700,9 @@ export class UserDetailsComponent implements OnInit {
    */
   removeIcon(): void {
     if (!this.editUser) return;
-    // Mark icon to be removed on save
     this.removeIconSelected = true;
     this.iconPreviewUrl = null;
     this.iconMetadata = { type: 'none' };
-    // Ensure we don't accidentally upload something
     (this.editUser as any).icon = null;
   }
 
@@ -818,17 +722,14 @@ export class UserDetailsComponent implements OnInit {
       email: this.editUser.email
     };
 
-    // Handle role
     if (this.canEditRole && this.editUser.selectedRole) {
       userToSave['roleId'] = this.editUser.selectedRole.id;
     }
 
-    // Handle phone
     if (this.editUser.phones && this.editUser.phones.length) {
       userToSave['phone'] = this.editUser.phones[0].number;
     }
 
-    // Handle map icon changes (none/create/upload)
     if (this.iconMetadata.type === 'none') {
       userToSave['icon'] = null;
       userToSave['iconMetadata'] = JSON.stringify({ type: 'none' });
@@ -899,7 +800,6 @@ export class UserDetailsComponent implements OnInit {
   removeUserFromEvent($event: MouseEvent, userEvent: any): void {
     $event.stopPropagation();
 
-    // TODO: Implement event removal API call
     this.userEvents = this.userEvents.filter(e => e.id !== userEvent.id);
     this.eventsDataSource.data = this.userEvents;
   }
@@ -1095,7 +995,6 @@ export class UserDetailsComponent implements OnInit {
     return moment(timestamp).format('MMM D YYYY hh:mm:ss A');
   }
 
-  // Build an authenticated URL for protected resources (e.g., user icon)
   /**
    * Get the authenticated URL for the user's icon (appends access token and cache-buster).
    * @returns Authenticated URL or null if none
@@ -1144,13 +1043,11 @@ export class UserDetailsComponent implements OnInit {
     if (!this.user?.id) return;
     this.passwordStatus = { status: null, msg: null };
 
-    // Template-driven form validation
     if (form && !form.valid) {
       this.passwordStatus = { status: 'danger', msg: 'Please fix the errors in the form.' };
       return;
     }
 
-    // Simple validation
     if (!this.newPassword || !this.newPasswordConfirm) {
       this.passwordStatus = { status: 'danger', msg: 'Please enter and confirm the new password.' };
       return;
@@ -1180,12 +1077,10 @@ export class UserDetailsComponent implements OnInit {
       this.passwordStatus = { status: 'danger', msg };
     };
 
-    // Use upgraded ng1 service
     const result = this.userService.updatePassword(this.user.id, authentication);
     if (result && typeof result.then === 'function') {
       result.then(onSuccess, onError);
     } else {
-      // Fallback in case service uses callbacks
       try {
         this.userService.updatePassword(this.user.id, authentication, onSuccess, onError);
       } catch (e) {
