@@ -28,14 +28,43 @@
     <div class="details-section">
         <div class="details-card">
             <div class="details-form">
-                <div class="form-field">
+                <div class="form-field map-icon-field">
                     <label class="field-label">Avatar</label>
                     <div class="field-content">
-                        <div class="avatar-display">
-                            <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" width="75" height="75"
+                        <div class="avatar-display" *ngIf="!isEditingUser">
+                            <img *ngIf="user.avatarUrl" [src]="userAvatarImgUrl" width="75" height="75"
                                 class="avatar-image">
-                            <div *ngIf="!user.avatarUrl" class="avatar-placeholder">
-                                <i class="fa fa-user"></i>
+                            <div *ngIf="!user.avatarUrl" class="avatar-placeholder"><i class="fa fa-user"></i></div>
+                        </div>
+
+                        <div class="map-icon-container" *ngIf="isEditingUser">
+                            <div class="map-icon-top">
+                                <div class="map-icon-preview">
+                                    <ng-container *ngIf="avatarPreviewUrl || user.avatarUrl; else noAvatar">
+                                        <img [src]="avatarPreviewUrl || userAvatarImgUrl" width="56" height="56"
+                                            class="map-icon-thumb" />
+                                    </ng-container>
+                                    <ng-template #noAvatar>
+                                        <div class="map-icon-empty">No avatar</div>
+                                    </ng-template>
+                                </div>
+                                <div class="map-icon-type-select">
+                                    <label>Avatar</label>
+                                    <div class="helper-text">Upload a square image; it will be cropped to a circle.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="map-icon-section">
+                                <div class="map-icon-section-title">Upload Avatar</div>
+                                <div class="upload-actions">
+                                    <input id="avatarUploadInput" type="file" accept="image/*"
+                                        (change)="onAvatarChanged($event)" [disabled]="saving" />
+                                    <label for="avatarUploadInput" class="action-button btn-secondary imageLabel"
+                                        [class.disabled]="saving">
+                                        <i class="fa fa-upload"></i> Choose Image
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -124,6 +124,7 @@ export class UserDetailsComponent implements OnInit {
   updatingPassword = false;
 
   iconPreviewUrl: string | null = null;
+  avatarPreviewUrl: string | null = null;
   removeIconSelected = false;
   iconMetadata: IconMetadata = { type: 'none' };
   @ViewChild('mapIconCanvas') mapIconCanvasRef?: ElementRef<HTMLCanvasElement>;
@@ -448,6 +449,7 @@ export class UserDetailsComponent implements OnInit {
     this.editUser = { ...this.user } as EditableUser;
 
     this.iconPreviewUrl = null;
+    this.avatarPreviewUrl = null;
     this.removeIconSelected = false;
 
     if (!this.iconMetadata) this.iconMetadata = { type: 'none' };
@@ -471,6 +473,7 @@ export class UserDetailsComponent implements OnInit {
     this.saving = false;
     this.error = null;
     this.iconPreviewUrl = null;
+    this.avatarPreviewUrl = null;
     this.removeIconSelected = false;
   }
 
@@ -696,6 +699,29 @@ export class UserDetailsComponent implements OnInit {
   }
 
   /**
+   * Handle uploaded avatar file selection and preview it.
+   * @param event - File input change event
+   */
+  onAvatarChanged(event: Event): void {
+    if (!this.editUser) return;
+    const input = event.target as HTMLInputElement;
+    const file = input.files && input.files[0];
+    if (!file) {
+      this.avatarPreviewUrl = null;
+      (this.editUser as any).avatar = null;
+      return;
+    }
+
+    (this.editUser as any).avatar = file;
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      this.avatarPreviewUrl = e.target.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /**
    * Mark the icon for removal and clear previews.
    */
   removeIcon(): void {
@@ -751,12 +777,17 @@ export class UserDetailsComponent implements OnInit {
       userToSave['iconMetadata'] = JSON.stringify({ type: 'upload' });
     }
 
+    if ((this.editUser as any).avatar instanceof File) {
+      userToSave['avatar'] = (this.editUser as any).avatar;
+    }
+
     const success = (updatedUser: User) => {
       this.user = updatedUser;
       this.isEditingUser = false;
       this.editUser = null;
       this.saving = false;
       this.iconPreviewUrl = null;
+      this.avatarPreviewUrl = null;
       this.removeIconSelected = false;
     };
 
@@ -1002,6 +1033,15 @@ export class UserDetailsComponent implements OnInit {
   get userIconImgUrl(): string | null {
     if (!this.user?.iconUrl) return null;
     return this.makeAuthenticatedUrl(this.user.iconUrl);
+  }
+
+  /**
+   * Get the authenticated URL for the user's avatar (appends access token and cache-buster).
+   * @returns Authenticated URL or null if none
+   */
+  get userAvatarImgUrl(): string | null {
+    if (!this.user?.avatarUrl) return null;
+    return this.makeAuthenticatedUrl(this.user.avatarUrl as any);
   }
 
   /**
