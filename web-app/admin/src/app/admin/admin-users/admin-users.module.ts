@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { UserDetailsComponent } from './user-details/user-details.component';
+import { DeleteUserComponent } from './delete-user/delete-user.component';
 import { CoreModule } from '../../core/core.module';
 import { LoginsModule } from '../../logins/logins.module';
 
@@ -26,7 +27,8 @@ import { LoginsModule } from '../../logins/logins.module';
         LoginsModule
     ],
     declarations: [
-        UserDetailsComponent
+        UserDetailsComponent,
+        DeleteUserComponent
     ],
     exports: [
         UserDetailsComponent

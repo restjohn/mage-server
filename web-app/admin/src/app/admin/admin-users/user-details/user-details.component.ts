@@ -2,6 +2,7 @@ import { Component, OnInit, Inject, ElementRef, ViewChild } from '@angular/core'
 import { NgForm } from '@angular/forms';
 import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
+import { DeleteUserComponent } from '../delete-user/delete-user.component';
 import { TeamsService } from '../../admin-teams/teams-service';
 import { EventsService } from '../../admin-event/events.service';
 import { MatTableDataSource } from '@angular/material/table';
@@ -920,6 +921,21 @@ export class UserDetailsComponent implements OnInit {
       this.stateService.go('admin.users');
     }).catch((err) => {
       console.error('Failed to delete user:', err);
+    });
+  }
+
+  /**
+   * Open a confirmation dialog before deleting the user.
+   */
+  confirmDeleteUser(user: User): void {
+    const dialogRef = this.dialog.open(DeleteUserComponent, {
+      data: { user }
+    });
+
+    dialogRef.afterClosed().subscribe((result?: { confirmed?: boolean }) => {
+      if (result?.confirmed) {
+        this.deleteUser(user);
+      }
     });
   }
 
