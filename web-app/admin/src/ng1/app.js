@@ -168,12 +168,6 @@ function config($httpProvider, $stateProvider, $urlRouterProvider, $animateProvi
     resolve: resolveAdmin()
   });
 
-  $stateProvider.state('admin.editUser', {
-    url: '/users/:userId/edit',
-    component: "adminUserEdit",
-    resolve: resolveAdmin()
-  });
-
   // Admin team routes
   $stateProvider.state('admin.teams', {
     url: '/teams',
