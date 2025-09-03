@@ -12,6 +12,8 @@ export interface SearchOptions {
     term?: string;
     start?: string;
     id?: string;
+    with_members?: string[];
+    without_members?: string[];
 }
 
 export interface membersOptions extends SearchOptions {
@@ -53,6 +55,16 @@ export class TeamsService {
         }
         if (options.start !== undefined) {
             params = params.set('start', options.start);
+        }
+        if (options.with_members && options.with_members.length) {
+            for (const m of options.with_members) {
+                params = params.append('with_members', m);
+            }
+        }
+        if (options.without_members && options.without_members.length) {
+            for (const m of options.without_members) {
+                params = params.append('without_members', m);
+            }
         }
 
         return this.http.get('/api/teams', { params });
@@ -152,7 +164,6 @@ export class TeamsService {
 
     /**
      * Updates a user's role in a team.
-     * This is a placeholder implementation that will be completed later.
      * 
      * @param teamId - The ID of the team
      * @param userId - The ID of the user

@@ -2,24 +2,16 @@ import { Component, Inject, OnInit, EventEmitter, Output } from "@angular/core";
 import * as angular from 'angular';
 import { Router } from "@angular/router";
 import * as _ from "underscore";
-import * as moment from "moment";
 import {
   UserService,
   DeviceService,
   DevicePagingService,
-  LoginService,
-  EventService,
-  LayerService,
   UserPagingService,
 } from "admin/src/app/upgrade/ajs-upgraded-providers";
 import { User } from "core-lib-src/user";
 import {
   Device,
   DevicesResponse,
-  Login,
-  LoginFilter,
-  LoginPage,
-  LoginSearchResults,
   UsersResponse,
 } from "admin/src/@types/dashboard/admin-dashboard";
 
@@ -47,27 +39,6 @@ export class AdminDashboardComponent implements OnInit {
   unregisteredDevices: Device[] = [];
   deviceStateAndData: DevicesResponse;
 
-  login = {
-    startDateOpened: false,
-    endDateOpened: false,
-    startDate: null,
-    endDate: null,
-  };
-
-  loginPage: LoginPage;
-  loginResultsLimit: number = 25;
-  loginSearchResults: LoginSearchResults[] = [];
-  loginDeviceSearchResults: Device[] = [];
-  firstLogin: Login;
-  showPrevious: boolean = false;
-  showNext: boolean = false;
-
-  filter: LoginFilter = {};
-  user: User = null;
-  device: Device[] = [];
-
-  toggleFilters = false;
-
   private $state: any;
 
   constructor(
@@ -75,9 +46,6 @@ export class AdminDashboardComponent implements OnInit {
     @Inject(UserService) private userService: any,
     @Inject(DeviceService) private deviceService: any,
     @Inject(DevicePagingService) private devicePagingService: any,
-    @Inject(LoginService) private loginService: any,
-    @Inject(EventService) private eventService: any,
-    @Inject(LayerService) private layerService: any,
     @Inject(UserPagingService) private userPagingService: any,
     @Inject('$injector') private $injector: any,
   ) {
@@ -85,7 +53,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   /**
-   * Initialize the component, loading users, devices, and login data.
+   * Initialize the component, loading users and devices data.
    */
   ngOnInit(): void {
     this.stateAndData = this.userPagingService.constructDefault();
@@ -97,26 +65,11 @@ export class AdminDashboardComponent implements OnInit {
       );
     });
 
-    this.loginService
-      .query({ limit: this.loginResultsLimit })
-      .then((loginPage: LoginPage) => {
-        this.loginPage = loginPage;
-        if (loginPage.logins.length) {
-          this.firstLogin = loginPage.logins[0];
-        }
-        loginPage.logins.forEach((login) => {
-          this.users.push(login.user);
-          this.devices.push(login.device);
-        });
-      });
-
     this.userPagingService.refresh(this.stateAndData).then(() => {
       this.inactiveUsers = this.userPagingService.users(
         this.stateAndData[this.userState],
       );
     });
-
-    this.loadDevicesForDropdown();
   }
 
   /**
@@ -248,33 +201,6 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   /**
-   * Search logins against users by a search string.
-   * @param searchString The string to search users by.
-   */
-  searchLoginsAgainstUsers(searchString: string | null) {
-    if (!searchString) searchString = ".*";
-    return this.userPagingService
-      .search(this.stateAndData["all"], searchString)
-      .then((users) => {
-        this.loginSearchResults = users.length
-          ? users
-          : [{ displayName: "No Results Found" }];
-        return this.loginSearchResults;
-      });
-  }
-
-  /**
-   * Load all devices for the dropdown filter.
-   */
-  loadDevicesForDropdown() {
-    this.devicePagingService.refresh(this.deviceStateAndData).then(() => {
-      this.loginDeviceSearchResults = this.devicePagingService.devices(
-        this.deviceStateAndData["all"],
-      );
-    });
-  }
-
-  /**
    * Determine the icon class for a device based on its type or user agent.
    * @param device The device to determine the icon for.
    */
@@ -350,125 +276,5 @@ export class AdminDashboardComponent implements OnInit {
       });
       this.onDeviceEnabled.emit({ user: updated });
     });
-  }
-
-  /**
-   * Navigate to a specific login page URL.
-   * @param url URL of the login page.
-   */
-  pageLogin(url: string) {
-    this.loginService
-      .query({ url, filter: this.filter, limit: this.loginResultsLimit })
-      .then((loginPage) => {
-        if (loginPage.logins.length) {
-          this.loginPage = loginPage;
-          this.showNext = loginPage.logins.length !== 0;
-          this.showPrevious = loginPage.logins[0].id !== this.firstLogin.id;
-        }
-      });
-  }
-
-  /**
-   * Filter logins based on selected user, device, and date range.
-   */
-  filterLogins() {
-    this.filter.user = this.user;
-
-    if (this.device && this.device.length > 0) {
-      this.filter.deviceIds = this.device.map((d) => d.id).join(",");
-    } else {
-      this.filter.deviceIds = null;
-    }
-
-    this.filter.startDate = this.login.startDate;
-
-    if (this.login.endDate) {
-      this.filter.endDate = moment(this.login.endDate).endOf("day").toDate();
-    }
-
-    this.loginService
-      .query({ filter: this.filter, limit: this.loginResultsLimit })
-      .then((loginPage) => {
-        this.loginPage = loginPage;
-        this.showNext = loginPage.logins.length !== 0;
-        this.showPrevious = false;
-      });
-  }
-
-  /**
-   * Handle input change for user search.
-   * @param value Search string or User object.
-   */
-  onUserInputChange(value: string | User) {
-    let searchValue: string =
-      typeof value === "string" ? value : value?.displayName || "";
-    this.searchLoginsAgainstUsers(searchValue);
-  }
-
-  /**
-   * Clear device filter and reload login data.
-   */
-  clearDeviceFilter() {
-    this.device = [];
-    this.filterLogins();
-  }
-
-  /**
-   * Clear user filter and reload login data.
-   */
-  clearUserFilter() {
-    this.user = null;
-    this.onUserInputChange("");
-    this.filterLogins();
-  }
-
-  /**
-   * Get display string for a user.
-   * @param user The user to display.
-   */
-  displayUser(user: User): string {
-    return user && user.displayName ? user.displayName : "";
-  }
-
-  /**
-   * Get display string for a device.
-   * @param user The device to display.
-   */
-  displayDevice(user: Device): string | number {
-    return user && user.uid ? user.uid : "";
-  }
-
-  /**
-   * Handle changes in date filter.
-   */
-  dateFilterChanged() {
-    this.filterLogins();
-  }
-
-  /**
-   * Handle changes in login results limit.
-   */
-  loginResultsLimitChanged() {
-    this.filterLogins();
-  }
-
-  /**
-   * Open the start date picker.
-   * @param event DOM event.
-   */
-  openLoginStart(event: Event) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.login.startDateOpened = true;
-  }
-
-  /**
-   * Open the end date picker.
-   * @param event DOM event.
-   */
-  openLoginEnd(event: Event) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.login.endDateOpened = true;
   }
 }
