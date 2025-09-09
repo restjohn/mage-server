@@ -71,7 +71,6 @@ export class SignupComponent {
       this.passwordPolicy =
         api.authenticationStrategies.local.settings.passwordPolicy;
 
-        console.log(this.passwordPolicy)
       const passwordControl = this.signup.get('password');
 
       if (this.passwordPolicy && passwordControl) {
@@ -132,9 +131,7 @@ export class SignupComponent {
       );
     }
     if (this.passwordPolicy.minCharsEnabled) {
-      rules.push(
-        `• At least ${this.passwordPolicy.minChars} letters [aA-zZ]`
-      );
+      rules.push(`• At least ${this.passwordPolicy.minChars} letters [aA-zZ]`);
     }
     if (this.passwordPolicy.lowLettersEnabled) {
       rules.push(
@@ -249,7 +246,7 @@ export class SignupComponent {
       if (!password) return null;
 
       const templates = this.passwordPolicy.helpTextTemplate;
-      let currentErrors:string[] = [];
+      let currentErrors: string[] = [];
 
       const errors: ValidationErrors = {};
 
@@ -258,7 +255,12 @@ export class SignupComponent {
         password.length < this.passwordPolicy.passwordMinLength
       ) {
         errors.passwordMinLength = true;
-        currentErrors.push(`Must ${templates.passwordMinLength?.replace('#', this.passwordPolicy.passwordMinLength.toString())}`);
+        currentErrors.push(
+          `Must ${templates.passwordMinLength?.replace(
+            '#',
+            this.passwordPolicy.passwordMinLength.toString()
+          )}`
+        );
       }
 
       if (
@@ -266,7 +268,12 @@ export class SignupComponent {
         (password.match(/[a-z]/g) || []).length < this.passwordPolicy.lowLetters
       ) {
         errors.lowLetters = true;
-        currentErrors.push(`Must ${templates.lowLetters?.replace('#', this.passwordPolicy.lowLetters.toString())}`);
+        currentErrors.push(
+          `Must ${templates.lowLetters?.replace(
+            '#',
+            this.passwordPolicy.lowLetters.toString()
+          )}`
+        );
       }
 
       if (
@@ -274,7 +281,12 @@ export class SignupComponent {
         (password.match(/[a-z]/gi) || []).length < this.passwordPolicy.minChars
       ) {
         errors.minChars = true;
-        currentErrors.push(`Must ${templates.minChars?.replace('#', this.passwordPolicy.minChars.toString())}`);
+        currentErrors.push(
+          `Must ${templates.minChars?.replace(
+            '#',
+            this.passwordPolicy.minChars.toString()
+          )}`
+        );
       }
 
       if (
@@ -283,7 +295,12 @@ export class SignupComponent {
           this.passwordPolicy.highLetters
       ) {
         errors.highLetters = true;
-        currentErrors.push(`Must ${templates.highLetters?.replace('#', this.passwordPolicy.highLetters.toString())}`);
+        currentErrors.push(
+          `Must ${templates.highLetters?.replace(
+            '#',
+            this.passwordPolicy.highLetters.toString()
+          )}`
+        );
       }
 
       if (
@@ -291,7 +308,12 @@ export class SignupComponent {
         (password.match(/[0-9]/g) || []).length < this.passwordPolicy.numbers
       ) {
         errors.numbers = true;
-        currentErrors.push(`Must ${templates.numbers?.replace('#', this.passwordPolicy.numbers.toString())}`);
+        currentErrors.push(
+          `Must ${templates.numbers?.replace(
+            '#',
+            this.passwordPolicy.numbers.toString()
+          )}`
+        );
       }
 
       if (
@@ -300,27 +322,41 @@ export class SignupComponent {
           this.passwordPolicy.specialChars
       ) {
         errors.specialChars = true;
-        currentErrors.push(`Must ${templates.specialChars?.replace('#', this.passwordPolicy.specialChars.toString())}`);
+        currentErrors.push(
+          `Must ${templates.specialChars?.replace(
+            '#',
+            this.passwordPolicy.specialChars.toString()
+          )}`
+        );
       }
 
       if (this.passwordPolicy.maxConCharsEnabled) {
         const maxConChars = this.passwordPolicy.maxConChars;
-    
+
         const regex = new RegExp(`[a-zA-Z]{${maxConChars + 1},}`);
-      
+
         if (regex.test(password)) {
           errors.maxConChars = true;
-          currentErrors.push(`Must ${templates.maxConChars?.replace('#', this.passwordPolicy.maxConChars.toString())}`);
+          currentErrors.push(
+            `Must ${templates.maxConChars?.replace(
+              '#',
+              this.passwordPolicy.maxConChars.toString()
+            )}`
+          );
         }
       }
-      
 
       if (this.passwordPolicy.restrictSpecialCharsEnabled) {
         const allowed = this.passwordPolicy.restrictSpecialChars.split('');
         const specialMatches = password.match(/[^a-zA-Z0-9]/g) || [];
         if (specialMatches.some((char) => !allowed.includes(char))) {
           errors.restrictSpecialChars = true;
-          currentErrors.push(`Must ${templates.restrictSpecialChars?.replace('#', this.passwordPolicy.restrictSpecialChars.toString())}`);
+          currentErrors.push(
+            `Must ${templates.restrictSpecialChars?.replace(
+              '#',
+              this.passwordPolicy.restrictSpecialChars.toString()
+            )}`
+          );
         }
       }
 
@@ -334,10 +370,9 @@ export class SignupComponent {
     if (errors['required']) {
       return ['Password is required'];
     }
-  
+
     return this.passwordErrorMessages;
   }
-  
 
   /**
    * Creates a validator that checks whether the password confirmation matches the original password.

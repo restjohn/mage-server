@@ -1,0 +1,251 @@
+::ng-deep .admin-main-content {
+  width: 100vw;
+  &:has(admin-users) {
+    height: 92vh;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  admin-users {
+    .container {
+      height: 90vh;
+    }
+  }
+}
+
+.container.bottom-gap-l {
+  margin-bottom: 2rem;
+}
+
+.admin-nav-gap {
+  margin-bottom: 1rem;
+
+  .breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.875rem;
+    color: #6b7280;
+
+    li.active {
+      color: #374151;
+      font-weight: 500;
+
+      i {
+        margin-right: 0.5rem;
+        color: #9ca3af;
+      }
+    }
+  }
+}
+
+.page-header {
+  margin-bottom: 20px;
+  margin-top: 20px;
+  padding: 0;
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 0.5rem;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+
+  .page-subtitle {
+    font-size: 1rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+}
+
+.btn-primary {
+  background-color: #1e88e5;
+  color: #fff;
+}
+
+.integrated-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 1rem 1.5rem;
+  border-bottom: 2px solid #e5e7eb;
+
+  mage-card-navbar {
+    flex: 1;
+    margin-right: 1rem;
+    min-width: 200px;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    margin-bottom: 0;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+
+    button {
+      white-space: nowrap;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+
+    mage-card-navbar {
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+.table-wrapper {
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  height: 78vh;
+  overflow: hidden;
+}
+
+.table-scroll {
+  height: 65.2vh;
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
+    height: 61.2vh;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .mat-header-row {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f9fafb;
+  }
+
+  .mat-row,
+  .mat-cell,
+  .mat-header-cell {
+    height: 3.5rem;
+  }
+}
+
+.mat-table-even-columns {
+  table-layout: fixed;
+  width: 100%;
+  background: white;
+
+  .mat-header-cell,
+  .mat-cell {
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem;
+  }
+
+  .mat-header-cell {
+    font-weight: 600;
+    color: #374151;
+    background: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  .mat-cell {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .mat-row {
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #f8fafc;
+    }
+  }
+
+  .strong {
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .muted {
+    color: #6b7280;
+  }
+}
+
+.mat-cell .d-flex {
+  gap: 0.5rem;
+
+  button {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+  }
+}
+
+.user-avatar {
+  margin-right: 1rem;
+}
+
+::ng-deep .mat-paginator {
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+
+  .mat-paginator-container {
+    padding: 0 1.5rem;
+    min-height: 3.5rem;
+
+    @media (max-width: 768px) {
+      padding: 0 1rem;
+    }
+  }
+
+  .mat-paginator-page-size,
+  .mat-paginator-range-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .mat-icon-button {
+    color: #6b7280;
+
+    &:hover {
+      background-color: #e5e7eb;
+    }
+
+    &[disabled] {
+      color: #d1d5db;
+    }
+  }
+}
+
+.mat-column-actions {
+  text-align: right;
+
+  .mat-cell,
+  .mat-header-cell {
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  .d-flex {
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+}

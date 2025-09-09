@@ -102,11 +102,11 @@
           signup.controls.password.invalid && signup.controls.password.touched
         "
       >
-      <mat-error *ngIf="signup.controls.password.errors as errors">
-        <div *ngFor="let msg of getPasswordErrorMessages(errors)">
-          {{ msg }}
-        </div>
-      </mat-error>      
+        <mat-error *ngIf="signup.controls.password.errors as errors">
+          <div *ngFor="let msg of getPasswordErrorMessages(errors)">
+            {{ msg }}
+          </div>
+        </mat-error>
       </div>
     </mat-form-field>
 
