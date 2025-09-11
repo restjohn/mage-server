@@ -1,28 +1,29 @@
-import { Component, EventEmitter, Output, Input } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import {
   FormControl,
   FormGroup,
   Validators,
-  ValidationErrors,
-  AbstractControl,
-  ValidatorFn
+  ValidationErrors
 } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
 import { ApiService } from '../../../api/api.service';
-import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
-import {
-  PasswordStrength,
-  passwordStrengthScores
-} from '../../../entities/entities.password';
 import { UserService } from '../../../user/user.service';
+import { zxcvbnOptions } from '@zxcvbn-ts/core';
 import * as zxcvbnCommonPackage from '@zxcvbn-ts/language-common';
 import * as zxcvbnEnPackage from '@zxcvbn-ts/language-en';
-import { PasswordPolicy, SignupEvent } from '../@types/signup';
 
-/**
- * Component for handling user signup, including form validation,
- * password strength estimation, CAPTCHA verification, and emitting
- * events on success or cancellation.
- */
+import { PasswordPolicy, SignupEvent } from '../@types/signup';
+import { PasswordStrength } from '../../../entities/entities.password';
+
+import {
+  createPasswordPolicyValidator,
+  confirmPasswordValidator,
+  evaluatePasswordStrength,
+  getPasswordTooltip
+} from 'admin/src/app/shared/utils/password.utils';
+
 @Component({
   selector: 'signup',
   templateUrl: './signup.component.html',
@@ -31,11 +32,9 @@ import { PasswordPolicy, SignupEvent } from '../@types/signup';
 export class SignupComponent {
   @Output() complete = new EventEmitter<SignupEvent>();
 
-  passwordPolicy: PasswordPolicy;
-
-  showPassword: boolean = false;
-
-  showConfirmPassword: boolean = false;
+  passwordPolicy!: PasswordPolicy;
+  showPassword = false;
+  showConfirmPassword = false;
   passwordErrorMessages: string[] = [];
 
   signup = new FormGroup({
@@ -49,48 +48,17 @@ export class SignupComponent {
   });
 
   passwordStrength?: PasswordStrength;
-
   loadingCaptcha = false;
+  captcha: { uri?: string; token?: string } = {};
 
-  captcha: {
-    uri?: string;
-    token?: string;
-  } = {};
+  private destroy$ = new Subject<void>();
 
   constructor(
     private apiService: ApiService,
     private userService: UserService
   ) {}
 
-  /**
-   * Initializes component by loading the password policy,
-   * setting up custom validators, and initializing password strength checker.
-   */
   ngOnInit(): void {
-    this.apiService.getApi().subscribe((api: any) => {
-      this.passwordPolicy =
-        api.authenticationStrategies.local.settings.passwordPolicy;
-
-      const passwordControl = this.signup.get('password');
-
-      if (this.passwordPolicy && passwordControl) {
-        const passwordControl = new FormControl<string>('', {
-          validators: [Validators.required, this.passwordPolicyValidator()]
-        });
-
-        const matchPasswordControl = new FormControl<string>('', {
-          validators: [Validators.required, this.confirmPasswordValidator()]
-        });
-
-        passwordControl.valueChanges.subscribe((value) => {
-          this.onPasswordChanged(value);
-        });
-
-        this.signup.setControl('password', passwordControl);
-        this.signup.setControl('passwordconfirm', matchPasswordControl);
-      }
-    });
-
     zxcvbnOptions.setOptions({
       dictionary: {
         ...zxcvbnCommonPackage.dictionary,
@@ -99,116 +67,102 @@ export class SignupComponent {
       graphs: zxcvbnCommonPackage.adjacencyGraphs,
       translations: zxcvbnEnPackage.translations
     });
+
+    this.apiService
+      .getApi()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((api: any) => {
+        this.passwordPolicy =
+          api.authenticationStrategies.local.settings.passwordPolicy;
+
+        const usernameGetter = () => this.signup.controls.username.value ?? '';
+
+        this.signup.setControl(
+          'password',
+          new FormControl<string>('', {
+            validators: [
+              Validators.required,
+              createPasswordPolicyValidator(
+                this.passwordPolicy,
+                (errs) => (this.passwordErrorMessages = errs),
+                usernameGetter()
+              )
+            ]
+          })
+        );
+
+        this.signup.setControl(
+          'passwordconfirm',
+          new FormControl<string>('', {
+            validators: [
+              Validators.required,
+              confirmPasswordValidator(
+                () => this.signup.controls.password.value ?? ''
+              )
+            ]
+          })
+        );
+
+        this.signup.controls.password.valueChanges
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((value) => {
+            this.onPasswordChanged(value ?? '');
+          });
+      });
   }
 
-  /**
-   * Updates the password strength indicator based on the current input.
-   * @param password The entered password string.
-   */
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   onPasswordChanged(password: string) {
-    if (password && password.length > 0) {
-      const score =
-        password && password.length
-          ? zxcvbn(password, [this.signup.controls.username.value]).score
-          : 0;
-      this.passwordStrength = passwordStrengthScores[score];
-    } else {
-      this.passwordStrength = passwordStrengthScores[0];
-    }
+    const username = this.signup.controls.username.value ?? '';
+    this.passwordStrength = evaluatePasswordStrength(password, username);
   }
 
-  /**
-   * Returns a list of password policy requirements in a tooltip-friendly format.
-   */
   get passwordTooltipText(): string {
-    if (!this.passwordPolicy) return '';
-
-    const rules: string[] = [];
-
-    if (this.passwordPolicy.passwordMinLengthEnabled) {
-      rules.push(
-        `• At least ${this.passwordPolicy.passwordMinLength} characters`
-      );
-    }
-    if (this.passwordPolicy.minCharsEnabled) {
-      rules.push(`• At least ${this.passwordPolicy.minChars} letters [aA-zZ]`);
-    }
-    if (this.passwordPolicy.lowLettersEnabled) {
-      rules.push(
-        `• Minimum ${this.passwordPolicy.lowLetters} lowercase letter(s)`
-      );
-    }
-    if (this.passwordPolicy.highLettersEnabled) {
-      rules.push(
-        `• Minimum ${this.passwordPolicy.highLetters} uppercase letter(s)`
-      );
-    }
-    if (this.passwordPolicy.numbersEnabled) {
-      rules.push(`• Minimum ${this.passwordPolicy.numbers} number(s)`);
-    }
-    if (this.passwordPolicy.specialCharsEnabled) {
-      rules.push(
-        `• Minimum ${this.passwordPolicy.specialChars} special character(s)`
-      );
-    }
-    if (this.passwordPolicy.maxConCharsEnabled) {
-      rules.push(
-        `• Maximum ${this.passwordPolicy.maxConChars} repeated character(s)`
-      );
-    }
-    if (this.passwordPolicy.restrictSpecialCharsEnabled) {
-      rules.push(
-        `• Allowed special characters: ${this.passwordPolicy.restrictSpecialChars}`
-      );
-    }
-
-    return rules.join('\n');
+    return this.passwordPolicy ? getPasswordTooltip(this.passwordPolicy) : '';
   }
 
-  /**
-   * Retrieves a new CAPTCHA image and token based on the entered username.
-   */
   getCaptcha(): void {
     this.loadingCaptcha = true;
     const username = this.signup.controls.username.value;
-    if (!username) return;
-
-    this.userService.signup(username).subscribe((response: any) => {
-      this.captcha = {
-        uri: response.captcha,
-        token: response.token
-      };
+    if (!username) {
       this.loadingCaptcha = false;
-    });
+      return;
+    }
+
+    this.userService
+      .signup(username)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((response: any) => {
+        this.captcha = {
+          uri: response.captcha,
+          token: response.token
+        };
+        this.loadingCaptcha = false;
+      });
   }
 
-  /**
-   * Emits a cancel event, typically used to close or reset the signup flow.
-   */
   onCancel(): void {
     this.complete.emit({ reason: 'cancel' });
   }
 
-  /**
-   * Handles the signup process, validates form fields,
-   * verifies the CAPTCHA, and emits a signup event on success.
-   */
   onSignup(): void {
-    const password = this.signup.controls.password.value;
-    const confirm = this.signup.controls.passwordconfirm.value;
+    const password = this.signup.controls.password.value ?? '';
+    const confirm = this.signup.controls.passwordconfirm.value ?? '';
 
     if (password !== confirm) {
       this.signup.controls.passwordconfirm.setErrors({ match: true });
     } else {
       const confirmControl = this.signup.controls.passwordconfirm;
-      const currentErrors = confirmControl.errors;
-      if (currentErrors && currentErrors['match']) {
+      const currentErrors: ValidationErrors | null = confirmControl.errors;
+      if (currentErrors?.['match']) {
         delete currentErrors['match'];
-        if (Object.keys(currentErrors).length === 0) {
-          confirmControl.setErrors(null);
-        } else {
-          confirmControl.setErrors(currentErrors);
-        }
+        confirmControl.setErrors(
+          Object.keys(currentErrors).length ? currentErrors : null
+        );
       }
     }
 
@@ -217,6 +171,7 @@ export class SignupComponent {
     if (this.signup.valid) {
       this.userService
         .signupVerify(this.signup.value, this.captcha.token)
+        .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response: any) => {
             this.complete.emit({ reason: 'signup', user: response });
@@ -235,159 +190,8 @@ export class SignupComponent {
     }
   }
 
-  /**
-   * Creates a custom validator based on the password policy rules.
-   * @returns A ValidatorFn that checks password strength and rules.
-   */
-  passwordPolicyValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const password: string = control.value;
-
-      if (!password) return null;
-
-      const templates = this.passwordPolicy.helpTextTemplate;
-      let currentErrors: string[] = [];
-
-      const errors: ValidationErrors = {};
-
-      if (
-        this.passwordPolicy.passwordMinLengthEnabled &&
-        password.length < this.passwordPolicy.passwordMinLength
-      ) {
-        errors.passwordMinLength = true;
-        currentErrors.push(
-          `Must ${templates.passwordMinLength?.replace(
-            '#',
-            this.passwordPolicy.passwordMinLength.toString()
-          )}`
-        );
-      }
-
-      if (
-        this.passwordPolicy.lowLettersEnabled &&
-        (password.match(/[a-z]/g) || []).length < this.passwordPolicy.lowLetters
-      ) {
-        errors.lowLetters = true;
-        currentErrors.push(
-          `Must ${templates.lowLetters?.replace(
-            '#',
-            this.passwordPolicy.lowLetters.toString()
-          )}`
-        );
-      }
-
-      if (
-        this.passwordPolicy.minCharsEnabled &&
-        (password.match(/[a-z]/gi) || []).length < this.passwordPolicy.minChars
-      ) {
-        errors.minChars = true;
-        currentErrors.push(
-          `Must ${templates.minChars?.replace(
-            '#',
-            this.passwordPolicy.minChars.toString()
-          )}`
-        );
-      }
-
-      if (
-        this.passwordPolicy.highLettersEnabled &&
-        (password.match(/[A-Z]/g) || []).length <
-          this.passwordPolicy.highLetters
-      ) {
-        errors.highLetters = true;
-        currentErrors.push(
-          `Must ${templates.highLetters?.replace(
-            '#',
-            this.passwordPolicy.highLetters.toString()
-          )}`
-        );
-      }
-
-      if (
-        this.passwordPolicy.numbersEnabled &&
-        (password.match(/[0-9]/g) || []).length < this.passwordPolicy.numbers
-      ) {
-        errors.numbers = true;
-        currentErrors.push(
-          `Must ${templates.numbers?.replace(
-            '#',
-            this.passwordPolicy.numbers.toString()
-          )}`
-        );
-      }
-
-      if (
-        this.passwordPolicy.specialCharsEnabled &&
-        (password.match(/[^a-zA-Z0-9]/g) || []).length <
-          this.passwordPolicy.specialChars
-      ) {
-        errors.specialChars = true;
-        currentErrors.push(
-          `Must ${templates.specialChars?.replace(
-            '#',
-            this.passwordPolicy.specialChars.toString()
-          )}`
-        );
-      }
-
-      if (this.passwordPolicy.maxConCharsEnabled) {
-        const maxConChars = this.passwordPolicy.maxConChars;
-
-        const regex = new RegExp(`[a-zA-Z]{${maxConChars + 1},}`);
-
-        if (regex.test(password)) {
-          errors.maxConChars = true;
-          currentErrors.push(
-            `Must ${templates.maxConChars?.replace(
-              '#',
-              this.passwordPolicy.maxConChars.toString()
-            )}`
-          );
-        }
-      }
-
-      if (this.passwordPolicy.restrictSpecialCharsEnabled) {
-        const allowed = this.passwordPolicy.restrictSpecialChars.split('');
-        const specialMatches = password.match(/[^a-zA-Z0-9]/g) || [];
-        if (specialMatches.some((char) => !allowed.includes(char))) {
-          errors.restrictSpecialChars = true;
-          currentErrors.push(
-            `Must ${templates.restrictSpecialChars?.replace(
-              '#',
-              this.passwordPolicy.restrictSpecialChars.toString()
-            )}`
-          );
-        }
-      }
-
-      this.passwordErrorMessages = currentErrors;
-
-      return Object.keys(errors).length ? errors : null;
-    };
-  }
-
   getPasswordErrorMessages(errors: any): string[] {
-    if (errors['required']) {
-      return ['Password is required'];
-    }
-
+    if (errors?.['required']) return ['Password is required'];
     return this.passwordErrorMessages;
-  }
-
-  /**
-   * Creates a validator that checks whether the password confirmation matches the original password.
-   * @returns A ValidatorFn that checks for password mismatch.
-   */
-  confirmPasswordValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const password: string = control.value;
-      if (!password) return null;
-
-      const errors: ValidationErrors = {};
-
-      if (password !== this.signup.controls.password.value) errors.match = true;
-
-      return Object.keys(errors).length ? errors : null;
-    };
   }
 }

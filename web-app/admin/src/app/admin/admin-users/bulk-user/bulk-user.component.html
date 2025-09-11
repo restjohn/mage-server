@@ -3,7 +3,7 @@
     <div class="form-grid">
       <mat-form-field appearance="fill">
         <mat-label>Team</mat-label>
-        <mat-select [(ngModel)]="selectedTeam">
+        <mat-select [(ngModel)]="selectedTeam" name="selectedTeam">
           <mat-option *ngFor="let team of teams" [value]="team">
             {{ team.name }}
           </mat-option>
@@ -12,25 +12,63 @@
 
       <mat-form-field appearance="fill">
         <mat-label>Role</mat-label>
-        <mat-select [(ngModel)]="selectedRole">
+        <mat-select [(ngModel)]="selectedRole" name="selectedRole">
           <mat-option *ngFor="let role of roles" [value]="role">
             {{ role.name }}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
-      <div class="file-upload">
-        <input
-          type="file"
-          (change)="onFileChange($event)"
-          accept=".csv"
-          [disabled]="!selectedRole"
-          [matTooltip]="
-            !selectedRole
-              ? 'Please select at least a role to enable file upload'
-              : ''
-          "
-        />
+      <div class="file-upload-container" style="grid-column: 1 / 3">
+        <div class="file-upload-row">
+          <div class="file-upload">
+            <input
+              type="file"
+              id="csvUpload"
+              (change)="onFileChange($event)"
+              accept=".csv"
+              [disabled]="!selectedRole"
+            />
+            <label
+              for="csvUpload"
+              class="upload-label"
+              [matTooltip]="
+                !selectedRole
+                  ? 'Please select a role before uploading a file'
+                  : ''
+              "
+                >Choose CSV</label
+            >
+          </div>
+
+          <button
+            mat-icon-button
+            type="button"
+            (click)="showCsvInfo = !showCsvInfo"
+            [matTooltip]="
+              showCsvInfo ? 'Hide CSV Format Info' : 'Show CSV Format Info'
+            "
+            aria-label="CSV format info"
+            class="info-btn"
+          >
+            <mat-icon color="primary" class="icon-margin">{{
+              showCsvInfo ? 'close' : 'info'
+            }}</mat-icon>
+          </button>
+        </div>
+
+        <div class="filename" *ngIf="filename">{{ filename }}</div>
+
+        <div *ngIf="showCsvInfo" class="csv-info-popover mat-elevation-z4">
+          <h4>CSV Format Requirements</h4>
+          <p><strong>Required:</strong> Username, Display Name, Password</p>
+          <p>
+            <strong>Optional:</strong> Email, Phone Number, Icon Initials, Icon
+            Color
+          </p>
+          <p>Ensure headers match these exactly (case-insensitive).</p>
+          <code>Username,Display Name,Email,Phone Number,Password</code>
+        </div>
       </div>
     </div>
 
@@ -77,7 +115,7 @@
       class="action-button btn-primary"
       (click)="onSubmit()"
       [disabled]="!filename"
-      [matTooltip]="!selectedRole ? 'Please select a file for import' : ''"
+      [matTooltip]="!filename ? 'Please select a file for import' : ''"
     >
       <i class="fa fa-save"></i> Import
     </button>

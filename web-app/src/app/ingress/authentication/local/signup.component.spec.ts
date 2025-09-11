@@ -141,6 +141,7 @@ describe('SignupComponent', () => {
     component.signup.controls.username.setValue('');
     component.getCaptcha();
     expect(mockUserService.signup).not.toHaveBeenCalled();
+    expect(component.loadingCaptcha).toBeFalse();
   });
 
   it('should emit signup event if form is valid and passwords match', () => {
@@ -266,24 +267,23 @@ describe('SignupComponent', () => {
   it('should return correct tooltip text from password policy', () => {
     const tooltip = component.passwordTooltipText;
     expect(tooltip).toContain('At least 8 characters');
-    expect(tooltip).toContain('Minimum 1 lowercase letter');
-    expect(tooltip).toContain('Allowed special characters');
+    expect(tooltip).toContain('Minimum 1 lowercase');
+    expect(tooltip).toContain('Allowed: !@#');
   });
 
-  it('should validate password with all policy rules', () => {
-    const validator = component.passwordPolicyValidator();
-    const control = { value: 'aa' } as any;
-    const result = validator(control);
-    expect(result).toBeTruthy();
-    expect(result?.passwordMinLength).toBeTrue();
-    expect(result?.lowLetters).toBeFalsy();
+  it('should validate password with policy (too short)', () => {
+    const ctrl = component.signup.controls.password;
+    ctrl.setValue('aa');
+    fixture.detectChanges();
+    const errors = ctrl.errors || {};
+    expect(errors['passwordMinLength']).toBeTrue();
   });
 
   it('should allow valid password by policy', () => {
-    const validator = component.passwordPolicyValidator();
-    const control = { value: 'Aa1!Aa1!' } as any;
-    const result = validator(control);
-    expect(result).toBeNull();
+    const ctrl = component.signup.controls.password;
+    ctrl.setValue('Aa1!Aa1!');
+    fixture.detectChanges();
+    expect(ctrl.errors).toBeNull();
   });
 
   it('should toggle showPassword flag', () => {
@@ -299,14 +299,14 @@ describe('SignupComponent', () => {
   });
 
   it('should validate minChars rule for mixed-case letters', () => {
-    const validator = component.passwordPolicyValidator();
+    const ctrl = component.signup.controls.password;
 
-    let control = { value: '1!' } as any;
-    let result = validator(control);
-    expect(result?.minChars).toBeTrue();
+    ctrl.setValue('1!');
+    fixture.detectChanges();
+    expect((ctrl.errors || {})['minChars']).toBeTrue();
 
-    control = { value: 'AA1a!' } as any;
-    result = validator(control);
-    expect(result?.minChars).toBeFalsy();
+    ctrl.setValue('AA1a!');
+    fixture.detectChanges();
+    expect((ctrl.errors || {})['minChars']).toBeFalsy();
   });
 });

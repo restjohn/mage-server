@@ -23,10 +23,20 @@
       ></mage-card-navbar>
 
       <div class="button-group">
-        <button mat-stroked-button color="primary" (click)="openImportModal()">
+        <button
+          mat-stroked-button
+          color="primary"
+          *ngIf="hasUserCreatePermission"
+          (click)="openImportModal()"
+        >
           Bulk Upload
         </button>
-        <button mat-flat-button class="btn-primary" (click)="createUser()">
+        <button
+          mat-flat-button
+          class="btn-primary"
+          *ngIf="hasUserCreatePermission"
+          (click)="createUser()"
+        >
           New User
         </button>
       </div>
@@ -115,5 +125,66 @@
       (page)="onPageChange($event)"
     >
     </mat-paginator>
+  </div>
+</div>
+<div *ngIf="isBulkUploading" class="bulk-overlay">
+  <div class="bulk-progress-content">
+    <div class="bulk-progress-warning">
+      <mat-icon color="warn">warning</mat-icon>
+      Please do not refresh or leave the page while the upload is in progress.
+    </div>
+    <div class="bulk-progress-bar">
+      <div
+        class="bulk-progress-success"
+        [style.width.%]="getSuccessPercent()"
+      ></div>
+      <div
+        class="bulk-progress-failure"
+        [style.width.%]="getFailurePercent()"
+      ></div>
+    </div>
+    <div class="bulk-progress-text">
+      Uploading users... {{ bulkProgress.completed }} /
+      {{ bulkProgress.total }} complete.
+      <span *ngIf="bulkProgress.failed > 0" class="text-danger">
+        {{ bulkProgress.failed }} failed
+      </span>
+    </div>
+    <div *ngIf="isFinalizing" class="finalizing-text">
+      Finalizing upload... please wait.
+    </div>
+    <div *ngIf="showErrorTable" class="bulk-error-summary">
+      <h4>Upload completed with errors</h4>
+      <p>{{ bulkErrors.length }} user(s) failed to upload.</p>
+      <div class="error-table-wrapper">
+        <table class="error-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Error</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let error of bulkErrors">
+              <td>{{ error.user.username }}</td>
+              <td>{{ error.user.email }}</td>
+              <td>{{ error.error }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="button-group">
+        <button mat-stroked-button (click)="downloadErrorCSV()">
+          Download Errors
+        </button>
+        <button mat-stroked-button (click)="closeBulkUpload()">Close</button>
+      </div>
+    </div>
+
+    <div *ngIf="isFinished && !showErrorTable">
+      <button mat-stroked-button (click)="closeBulkUpload()">Close</button>
+    </div>
   </div>
 </div>

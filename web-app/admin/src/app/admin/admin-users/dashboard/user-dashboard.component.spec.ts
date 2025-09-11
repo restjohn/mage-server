@@ -170,7 +170,7 @@ describe('UserDashboardComponent', () => {
     component.refreshUsers();
     tick();
     expect(pagingServiceSpy.refresh).toHaveBeenCalled();
-    expect(component.users.length).toBe(3);
+    expect(component.dataSource.length).toBe(3);
     expect(component.totalUsers).toBe(2);
     flush();
   }));
@@ -182,7 +182,7 @@ describe('UserDashboardComponent', () => {
       component.stateAndData['all'],
       'user'
     );
-    expect(component.users.length).toBe(3);
+    expect(component.dataSource.length).toBe(3);
     flush();
   }));
 
