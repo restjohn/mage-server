@@ -241,9 +241,20 @@ export class UserDashboardComponent implements OnInit {
     dialogRef.afterClosed().subscribe((newUser) => {
       if (newUser?.confirmed) {
         const error = (response: any) => console.error(response);
-        this.userService.createUser(newUser.user, error).finally(() => {
-          this.refreshUsers();
-        });
+        new Promise((resolve, reject) => {
+            this.userService.createUser(
+              newUser.user,
+              (user) => resolve(user),
+              (err) => reject(err),
+              null
+            );
+          })
+            .catch((err) => {
+              console.error(err);
+            })
+            .finally(() => {
+              this.refreshUsers();
+            });
       }
     });
   }

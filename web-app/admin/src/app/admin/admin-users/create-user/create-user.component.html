@@ -110,7 +110,7 @@
         "
       >
         <mat-error *ngIf="signup.controls.password.errors as errors">
-          <div *ngFor="let msg of passwordErrorMessages">
+          <div *ngFor="let msg of getPasswordErrorMessages(errors)">
             {{ msg }}
           </div>
         </mat-error>

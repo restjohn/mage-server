@@ -279,4 +279,9 @@ export class CreateUserModalComponent {
   get passwordTooltipText(): string {
     return this.passwordPolicy ? getPasswordTooltip(this.passwordPolicy) : '';
   }
+
+  getPasswordErrorMessages(errors: any): string[] {
+    if (errors?.['required']) return ['Password is required'];
+    return this.passwordErrorMessages;
+  }
 }
