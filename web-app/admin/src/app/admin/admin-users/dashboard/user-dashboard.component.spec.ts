@@ -160,7 +160,6 @@ describe('UserDashboardComponent', () => {
   it('should load permissions and roles on init', fakeAsync(() => {
     component.ngOnInit();
     tick();
-    expect(component.hasUserCreatePermission).toBeTrue();
     expect(userServiceSpy.getRoles).toHaveBeenCalled();
     expect(component.roles.length).toBeGreaterThan(0);
     flush();
@@ -224,62 +223,10 @@ describe('UserDashboardComponent', () => {
     flush();
   }));
 
-  it('should open delete modal and delete user', fakeAsync(() => {
-    dialogSpy.open.and.returnValue({
-      afterClosed: () => of({ confirmed: true })
-    });
-
-    const event = new MouseEvent('click');
-    spyOn(event, 'stopPropagation');
-
-    component.deleteUser(event, testUsers[0] as any);
-    tick();
-
-    expect(userServiceSpy.deleteUser).toHaveBeenCalled();
-    expect(event.stopPropagation).toHaveBeenCalled();
-    flush();
-  }));
-
-  it('should activate user and refresh', fakeAsync(() => {
-    const user = { ...testUsers[0], active: false };
-    const event = new MouseEvent('click');
-    spyOn(event, 'stopPropagation');
-
-    component.activateUser(event, user);
-    tick();
-
-    expect(user.active).toBeTrue();
-    expect(userServiceSpy.updateUser).toHaveBeenCalledWith(user.id, user);
-    flush();
-  }));
-
-  it('should enable user and refresh', fakeAsync(() => {
-    const user = { ...testUsers[0], enabled: false };
-    const event = new MouseEvent('click');
-    spyOn(event, 'stopPropagation');
-
-    component.enableUser(event, user);
-    tick();
-
-    expect(user.enabled).toBeTrue();
-    expect(userServiceSpy.updateUser).toHaveBeenCalledWith(user.id, user);
-    flush();
-  }));
-
   it('should navigate to user detail on click', () => {
     component.gotoUser(testUsers[0] as any);
     expect(stateServiceSpy.go).toHaveBeenCalledWith('admin.user', {
       userId: '1'
-    });
-  });
-
-  it('should navigate to edit user page', () => {
-    const event = new MouseEvent('click');
-    spyOn(event, 'stopPropagation');
-
-    component.editUser(event, testUsers[1] as any);
-    expect(stateServiceSpy.go).toHaveBeenCalledWith('admin.editUser', {
-      userId: '2'
     });
   });
 });

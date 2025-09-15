@@ -256,7 +256,11 @@ export class CreateUserModalComponent {
       roleId: this.signup.get('selectedRole')?.value,
       avatar: this.newUserFiles.avatar,
       icon: this.newUserFiles.icon,
-      iconMetadata: JSON.stringify(this.iconMetadata)
+      iconMetadata: JSON.stringify({
+        ...this.iconMetadata,
+        text: this.signup.get('iconInitials').value,
+        color: this.signup.get('iconColor').value
+      })
     };
 
     this.dialogRef.close({ confirmed: true, user: userPayload });

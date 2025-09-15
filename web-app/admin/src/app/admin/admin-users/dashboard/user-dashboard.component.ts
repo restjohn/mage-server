@@ -9,7 +9,6 @@ import {
   UserService,
   UserPagingService
 } from 'admin/src/app/upgrade/ajs-upgraded-providers';
-import { DeleteUserComponent } from '../delete-user/delete-user.component';
 import { User } from 'core-lib-src/user';
 import { CreateUserModalComponent } from '../create-user/create-user.component';
 import { Role } from '../user';
@@ -25,7 +24,7 @@ import pLimit from 'p-limit';
 })
 export class UserDashboardComponent implements OnInit {
   dataSource: User[] = [];
-  displayedColumns: string[] = ['user', 'actions'];
+  displayedColumns: string[] = ['user'];
 
   userSearch: string = '';
 
@@ -38,8 +37,6 @@ export class UserDashboardComponent implements OnInit {
   error: string | null = null;
 
   hasUserCreatePermission = false;
-  hasUserEditPermission = false;
-  hasUserDeletePermission = false;
 
   stateAndData: any;
 
@@ -110,8 +107,6 @@ export class UserDashboardComponent implements OnInit {
   private initPermissions(): void {
     const permissions = this.userService.myself.role?.permissions || [];
     this.hasUserCreatePermission = permissions.includes('CREATE_USER');
-    this.hasUserEditPermission = permissions.includes('UPDATE_USER');
-    this.hasUserDeletePermission = permissions.includes('DELETE_USER');
   }
 
   /**
@@ -230,7 +225,7 @@ export class UserDashboardComponent implements OnInit {
    * @param user The user to navigate to
    */
   gotoUser(user: User): void {
-    this.stateService.go('admin.user', { userId: user.id });
+    this.stateService.go('admin.user', { userId: user.id});
   }
 
   /**
@@ -246,7 +241,7 @@ export class UserDashboardComponent implements OnInit {
     dialogRef.afterClosed().subscribe((newUser) => {
       if (newUser?.confirmed) {
         const error = (response: any) => console.error(response);
-        this.userService.createUser(newUser.user, error).then(() => {
+        this.userService.createUser(newUser.user, error).finally(() => {
           this.refreshUsers();
         });
       }
@@ -387,65 +382,4 @@ export class UserDashboardComponent implements OnInit {
     this.bulkProgress = { total: 0, completed: 0, failed: 0 };
   }
   
-  /**
-   * Navigates to the user edit page.
-   * @param event The triggering mouse event
-   * @param user The user to edit
-   */
-  editUser(event: MouseEvent, user: User): void {
-    event.stopPropagation();
-    this.stateService.go('admin.editUser', { userId: user.id });
-  }
-
-  /**
-   * Opens a confirmation modal and deletes the user if confirmed.
-   * @param event The triggering mouse event
-   * @param user The user to delete
-   */
-  deleteUser(event: MouseEvent, user: User): void {
-    event.stopPropagation();
-
-    const dialogRef = this.dialog.open(DeleteUserComponent, {
-      data: { user }
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result?.confirmed) {
-        this.userService.deleteUser(user).then(() => {
-          this.refreshUsers();
-        });
-      }
-    });
-  }
-
-  /**
-   * Activates a user account.
-   * @param event The triggering mouse event
-   * @param user The user to activate
-   */
-  activateUser(event: MouseEvent, user: User): void {
-    event.stopPropagation();
-
-    user.active = true;
-    this.userService.updateUser(user.id, user).then({
-      next: () => this.refreshUsers(),
-      error: (err) => {
-        this.error = err?.message || 'Failed to activate user';
-      }
-    });
-  }
-
-  /**
-   * Enables a user account.
-   * @param event The triggering mouse event
-   * @param user The user to enable
-   */
-  enableUser(event: MouseEvent, user: User): void {
-    event.stopPropagation();
-
-    user.enabled = true;
-    this.userService.updateUser(user.id, user).then(() => {
-      this.refreshUsers();
-    });
-  }
 }
