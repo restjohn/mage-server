@@ -202,7 +202,6 @@ export class UserDetailsComponent implements OnInit {
 
     this.userService.getUser(userId).then((user: User) => {
       this.user = user;
-      console.log(user)
       // determine if viewing own profile to adjust UI (e.g., hide disable card)
       this.isSelf =
         !!this.userService.myself && this.userService.myself.id === user.id;
@@ -473,7 +472,6 @@ export class UserDetailsComponent implements OnInit {
     this.iconPreviewUrl = null;
     this.avatarPreviewUrl = null;
     this.removeIconSelected = false;
-console.log(this.iconMetadata);
     if (!this.iconMetadata) this.iconMetadata = { type: 'none' };
     if (this.iconMetadata.type === 'create') {
       if (!this.iconMetadata.text) this.setIconInitials(this.user.displayName);
