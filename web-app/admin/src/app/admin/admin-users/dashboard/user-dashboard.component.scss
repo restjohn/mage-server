@@ -1,5 +1,6 @@
 ::ng-deep .admin-main-content {
   width: 100vw;
+  min-width: 520px;
   &:has(admin-users) {
     height: 92vh;
     overflow-y: hidden;
