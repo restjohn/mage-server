@@ -76,14 +76,17 @@
       </table>
     </div>
 
-    <mat-paginator
-      [length]="totalUsers"
-      [pageSize]="pageSize"
-      [pageIndex]="pageIndex"
-      [pageSizeOptions]="pageSizeOptions"
-      (page)="onPageChange($event)"
-    >
-    </mat-paginator>
+    <div class="pagination">
+      <mat-paginator
+        [length]="totalUsers"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="pageSizeOptions"
+        showFirstLastButtons
+        (page)="onPageChange($event)"
+      >
+      </mat-paginator>
+    </div>
   </div>
 </div>
 <div *ngIf="isBulkUploading" class="bulk-overlay">

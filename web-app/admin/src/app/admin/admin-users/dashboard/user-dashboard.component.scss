@@ -4,6 +4,10 @@
     height: 92vh;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+
+    @media (max-height: 500px) {
+      overflow-y: scroll;
+    }
   }
   admin-users {
     .container {
@@ -11,6 +15,9 @@
     }
   }
 }
+
+$min-height: 40.8vh;
+$max-height: 72.8vh;
 
 .container.bottom-gap-l {
   margin-bottom: 2rem;
@@ -93,13 +100,15 @@
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: stretch;
+    margin: 0;
+    padding: 5px;
 
-    mage-card-navbar {
-      margin-bottom: 1rem;
+    .button-group {
+      width: auto;
+      margin: 0 auto;
     }
   }
 }
-
 .table-wrapper {
   border-radius: 12px;
   background: #fff;
@@ -108,18 +117,92 @@
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
   height: 78vh;
   overflow: hidden;
+
+  @media (max-height: 1100px) {
+    height: 76vh;
+  }
+
+  @media (max-height: 1000px) {
+    height: 74vh;
+  }
+
+  @media (max-height: 900px) {
+    height: 71vh;
+  }
+
+  @media (max-height: 800px) {
+    height: 67vh;
+  }
+
+  @media (max-height: 700px) {
+    height: 60vh;
+  }
+
+  @media (max-height: 600px) {
+    height: 53vh;
+  }
 }
 
 .table-scroll {
   height: 65.2vh;
-  overflow-y: auto;
-
   @media (max-width: 768px) {
-    height: 61.2vh;
+      height: 63.2vh
   }
+  overflow-y: auto;
+  max-height: 100%;
+
+  @media (max-height: 1100px) {
+    height: 62vh;
+    @media (max-width: 768px) {
+        height: 60vh
+    }
+  }
+
+  @media (max-height: 1000px) {
+    height: 57vh;
+    @media (max-width: 768px) {
+        height: 55vh
+    }
+  }
+
+  @media (max-height: 900px) {
+    height: 52vh;
+    @media (max-width: 768px) {
+        height: 50vh
+    }
+  }
+
+  @media (max-height: 800px) {
+    height: 45vh;
+    @media (max-width: 768px) {
+        height: 43vh
+    }
+  }
+
+  @media (max-height: 700px) {
+    height: 35vh;
+    @media (max-width: 768px) {
+        height: 33vh
+    }
+  }
+  @media (max-height: 600px) {
+    height: 23vh;
+    @media (max-width: 768px) {
+        height: 21vh
+    }
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
+
+    th,
+    td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 
   .mat-header-row {
@@ -133,102 +216,37 @@
   .mat-cell,
   .mat-header-cell {
     height: 3.5rem;
+    padding: 0.5rem;
+
+    @media (max-height: 768px) {
+      height: 3.2rem;
+    }
+
+    @media (max-height: 600px) {
+      height: 3rem;
+      padding: 0.4rem;
+    }
+
+    @media (max-height: 480px) {
+      height: 2.8rem;
+      padding: 0.3rem;
+      font-size: 0.85rem;
+    }
+
+    @media (max-height: 400px) {
+      height: 2.5rem;
+      font-size: 0.75rem;
+    }
+
+    @media (max-height: 350px) {
+      height: 2.3rem;
+      font-size: 0.7rem;
+    }
   }
 }
 
-.mat-table-even-columns {
-  table-layout: fixed;
-  width: 100%;
-  background: white;
-
-  .mat-header-cell,
-  .mat-cell {
-    padding: 1rem 1.5rem;
-    font-size: 0.875rem;
-  }
-
-  .mat-header-cell {
-    font-weight: 600;
-    color: #374151;
-    background: #f9fafb;
-    border-bottom: 2px solid #e5e7eb;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-  }
-
-  .mat-cell {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    border-bottom: 1px solid #f1f5f9;
-  }
-
-  .mat-row {
-    transition: background-color 0.2s ease;
-    cursor: pointer;
-
-    &:hover {
-      background-color: #f8fafc;
-    }
-  }
-
-  .strong {
-    font-weight: 600;
-    color: #111827;
-  }
-
-  .muted {
-    color: #6b7280;
-  }
-}
-
-.mat-cell .d-flex {
-  gap: 0.5rem;
-
-  button {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    font-weight: 500;
-    padding: 0.25rem 0.75rem;
-    border-radius: 6px;
-  }
-}
-
-.user-avatar {
-  margin-right: 1rem;
-}
-
-::ng-deep .mat-paginator {
-  border-top: 1px solid #e5e7eb;
-  background: #f9fafb;
-
-  .mat-paginator-container {
-    padding: 0 1.5rem;
-    min-height: 3.5rem;
-
-    @media (max-width: 768px) {
-      padding: 0 1rem;
-    }
-  }
-
-  .mat-paginator-page-size,
-  .mat-paginator-range-label {
-    font-size: 0.875rem;
-    color: #6b7280;
-  }
-
-  .mat-icon-button {
-    color: #6b7280;
-
-    &:hover {
-      background-color: #e5e7eb;
-    }
-
-    &[disabled] {
-      color: #d1d5db;
-    }
-  }
+.pagination {
+  display: contents;
 }
 
 .mat-column-actions {
