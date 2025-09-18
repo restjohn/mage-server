@@ -140,14 +140,14 @@ export class UserDashboardComponent implements OnInit {
    */
   refreshUsers(): Promise<void> {
     const state = this.stateAndData['all'];
-  
+
     state.pageSize = this.pageSize;
     state.pageIndex = this.pageIndex;
-  
+
     state.userFilter = state.userFilter || {};
     state.userFilter.limit = this.pageSize;
     state.userFilter.page = this.pageIndex;
-  
+
     return this.userPagingService.refresh(this.stateAndData).then(() => {
       const users = this.userPagingService.users(state);
       this.dataSource = users;
@@ -225,7 +225,7 @@ export class UserDashboardComponent implements OnInit {
    * @param user The user to navigate to
    */
   gotoUser(user: User): void {
-    this.stateService.go('admin.user', { userId: user.id});
+    this.stateService.go('admin.user', { userId: user.id });
   }
 
   /**
@@ -240,21 +240,20 @@ export class UserDashboardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((newUser) => {
       if (newUser?.confirmed) {
-        const error = (response: any) => console.error(response);
         new Promise((resolve, reject) => {
-            this.userService.createUser(
-              newUser.user,
-              (user) => resolve(user),
-              (err) => reject(err),
-              null
-            );
+          this.userService.createUser(
+            newUser.user,
+            (user) => resolve(user),
+            (err) => reject(err),
+            null
+          );
+        })
+          .catch((err) => {
+            console.error(err);
           })
-            .catch((err) => {
-              console.error(err);
-            })
-            .finally(() => {
-              this.refreshUsers();
-            });
+          .finally(() => {
+            this.refreshUsers();
+          });
       }
     });
   }
@@ -270,7 +269,7 @@ export class UserDashboardComponent implements OnInit {
         teams: this.teams
       }
     });
-  
+
     dialogRef.afterClosed().subscribe((result) => {
       if (result?.users?.length) {
         this.isBulkUploading = true;
@@ -280,33 +279,34 @@ export class UserDashboardComponent implements OnInit {
           completed: 0,
           failed: 0
         };
-  
+
         this.bulkCreateUsers(result.users)
           .then(async (createdUsers) => {
             this.isFinalizing = true;
-  
+
             if (result.selectedTeam) {
               await Promise.all(
                 createdUsers.map((u) =>
-                  this.teamService.addUserToTeam(result.selectedTeam.id, u).toPromise()
+                  this.teamService
+                    .addUserToTeam(result.selectedTeam.id, u)
+                    .toPromise()
                 )
               );
             }
           })
           .finally(() => {
             this.refreshUsers().then(() => {
-                this.isFinalizing = false;
-                if (this.bulkErrors.length === 0) {
-                  this.isFinished = true;
-                } else {
-                    this.showErrorTable = true;
-                }
+              this.isFinalizing = false;
+              if (this.bulkErrors.length === 0) {
+                this.isFinished = true;
+              } else {
+                this.showErrorTable = true;
+              }
             });
           });
       }
     });
   }
-  
 
   /**
    * Creates users in bulk via the user service.
@@ -392,5 +392,4 @@ export class UserDashboardComponent implements OnInit {
     this.bulkErrors = [];
     this.bulkProgress = { total: 0, completed: 0, failed: 0 };
   }
-  
 }

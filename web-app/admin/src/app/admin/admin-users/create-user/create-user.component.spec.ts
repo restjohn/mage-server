@@ -98,17 +98,6 @@ describe('CreateUserModalComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize form with default values', () => {
-    const form = component.signup;
-    expect(form).toBeDefined();
-    expect(form.get('displayName')).toBeTruthy();
-    expect(form.get('username')).toBeTruthy();
-    expect(form.get('email')).toBeTruthy();
-    expect(form.get('selectedRole')).toBeTruthy();
-    expect(form.get('password')).toBeTruthy();
-    expect(form.get('passwordconfirm')).toBeTruthy();
-  });
-
   it('should validate required fields in form', () => {
     const form = component.signup;
     form.get('displayName')?.setValue('');

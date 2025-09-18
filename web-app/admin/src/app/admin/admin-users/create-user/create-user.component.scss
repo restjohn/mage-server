@@ -388,3 +388,7 @@
   box-shadow: none !important;
   border-radius: 30px !important;
 }
+
+::ng-deep .mat-form-field-required-marker {
+  color: red;
+}
