@@ -1,4 +1,10 @@
-import { Component, OnInit, Inject, ElementRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Inject,
+  ElementRef,
+  ViewChild
+} from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
@@ -118,7 +124,8 @@ export class UserDetailsComponent implements OnInit {
   canUpdatePassword = false;
   passwordStrengthType: string | null = null;
   passwordStrength: string | null = null;
-  passwordStatus: { status: 'success' | 'danger' | null; msg: string | null } = { status: null, msg: null };
+  passwordStatus: { status: 'success' | 'danger' | null; msg: string | null } =
+    { status: null, msg: null };
   changePassword = false;
   newPassword = '';
   newPasswordConfirm = '';
@@ -157,7 +164,7 @@ export class UserDetailsComponent implements OnInit {
     @Inject(Team) private teamService: any,
     @Inject(LocalStorageService) private localStorageService: any,
     @Inject(TeamsService) private teamsService: TeamsService,
-    @Inject(EventsService) private eventsService: EventsService
+    @Inject(EventsService) private eventsService: EventsService,
   ) {
     this.deviceStateAndData = this.devicePagingService.constructDefault();
   }
@@ -173,10 +180,20 @@ export class UserDetailsComponent implements OnInit {
       user: { id: userId }
     };
 
-    this.hasUserEditPermission = this.userService.myself?.role?.permissions?.includes('UPDATE_USER') || false;
-    this.hasUserDeletePermission = this.userService.myself?.role?.permissions?.includes('DELETE_USER') || false;
-    this.canEditRole = this.userService.myself?.role?.permissions?.includes('UPDATE_USER_ROLE') || false;
-    this.canUpdatePassword = this.userService.myself?.role?.permissions?.includes('UPDATE_USER_ROLE') || false;
+    this.hasUserEditPermission =
+      this.userService.myself?.role?.permissions?.includes('UPDATE_USER') ||
+      false;
+    this.hasUserDeletePermission =
+      this.userService.myself?.role?.permissions?.includes('DELETE_USER') ||
+      false;
+    this.canEditRole =
+      this.userService.myself?.role?.permissions?.includes(
+        'UPDATE_USER_ROLE'
+      ) || false;
+    this.canUpdatePassword =
+      this.userService.myself?.role?.permissions?.includes(
+        'UPDATE_USER_ROLE'
+      ) || false;
 
     this.userService.getRoles().then((roles: any[]) => {
       this.roles = roles;
@@ -186,10 +203,11 @@ export class UserDetailsComponent implements OnInit {
     this.userService.getUser(userId).then((user: User) => {
       this.user = user;
       // determine if viewing own profile to adjust UI (e.g., hide disable card)
-      this.isSelf = !!this.userService.myself && (this.userService.myself.id === user.id);
+      this.isSelf =
+        !!this.userService.myself && this.userService.myself.id === user.id;
 
       const anyUser: any = user as any;
-      if (anyUser.icon && (anyUser.icon.type === 'create')) {
+      if (anyUser.icon && anyUser.icon.type === 'create') {
         this.iconMetadata = {
           type: 'create',
           text: anyUser.icon.text,
@@ -208,18 +226,22 @@ export class UserDetailsComponent implements OnInit {
       this.setSelectedRoleFromUser();
     });
 
-    this.loginService.query({ filter: this.filter, limit: this.loginResultsLimit }).then((loginPage: LoginPage) => {
-      this.loginPage = loginPage;
-      if (loginPage.logins.length) {
-        this.firstLogin = loginPage.logins[0];
-      }
-    });
+    this.loginService
+      .query({ filter: this.filter, limit: this.loginResultsLimit })
+      .then((loginPage: LoginPage) => {
+        this.loginPage = loginPage;
+        if (loginPage.logins.length) {
+          this.firstLogin = loginPage.logins[0];
+        }
+      });
 
     delete this.deviceStateAndData['registered'];
     delete this.deviceStateAndData['unregistered'];
 
     this.devicePagingService.refresh(this.deviceStateAndData).then(() => {
-      this.devices = this.devicePagingService.devices(this.deviceStateAndData[this.deviceState]);
+      this.devices = this.devicePagingService.devices(
+        this.deviceStateAndData[this.deviceState]
+      );
     });
 
     try {
@@ -231,7 +253,7 @@ export class UserDetailsComponent implements OnInit {
         graphs: zxcvbnCommonPackage.adjacencyGraphs,
         translations: zxcvbnEnPackage.translations
       });
-    } catch { }
+    } catch {}
   }
 
   /**
@@ -240,38 +262,40 @@ export class UserDetailsComponent implements OnInit {
   private loadUserTeams(): void {
     if (!this.user?.id) return;
 
-    this.teamsService.getTeams({
-      with_members: [this.user.id],
-      term: this.userTeamSearch || undefined,
-      limit: this.userTeamsPageSize,
-      start: String(this.userTeamsPageIndex),
-      populate: true
-    }).subscribe({
-      next: (results: any) => {
-        if (Array.isArray(results) && results.length && results[0]?.items) {
-          const page = results[0];
-          this.userTeams = page.items || [];
-          this.totalUserTeams = page.totalCount ?? this.userTeams.length;
-        } else if (Array.isArray(results)) {
-          this.userTeams = results;
-          this.totalUserTeams = results.length;
-        } else if (results?.items) {
-          this.userTeams = results.items || [];
-          this.totalUserTeams = results.totalCount ?? this.userTeams.length;
-        } else {
+    this.teamsService
+      .getTeams({
+        with_members: [this.user.id],
+        term: this.userTeamSearch || undefined,
+        limit: this.userTeamsPageSize,
+        start: String(this.userTeamsPageIndex),
+        populate: true
+      })
+      .subscribe({
+        next: (results: any) => {
+          if (Array.isArray(results) && results.length && results[0]?.items) {
+            const page = results[0];
+            this.userTeams = page.items || [];
+            this.totalUserTeams = page.totalCount ?? this.userTeams.length;
+          } else if (Array.isArray(results)) {
+            this.userTeams = results;
+            this.totalUserTeams = results.length;
+          } else if (results?.items) {
+            this.userTeams = results.items || [];
+            this.totalUserTeams = results.totalCount ?? this.userTeams.length;
+          } else {
+            this.userTeams = [];
+            this.totalUserTeams = 0;
+          }
+          this.teamsDataSource.data = this.userTeams;
+          this.loadingTeams = false;
+        },
+        error: () => {
           this.userTeams = [];
           this.totalUserTeams = 0;
+          this.teamsDataSource.data = [];
+          this.loadingTeams = false;
         }
-        this.teamsDataSource.data = this.userTeams;
-        this.loadingTeams = false;
-      },
-      error: () => {
-        this.userTeams = [];
-        this.totalUserTeams = 0;
-        this.teamsDataSource.data = [];
-        this.loadingTeams = false;
-      }
-    });
+      });
   }
 
   /**
@@ -280,25 +304,27 @@ export class UserDetailsComponent implements OnInit {
   private loadUserEvents(): void {
     if (!this.user?.id) return;
 
-    this.eventsService.getEvents({
-      userId: this.user.id,
-      term: this.userEventSearch || undefined,
-      page: this.userEventsPageIndex,
-      page_size: this.userEventsPageSize
-    }).subscribe({
-      next: (results) => {
-        this.userEvents = results.items || [];
-        this.totalUserEvents = results.totalCount || this.userEvents.length;
-        this.eventsDataSource.data = this.userEvents;
-        this.loadingEvents = false;
-      },
-      error: () => {
-        this.userEvents = [];
-        this.totalUserEvents = 0;
-        this.eventsDataSource.data = [];
-        this.loadingEvents = false;
-      }
-    });
+    this.eventsService
+      .getEvents({
+        userId: this.user.id,
+        term: this.userEventSearch || undefined,
+        page: this.userEventsPageIndex,
+        page_size: this.userEventsPageSize
+      })
+      .subscribe({
+        next: (results) => {
+          this.userEvents = results.items || [];
+          this.totalUserEvents = results.totalCount || this.userEvents.length;
+          this.eventsDataSource.data = this.userEvents;
+          this.loadingEvents = false;
+        },
+        error: () => {
+          this.userEvents = [];
+          this.totalUserEvents = 0;
+          this.eventsDataSource.data = [];
+          this.loadingEvents = false;
+        }
+      });
   }
 
   /**
@@ -383,7 +409,7 @@ export class UserDetailsComponent implements OnInit {
     this.nonUserTeamSearchResults = [];
     if (this.nonUserTeamSearchResults.length === 0) {
       const noTeam = {
-        name: "No Results Found"
+        name: 'No Results Found'
       };
       this.nonUserTeamSearchResults.push(noTeam);
     }
@@ -402,13 +428,13 @@ export class UserDetailsComponent implements OnInit {
 
     if (device.iconClass) return device.iconClass;
 
-    const userAgent = device.userAgent || "";
+    const userAgent = device.userAgent || '';
 
     if (device.appVersion === 'Web Client') {
       device.iconClass = 'fa-desktop admin-desktop-icon-xs';
-    } else if (userAgent.toLowerCase().indexOf("android") !== -1) {
+    } else if (userAgent.toLowerCase().indexOf('android') !== -1) {
       device.iconClass = 'fa-android admin-android-icon-xs';
-    } else if (userAgent.toLowerCase().indexOf("ios") !== -1) {
+    } else if (userAgent.toLowerCase().indexOf('ios') !== -1) {
       device.iconClass = 'fa-apple admin-apple-icon-xs';
     } else {
       device.iconClass = 'fa-mobile admin-generic-icon-xs';
@@ -446,11 +472,11 @@ export class UserDetailsComponent implements OnInit {
     this.iconPreviewUrl = null;
     this.avatarPreviewUrl = null;
     this.removeIconSelected = false;
-
     if (!this.iconMetadata) this.iconMetadata = { type: 'none' };
     if (this.iconMetadata.type === 'create') {
       if (!this.iconMetadata.text) this.setIconInitials(this.user.displayName);
-      if (!this.iconMetadata.color) this.iconMetadata.color = this.randomColor();
+      if (!this.iconMetadata.color)
+        this.iconMetadata.color = this.randomColor();
       setTimeout(() => this.updateMapIconCanvas(), 0);
     }
 
@@ -531,7 +557,8 @@ export class UserDetailsComponent implements OnInit {
   iconTypeChanged(): void {
     if (this.iconMetadata.type === 'create') {
       this.setIconInitials(this.user.displayName);
-      if (!this.iconMetadata.color) this.iconMetadata.color = this.randomColor();
+      if (!this.iconMetadata.color)
+        this.iconMetadata.color = this.randomColor();
       if (this.editUser) (this.editUser as any).icon = null;
       this.iconPreviewUrl = null;
       this.removeIconSelected = false;
@@ -540,7 +567,9 @@ export class UserDetailsComponent implements OnInit {
       this.removeIconSelected = false;
     } else {
       this.iconPreviewUrl = null;
-      if (this.editUser) { (this.editUser as any).icon = null; }
+      if (this.editUser) {
+        (this.editUser as any).icon = null;
+      }
       this.removeIconSelected = true;
     }
   }
@@ -570,7 +599,9 @@ export class UserDetailsComponent implements OnInit {
   private setIconInitials(name: string): void {
     if (this.iconMetadata.text) return;
     const initials = (name || '').match(/\b\w/g) || [];
-    this.iconMetadata.text = ((initials.shift() || '') + (initials.pop() || '')).toUpperCase();
+    this.iconMetadata.text = (
+      (initials.shift() || '') + (initials.pop() || '')
+    ).toUpperCase();
   }
 
   /**
@@ -598,7 +629,11 @@ export class UserDetailsComponent implements OnInit {
    * @param color - Marker color
    * @param text - Initials text
    */
-  private drawMarker(canvas: HTMLCanvasElement, color: string, text: string): void {
+  private drawMarker(
+    canvas: HTMLCanvasElement,
+    color: string,
+    text: string
+  ): void {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     // Use the canvas' existing size (set by template) and scale drawing accordingly
@@ -799,7 +834,8 @@ export class UserDetailsComponent implements OnInit {
     };
 
     const error = (response: any) => {
-      this.error = response.responseText || response.data || 'Failed to update user';
+      this.error =
+        response.responseText || response.data || 'Failed to update user';
       this.saving = false;
     };
 
@@ -810,10 +846,14 @@ export class UserDetailsComponent implements OnInit {
    * Add the current user to the selected non-member team.
    */
   addUserToTeam(): void {
-    this.teamService.addUser({ id: this.nonUserTeam.id }, this.user, (team: any) => {
-      this.userTeams.push(team);
-      this.nonUserTeam = null;
-    });
+    this.teamService.addUser(
+      { id: this.nonUserTeam.id },
+      this.user,
+      (team: any) => {
+        this.userTeams.push(team);
+        this.nonUserTeam = null;
+      }
+    );
   }
 
   /**
@@ -825,18 +865,21 @@ export class UserDetailsComponent implements OnInit {
     $event.stopPropagation();
     const wasLastItemOnPage = (this.userTeams?.length || 0) <= 1;
 
-    this.teamService.removeUser({ id: team.id, userId: this.user.id }, (removedTeam: any) => {
-      // Optimistically update total count
-      this.totalUserTeams = Math.max(0, (this.totalUserTeams || 0) - 1);
+    this.teamService.removeUser(
+      { id: team.id, userId: this.user.id },
+      (removedTeam: any) => {
+        // Optimistically update total count
+        this.totalUserTeams = Math.max(0, (this.totalUserTeams || 0) - 1);
 
-      // If we removed the last item on a non-first page, go back a page
-      if (wasLastItemOnPage && this.userTeamsPageIndex > 0) {
-        this.userTeamsPageIndex = this.userTeamsPageIndex - 1;
+        // If we removed the last item on a non-first page, go back a page
+        if (wasLastItemOnPage && this.userTeamsPageIndex > 0) {
+          this.userTeamsPageIndex = this.userTeamsPageIndex - 1;
+        }
+
+        // Refresh the current page from the server so rows and totals are accurate
+        this.loadUserTeams();
       }
-
-      // Refresh the current page from the server so rows and totals are accurate
-      this.loadUserTeams();
-    });
+    );
   }
 
   /**
@@ -852,11 +895,14 @@ export class UserDetailsComponent implements OnInit {
    * @param user - User to delete
    */
   deleteUser(user: User): void {
-    this.userService.deleteUser(user).then(() => {
-      this.stateService.go('admin.users');
-    }).catch((err) => {
-      console.error('Failed to delete user:', err);
-    });
+    this.userService
+      .deleteUser(user)
+      .then(() => {
+        this.stateService.go('admin.users');
+      })
+      .catch((err) => {
+        console.error('Failed to delete user:', err);
+      });
   }
 
   /**
@@ -880,7 +926,7 @@ export class UserDetailsComponent implements OnInit {
    */
   activateUser(user: User): void {
     user.active = true;
-    this.userService.updateUser(user.id, user, () => { });
+    this.userService.updateUser(user.id, user, () => {});
   }
 
   /**
@@ -889,7 +935,7 @@ export class UserDetailsComponent implements OnInit {
    */
   enableUser(user: User): void {
     user.enabled = true;
-    this.userService.updateUser(user.id, user, () => { });
+    this.userService.updateUser(user.id, user, () => {});
   }
 
   /**
@@ -898,7 +944,7 @@ export class UserDetailsComponent implements OnInit {
    */
   disableUser(user: User): void {
     user.enabled = false;
-    this.userService.updateUser(user.id, user, () => { });
+    this.userService.updateUser(user.id, user, () => {});
   }
 
   /**
@@ -923,13 +969,15 @@ export class UserDetailsComponent implements OnInit {
    * @param url - Next/previous page URL
    */
   pageLogin(url: string): void {
-    this.loginService.query({ url: url, filter: this.filter, limit: this.loginResultsLimit }).then((loginPage: LoginPage) => {
-      if (loginPage.logins.length) {
-        this.loginPage = loginPage;
-        this.showNext = loginPage.logins.length !== 0;
-        this.showPrevious = loginPage.logins[0].id !== this.firstLogin?.id;
-      }
-    });
+    this.loginService
+      .query({ url: url, filter: this.filter, limit: this.loginResultsLimit })
+      .then((loginPage: LoginPage) => {
+        if (loginPage.logins.length) {
+          this.loginPage = loginPage;
+          this.showNext = loginPage.logins.length !== 0;
+          this.showPrevious = loginPage.logins[0].id !== this.firstLogin?.id;
+        }
+      });
   }
 
   /**
@@ -944,19 +992,21 @@ export class UserDetailsComponent implements OnInit {
       searchString = '.*';
     }
 
-    return this.devicePagingService.search(this.deviceStateAndData[this.deviceState], searchString).then((devices: Device[]) => {
-      this.loginSearchResults = devices;
-      this.isSearchingDevices = false;
+    return this.devicePagingService
+      .search(this.deviceStateAndData[this.deviceState], searchString)
+      .then((devices: Device[]) => {
+        this.loginSearchResults = devices;
+        this.isSearchingDevices = false;
 
-      if (this.loginSearchResults.length === 0) {
-        const noDevice = {
-          userAgent: "No Results Found"
-        } as Device;
-        this.loginSearchResults.push(noDevice);
-      }
+        if (this.loginSearchResults.length === 0) {
+          const noDevice = {
+            userAgent: 'No Results Found'
+          } as Device;
+          this.loginSearchResults.push(noDevice);
+        }
 
-      return this.loginSearchResults;
-    });
+        return this.loginSearchResults;
+      });
   }
 
   /**
@@ -969,11 +1019,13 @@ export class UserDetailsComponent implements OnInit {
       this.endDate = moment(this.login.endDate).endOf('day').toDate();
     }
 
-    this.loginService.query({ filter: this.filter, limit: this.loginResultsLimit }).then((loginPage: LoginPage) => {
-      this.showNext = loginPage.logins.length !== 0;
-      this.showPrevious = false;
-      this.loginPage = loginPage;
-    });
+    this.loginService
+      .query({ filter: this.filter, limit: this.loginResultsLimit })
+      .then((loginPage: LoginPage) => {
+        this.showNext = loginPage.logins.length !== 0;
+        this.showPrevious = false;
+        this.loginPage = loginPage;
+      });
   }
 
   /**
@@ -1058,7 +1110,9 @@ export class UserDetailsComponent implements OnInit {
     const token = this.localStorageService?.getToken?.();
     if (!token) return url;
     const sep = url.includes('?') ? '&' : '?';
-    const dc = (this.user as any)?.lastUpdated ? `&_dc=${(this.user as any).lastUpdated}` : '';
+    const dc = (this.user as any)?.lastUpdated
+      ? `&_dc=${(this.user as any).lastUpdated}`
+      : '';
     return `${url}${sep}access_token=${token}${dc}`;
   }
 
@@ -1068,10 +1122,17 @@ export class UserDetailsComponent implements OnInit {
    */
   passwordChanged(password: string): void {
     if (password && password.length > 0) {
-      const score = zxcvbn(password, [this.user?.username, this.user?.displayName, this.user?.email].filter(Boolean) as string[]).score;
+      const score = zxcvbn(
+        password,
+        [this.user?.username, this.user?.displayName, this.user?.email].filter(
+          Boolean
+        ) as string[]
+      ).score;
       this.passwordStrengthScore = score + 1;
-      this.passwordStrengthType = this.passwordStrengthMap[score as 0 | 1 | 2 | 3 | 4].type;
-      this.passwordStrength = this.passwordStrengthMap[score as 0 | 1 | 2 | 3 | 4].text;
+      this.passwordStrengthType =
+        this.passwordStrengthMap[score as 0 | 1 | 2 | 3 | 4].type;
+      this.passwordStrength =
+        this.passwordStrengthMap[score as 0 | 1 | 2 | 3 | 4].text;
     } else {
       this.passwordStrengthScore = 0;
       this.passwordStrengthType = null;
@@ -1088,21 +1149,33 @@ export class UserDetailsComponent implements OnInit {
     this.passwordStatus = { status: null, msg: null };
 
     if (form && !form.valid) {
-      this.passwordStatus = { status: 'danger', msg: 'Please fix the errors in the form.' };
+      this.passwordStatus = {
+        status: 'danger',
+        msg: 'Please fix the errors in the form.'
+      };
       return;
     }
 
     if (!this.newPassword || !this.newPasswordConfirm) {
-      this.passwordStatus = { status: 'danger', msg: 'Please enter and confirm the new password.' };
+      this.passwordStatus = {
+        status: 'danger',
+        msg: 'Please enter and confirm the new password.'
+      };
       return;
     }
     if (this.newPassword !== this.newPasswordConfirm) {
-      this.passwordStatus = { status: 'danger', msg: 'Passwords do not match.' };
+      this.passwordStatus = {
+        status: 'danger',
+        msg: 'Passwords do not match.'
+      };
       return;
     }
 
     this.updatingPassword = true;
-    const authentication = { password: this.newPassword, passwordconfirm: this.newPasswordConfirm };
+    const authentication = {
+      password: this.newPassword,
+      passwordconfirm: this.newPasswordConfirm
+    };
     const onSuccess = () => {
       this.passwordStrengthScore = 0;
       this.passwordStrengthType = null;
@@ -1110,23 +1183,35 @@ export class UserDetailsComponent implements OnInit {
       this.newPassword = '';
       this.newPasswordConfirm = '';
       this.updatingPassword = false;
-      this.passwordStatus = { status: 'success', msg: 'Password successfully updated.' };
+      this.passwordStatus = {
+        status: 'success',
+        msg: 'Password successfully updated.'
+      };
       if (form) form.resetForm();
       this.changePassword = false;
       this.cancelEdit();
     };
     const onError = (response: any) => {
       this.updatingPassword = false;
-      const msg = response?.data || response?.responseText || 'Failed to update password';
+      const msg =
+        response?.data || response?.responseText || 'Failed to update password';
       this.passwordStatus = { status: 'danger', msg };
     };
 
-    const result = this.userService.updatePassword(this.user.id, authentication);
+    const result = this.userService.updatePassword(
+      this.user.id,
+      authentication
+    );
     if (result && typeof result.then === 'function') {
       result.then(onSuccess, onError);
     } else {
       try {
-        this.userService.updatePassword(this.user.id, authentication, onSuccess, onError);
+        this.userService.updatePassword(
+          this.user.id,
+          authentication,
+          onSuccess,
+          onError
+        );
       } catch (e) {
         onError(e);
       }

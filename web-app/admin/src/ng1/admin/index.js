@@ -12,7 +12,6 @@ angular
   .component('mageAdminPluginTabContentBridge', adminPluginTabContentBridge)
   .directive('mageAdminPluginTabContent', downgradeComponent({ component: AdminPluginTabContentComponent }))
 
-require('./users');
 require('./devices');
 require('./events');
 require('./layers');
