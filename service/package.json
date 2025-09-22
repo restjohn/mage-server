@@ -1,11 +1,11 @@
 {
   "name": "@ngageoint/mage.service",
   "version": "6.4.0-beta.2",
-  "displayName": "MAGE Service",
-  "description": "MAGE is a geospatial situational awareness and data collection platform.  The MAGE Service is the ReST service API that the MAGE client apps use to interact with MAGE data.",
+  "displayName": "Mage Service",
+  "description": "Mage is a geospatial situational awareness and data collection platform.  The Mage Service is the ReST service API that the Mage client apps use to interact with Mage data.",
   "keywords": [
     "NGA",
-    "MAGE",
+    "Mage",
     "situational awareness",
     "geospatial"
   ],
