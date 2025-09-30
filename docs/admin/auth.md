@@ -1,7 +1,7 @@
-# MAGE Authentication and Identity Providers
+# Mage Authentication and Identity Providers
 
 To configure authentication settings and identity providers
-1. Click the gear icon in the upper right of the MAGE web app to load the _Admin_ page.
+1. Click the gear icon in the upper right of the Mage web app to load the _Admin_ page.
 1. Click, the _Settings_ tab in the tab strip on the left of the page.
 1. Click the _Authentication_ tab near the top of the main content pane.  This tab should be selected by default.
 1. Click any of the accordion headings to expand the section for the authentication you want to configure, or
@@ -11,13 +11,13 @@ To configure authentication settings and identity providers
 
 ## OAuth 2.0
 
-Here is an example of using Google's OAuth 2.0 [endpoints](https://developers.google.com/identity/gsi/web/guides/overview) to authenticate MAGE
+Here is an example of using Google's OAuth 2.0 [endpoints](https://developers.google.com/identity/gsi/web/guides/overview) to authenticate Mage
 users.  This setup is very similar to Google OpenID Connect authentication.
 
 Obtain your _Client Identifier_ and _Client Secret_ from Google's [API Console](https://console.cloud.google.com/apis/credentials/oauthclient).
 Additionally on that page, ensure you register the correct callback URL, e.g., `https://mage.example.com/auth/oauth/callback`
 
-On the MAGE Admin page, click the  _Settings_ tab.
+On the Mage Admin page, click the  _Settings_ tab.
 
 _Authorization URL_ - `https://accounts.google.com/o/oauth2/v2/auth`
 _Token URL_ - `https://oauth2.googleapis.com/token`
@@ -30,7 +30,7 @@ _Display Name Property_ - `name`
 
 ## LDAP
 
-You can setup MAGE to authenticate users with an LDAP server.  For development
+You can setup Mage to authenticate users with an LDAP server.  For development
 testing, the [`auth-idp`](../docker/auth-idp/docker-compose.yml) Compose file
 uses the [osixia/openldap](https://github.com/osixia/docker-openldap) and
 [osixia/phpLDAPAdmin](https://github.com/osixia/docker-phpLDAPAdmin) images
@@ -79,9 +79,9 @@ Using the phpLDAPAdmin UI to setup a simple group structure.
 You now have a simple group structure and user account in your LDAP database.
 
 Now that you have an LDAP database with a user account, you can configure LDAP
-authentication in MAGE.  This assumes you're running a MAGE server on
+authentication in Mage.  This assumes you're running a Mage server on
 http://localhost:4242.
-1. Open the MAGE web app in your browser.
+1. Open the Mage web app in your browser.
 1. Click the gear icon in the top right to load the _Admin_ page.
 1. Click the _Security_ tab in the vertical tab strip on the left.
 1. Click the _New Authentication_ button.
@@ -108,7 +108,7 @@ http://localhost:4242.
 1. Adjust the color settings to your preference.
 1. Click the _Next_ button.
 1. Review the settings and click the _Save_ button.
-1. Open a new private browser tab or window and load your MAGE server web app.
+1. Open a new private browser tab or window and load your Mage server web app.
 1. The sign-in page should display a button labeled _SIGN IN WITH LOCAL LDAP_
    under two text fields.
 1. In the _Local LDAP Username_ text field, enter `batman`.
@@ -116,7 +116,7 @@ http://localhost:4242.
 1. Click the _SIGN IN WITH LOCAL LDAP_ button.
 1. The page will most likely display a dialog that states the account needs
    admin approval.
-1. In the browser tab with your MAGE admin page, click the _Users_ tab in the
+1. In the browser tab with your Mage admin page, click the _Users_ tab in the
    tab strip on the left.
 1. Click the _Inactive_ search facet near the top left of the main pane.  The
    user list should contain the _Batman_ user with a green _Activate_ button.
@@ -130,7 +130,7 @@ http://localhost:4242.
 1. You are now authenticated with your LDAP account.
 
 ## SAML
-You can setup MAGE to authenticate users with an SAML server.  For development
+You can setup Mage to authenticate users with an SAML server.  For development
 testing, the [`auth-idp`](../docker/auth-idp/docker-compose.yml) Compose file
 uses the [kristophjunge/test-saml-idp](https://github.com/kristophjunge/docker-test-saml-idp)
 Start the `mage-idp-saml` SAML
@@ -144,7 +144,7 @@ The docker compose file is set to seed a few users with the .saml/authsources.ph
 file is mounted under volumes in the docker compose. Once it is spun up, you are ready to
 configure your saml authentication provider.
 
-1. Open the MAGE web app in your browser.
+1. Open the Mage web app in your browser.
 1. Click the gear icon in the top right to load the _Admin_ page.
 1. Click the _Security_ tab in the vertical tab strip on the left.
 1. Click the _New Authentication_ button.
@@ -168,7 +168,7 @@ configure your saml authentication provider.
 1. Adjust the color settings to your preference.
 1. Click the _Next_ button.
 1. Review the settings and click the _Save_ button.
-1. Open a new private browser tab or window and load your MAGE server web app.
+1. Open a new private browser tab or window and load your Mage server web app.
 1. The sign-in page should display a button labeled _Continue with SAML_
 1. Clicking this button will take you to a simple login page where the saml server is running.
 1. for Username enter `saml.user1`
