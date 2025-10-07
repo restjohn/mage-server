@@ -1,5 +1,6 @@
 import { Inject, Pipe, PipeTransform } from '@angular/core'
-import * as turfCenter from '@turf/center'
+import turfCenter from '@turf/center'
+import { Feature as TurfFeature } from '@turf/helpers'
 import { Feature, Point } from 'geojson'
 import * as mgrs from 'mgrs'
 import { LocalStorageService } from '../upgrade/ajs-upgraded-providers'
@@ -47,6 +48,6 @@ export class GeometryPipe implements PipeTransform {
       geometry: value
     }
 
-    return turfCenter(feature).geometry as Point
+    return turfCenter(feature as TurfFeature).geometry as Point
   }
 }

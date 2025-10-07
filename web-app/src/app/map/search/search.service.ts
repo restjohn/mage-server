@@ -4,13 +4,14 @@ import { MapSettings, WebSearchType } from 'src/app/entities/map/entities.map';
 import { Observable } from 'rxjs';
 import { BBox, FeatureCollection, Position } from 'geojson';
 import { map } from 'rxjs/operators';
-import * as center from '@turf/center';
+import center from '@turf/center';
+import { Feature } from '@turf/helpers';
 
 export class PlacenameSearchResult {
   name: string
   bbox: BBox
   position: Position
-  
+
   constructor(name: string, bbox: BBox, position: Position) {
     this.name = name
     this.bbox = bbox
@@ -28,7 +29,7 @@ interface PlacenameSearch {
 export class PlacenameSearchService {
   constructor(
     private http: HttpClient
-  ) {} 
+  ) { }
 
   search(settings: MapSettings, text: string): Observable<PlacenameSearchResult[]> {
     const service = this.getSearchService(settings.webSearchType, settings.webNominatimUrl)
@@ -53,7 +54,7 @@ class NominatimService implements PlacenameSearch {
   constructor(
     private http: HttpClient,
     private url: string
-  ) {}
+  ) { }
 
   search(text: string): Observable<PlacenameSearchResult[]> {
     const params = new HttpParams()
@@ -65,7 +66,7 @@ class NominatimService implements PlacenameSearch {
     return this.http.get<FeatureCollection>(`${this.url}/search`, { params: params }).pipe(map(featureCollection => {
       const result = featureCollection.features.map(feature => {
         const name = feature.properties['display_name'] || text
-        const position: Position = center(feature).geometry.coordinates
+        const position: Position = center(feature as Feature).geometry.coordinates
         let bbox: BBox = [position[0], position[1], position[0], position[1]]
         if (feature.bbox) {
           bbox = feature.bbox
