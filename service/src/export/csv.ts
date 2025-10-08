@@ -3,16 +3,16 @@
 import async from 'async'
 import archiver from 'archiver'
 import path from 'path'
-import { AllGeoJSON } from '@turf/helpers'
+import { Polygon } from '@turf/helpers'
 import { Exporter } from './exporter'
-import turfCentroid from '@turf/centroid'
+import centroid from '@turf/centroid'
 import * as User from '../models/user'
 import * as Device from '../models/device'
 import * as json2csv from 'json2csv'
 const mgrs = require('mgrs')
 const log = require('winston')
 const wkx = require('wkx')
-import { attachmentBaseDirectory as attachmentBase } from  '../environment/env'
+import { attachmentBaseDirectory as attachmentBase } from '../environment/env'
 import stream from 'stream'
 import { ObservationDocument } from '../models/observation'
 import { UserDocument } from '../adapters/users/adapters.users.db.mongoose'
@@ -92,7 +92,7 @@ export class Csv extends Exporter {
           });
         },
         (done): void => {
-          if (!this._filter.exportLocations){
+          if (!this._filter.exportLocations) {
             return done();
           }
           const asyncParser = new json2csv.AsyncParser({ fields: locationFields }, { readableObjectMode: true, writableObjectMode: true });
@@ -161,16 +161,16 @@ export class Csv extends Exporter {
       flat.device = cache.device.uid;
     }
 
-    const centroid = turfCentroid(observation as AllGeoJSON);
-    flat.mgrs = mgrs.forward(centroid.geometry.coordinates);
+    const cd = centroid(observation.geometry as Polygon);
+    flat.mgrs = mgrs.forward(cd.geometry.coordinates);
 
     flat.shapeType = observation.geometry.type;
     if (observation.geometry.type === 'Point') {
       flat.longitude = observation.geometry.coordinates[0];
       flat.latitude = observation.geometry.coordinates[1];
     } else {
-      flat.longitude = centroid.geometry.coordinates[0];
-      flat.latitude = centroid.geometry.coordinates[1];
+      flat.longitude = cd.geometry.coordinates[0];
+      flat.latitude = cd.geometry.coordinates[1];
     }
     flat.wkt = wkx.Geometry.parseGeoJSON(observation.geometry).toWkt();
     flat.excelTimestamp = "=DATEVALUE(MID(INDIRECT(ADDRESS(ROW(),COLUMN()-1)),1,10)) + TIMEVALUE(MID(INDIRECT(ADDRESS(ROW(),COLUMN()-1)),12,8))";
@@ -192,7 +192,7 @@ export class Csv extends Exporter {
     }
 
     if (observation.attachments) {
-      observation.attachments.forEach((attachment, index) => {
+      observation.attachments.forEach((attachment) => {
         if (!attachment.relativePath) {
           // exclude attachments that are pending upload and/or not saved
           return
@@ -221,16 +221,16 @@ export class Csv extends Exporter {
       stream.push(locationRecord)
       numLocations++
     })
-    .then(() => {
-      if (cursor) {
-        cursor.close
-      }
-      log.info('Successfully wrote ' + numLocations + ' locations to CSV')
-      log.info('done writing locations')
-      stream.push(null)
-      done()
-    })
-    .catch(err => done(err))
+      .then(() => {
+        if (cursor) {
+          cursor.close
+        }
+        log.info('Successfully wrote ' + numLocations + ' locations to CSV')
+        log.info('done writing locations')
+        stream.push(null)
+        done()
+      })
+      .catch(err => done(err))
   }
 
   async flattenLocation(location: UserLocationDocument, cache: { user: UserDocument | null, device: any }): Promise<any> {

@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import { BBox, FeatureCollection, Position } from 'geojson';
 import { map } from 'rxjs/operators';
 import center from '@turf/center';
-import { Feature } from '@turf/helpers';
 
 export class PlacenameSearchResult {
   name: string
@@ -66,7 +65,7 @@ class NominatimService implements PlacenameSearch {
     return this.http.get<FeatureCollection>(`${this.url}/search`, { params: params }).pipe(map(featureCollection => {
       const result = featureCollection.features.map(feature => {
         const name = feature.properties['display_name'] || text
-        const position: Position = center(feature as Feature).geometry.coordinates
+        const position: Position = center(feature).geometry.coordinates
         let bbox: BBox = [position[0], position[1], position[0], position[1]]
         if (feature.bbox) {
           bbox = feature.bbox
