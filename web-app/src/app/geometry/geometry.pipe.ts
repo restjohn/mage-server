@@ -41,6 +41,10 @@ export class GeometryPipe implements PipeTransform {
   }
 
   center(value: any): Point {
+    if (!value || !value.coordinates || !Array.isArray(value.coordinates)) {
+      return { type: 'Point', coordinates: [0, 0] }
+    }
+
     const feature: Feature = {
       type: 'Feature',
       properties: {},

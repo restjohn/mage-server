@@ -3,7 +3,7 @@
 const mgrs = require('mgrs')
 import moment from 'moment'
 import path from 'path'
-import centroid from '@turf/centroid'
+import { centroid as turfCentroid } from '@turf/centroid'
 import { fragment } from 'xmlbuilder2'
 import { UserDocument } from '../models/user'
 import { FormDocument, FormFieldDocument, MageEventDocument } from '../models/event'
@@ -406,20 +406,20 @@ export function generateKMLClose(): string {
 }
 
 export function generateDescription(feature: Feature, sections: any[]): { description: { $: string } } {
-  const cd = centroid(feature);
+  const centroid = turfCentroid(feature);
   const header = [{
     section: [
       {
         span: [{ label: 'Timestamp' }, moment(feature.properties!.timestamp).utc().format('YYYY-MM-DDTHH:mm:ss') + 'Z']
       },
       {
-        span: [{ label: 'Latitude' }, cd.geometry.coordinates[1]]
+        span: [{ label: 'Latitude' }, centroid.geometry.coordinates[1]]
       },
       {
-        span: [{ label: 'Longitude' }, cd.geometry.coordinates[0]]
+        span: [{ label: 'Longitude' }, centroid.geometry.coordinates[0]]
       },
       {
-        span: [{ label: 'MGRS' }, mgrs.forward(cd.geometry.coordinates)]
+        span: [{ label: 'MGRS' }, mgrs.forward(centroid.geometry.coordinates)]
       }
     ]
   }]

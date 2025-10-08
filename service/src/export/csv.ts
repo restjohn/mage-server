@@ -3,9 +3,8 @@
 import async from 'async'
 import archiver from 'archiver'
 import path from 'path'
-import { Polygon } from '@turf/helpers'
 import { Exporter } from './exporter'
-import centroid from '@turf/centroid'
+import { centroid as turfCenteroid } from '@turf/centroid'
 import * as User from '../models/user'
 import * as Device from '../models/device'
 import * as json2csv from 'json2csv'
@@ -161,16 +160,16 @@ export class Csv extends Exporter {
       flat.device = cache.device.uid;
     }
 
-    const cd = centroid(observation.geometry as Polygon);
-    flat.mgrs = mgrs.forward(cd.geometry.coordinates);
+    const centroid = turfCenteroid(observation);
+    flat.mgrs = mgrs.forward(centroid.geometry.coordinates);
 
     flat.shapeType = observation.geometry.type;
     if (observation.geometry.type === 'Point') {
       flat.longitude = observation.geometry.coordinates[0];
       flat.latitude = observation.geometry.coordinates[1];
     } else {
-      flat.longitude = cd.geometry.coordinates[0];
-      flat.latitude = cd.geometry.coordinates[1];
+      flat.longitude = centroid.geometry.coordinates[0];
+      flat.latitude = centroid.geometry.coordinates[1];
     }
     flat.wkt = wkx.Geometry.parseGeoJSON(observation.geometry).toWkt();
     flat.excelTimestamp = "=DATEVALUE(MID(INDIRECT(ADDRESS(ROW(),COLUMN()-1)),1,10)) + TIMEVALUE(MID(INDIRECT(ADDRESS(ROW(),COLUMN()-1)),12,8))";

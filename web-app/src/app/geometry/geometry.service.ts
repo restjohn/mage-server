@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { polygon } from "@turf/helpers";
-import kinks from '@turf/kinks'
+import { kinks as turfKinks } from '@turf/kinks'
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +11,8 @@ export class GeometryService {
       return false;
     }
 
-    const ks = kinks(polygon(feature.geometry.coordinates));
+    const kinks = turfKinks(polygon(feature.geometry.coordinates));
 
-    return ks.features.length !== 0;
+    return kinks.features.length !== 0;
   }
 }

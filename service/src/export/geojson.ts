@@ -6,7 +6,7 @@ import archiver from 'archiver'
 import moment from 'moment'
 import stream from 'stream'
 import path from 'path'
-import centroid from '@turf/centroid'
+import { centroid as turfCentroid } from '@turf/centroid'
 import { Exporter } from './exporter'
 import { attachmentBaseDirectory as attachmentBase } from '../environment/env'
 import User, { UserDocument } from '../models/user'
@@ -63,12 +63,12 @@ export class GeoJson extends Exporter {
   }
 
   mapObservationProperties(observation: ObservationDocument, archive: archiver.Archiver): void {
-    const cd = centroid(observation);
+    const centroid = turfCentroid(observation);
     const exportProperties = {
       ...observation.properties,
       id: observation._id,
       timestamp: moment(observation.properties.timestamp).toISOString(),
-      mgrs: mgrs.forward(cd.geometry.coordinates),
+      mgrs: mgrs.forward(centroid.geometry.coordinates),
     } as any
     delete exportProperties.forms
     const formEntries = observation.properties?.forms || [] as ObservationDocumentFormEntry[]
@@ -172,9 +172,9 @@ export class GeoJson extends Exporter {
       if (numLocations > 0) {
         stream.write(',');
       }
-      const cd = centroid(location);
+      const centroid = turfCentroid(location);
       const exportProperties = location.properties as any
-      exportProperties.mgrs = mgrs.forward(cd.geometry.coordinates);
+      exportProperties.mgrs = mgrs.forward(centroid.geometry.coordinates);
       const data = JSON.stringify(location);
       stream.write(data);
       numLocations++;
