@@ -1,9 +1,13 @@
-<div class="admin-nav-gap">
-  <div class="container-fluid">
-    <ol class="breadcrumb">
-      <li><i class="fa fa-map admin-dashboard"></i> <a ui-sref="admin.layers">Layers</a></li>
-      <li class="active">{{$ctrl.layer.name}}</li>
-    </ol>
+<div class="admin-breadcrumbs mat-elevation-z1">
+  <i class="fa fa-map"></i>
+  <div>
+    <span class="admin-breadcrumb"><a ui-sref="admin.layers">Layers</a></span>
+  </div>
+  <div>
+    <span class="admin-breadcrumb__separator">/</span>
+  </div>
+  <div>
+    <span class="admin-breadcrumb admin-breadcrumb--active">{{$ctrl.layer.name}}</span>
   </div>
 </div>
 

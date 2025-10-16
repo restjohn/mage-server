@@ -13,6 +13,7 @@ import { DeleteTeamComponent } from '../delete-team/delete-team.component';
 import { CardActionButton } from '../../../core/card-navbar/card-navbar.component';
 import { SearchModalComponent, SearchModalData, SearchModalResult, SearchModalColumn } from '../../../core/search-modal/search-modal.component';
 import { Observable } from 'rxjs';
+import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 
 /**
  * Component for displaying and managing team details in the admin interface.
@@ -61,6 +62,12 @@ export class TeamDetailsComponent implements OnInit {
   actionButtons: CardActionButton[] = [];
   memberActionButtons: CardActionButton[] = [];
   eventActionButtons: CardActionButton[] = [];
+
+  breadcrumbs: AdminBreadcrumb[] = [{
+    title: 'Teams',
+    iconClass: 'fa fa-users',
+    state: {name: "admin.teams"}
+  }]
 
   /**
    * Configures buttons for main team actions, member management, and event management.
@@ -133,6 +140,7 @@ export class TeamDetailsComponent implements OnInit {
         this.updateActionButtons();
         this.getMembers();
         this.getTeamEvents();
+        this.breadcrumbs.push({title: this.team.name})
       });
     }
   }

@@ -14,6 +14,7 @@ import {
   DevicesResponse,
   UsersResponse,
 } from "admin/src/@types/dashboard/admin-dashboard";
+import { AdminBreadcrumb } from "../admin-breadcrumb/admin-breadcrumb.model";
 
 /**
  * Admin dashboard component for managing users, devices, and logins.
@@ -38,6 +39,11 @@ export class AdminDashboardComponent implements OnInit {
   deviceState = "unregistered";
   unregisteredDevices: Device[] = [];
   deviceStateAndData: DevicesResponse;
+
+  breadcrumbs: AdminBreadcrumb[] = [{
+    title: 'Dashboard',
+    iconClass: 'fa fa-dashboard'
+  }]
 
   private $state: any;
 

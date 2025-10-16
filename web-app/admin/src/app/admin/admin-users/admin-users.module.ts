@@ -23,6 +23,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatOptionModule } from '@angular/material/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BulkUserComponent } from './bulk-user/bulk-user.component';
+import { AdminBreadcrumbModule } from '../admin-breadcrumb/admin-breadcrumb.module';
 
 @NgModule({
   imports: [
@@ -43,7 +44,8 @@ import { BulkUserComponent } from './bulk-user/bulk-user.component';
     MatSelectModule,
     MatTooltipModule,
     MatProgressBarModule,
-    MatOptionModule
+    MatOptionModule,
+    AdminBreadcrumbModule
   ],
   declarations: [
     UserDashboardComponent,

@@ -1,4 +1,5 @@
 ::ng-deep .admin-main-content {
+  transition: margin-left 0.3s;
   &:has(admin-dashboard) {
     height: 92vh;
     overflow-y: auto;
@@ -9,35 +10,7 @@
     }
   }
 
-  width: 100vw;
-}
-
-.admin-nav-gap {
-  margin-top: -15px;
-  margin-bottom: -15px;
-
-  .breadcrumbs-toolbar {
-    min-height: 36px !important;
-    height: 36px;
-    background-color: #f0f0f0;
-    color: #555;
-    font-size: 13px;
-    padding: 0 16px;
-    border-radius: 4px;
-
-    mat-icon {
-      font-size: 18px;
-      margin-right: 4px;
-      vertical-align: middle;
-      color: #777;
-    }
-
-    span {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-  }
+  width: 100%;
 }
 
 .admin-content {
@@ -243,7 +216,8 @@
     background: white;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
     border: 1px solid #e5e7eb;
     margin-top: 8px;
   }
