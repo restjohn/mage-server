@@ -2,14 +2,10 @@
 @import 'variables.scss';
 
 ::ng-deep admin {
-  display: block;
-
-  .admin-main{
-    display: contents;
-  }
-
-  .breadcrumb-spacer {
-    height: 55px;
+  .admin-main-content {
+    &:has(mage-admin-plugin-tab-content) {
+      margin-top: 55px;
+    }
   }
 
   .admin-breadcrumbs {

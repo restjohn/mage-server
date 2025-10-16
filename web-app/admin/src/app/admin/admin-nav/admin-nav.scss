@@ -11,18 +11,20 @@
 }
 
 .nav-float-wrapper {
-  position: absolute;
-  top: 8px;
+  position: fixed;
+  top: 72px;
   left: 5px;
   z-index: 10000;
   display: flex;
 
   .nav-divider {
+    left: 105px;
     width: 1px;
     height: 38px;
     background: rgba(0, 0, 0, 0.25);
     margin: 0 4px;
     border-radius: 1px;
+    position: fixed;
   }
 
   .nav-toggle {
@@ -35,6 +37,8 @@
     padding: 0.55rem 0.9rem;
     cursor: pointer;
     transition: background 0.25s ease, transform 0.15s ease;
+    position: fixed;
+    
     .label {
       font-weight: 400;
       color: #000;
@@ -61,7 +65,7 @@
 
   .drawer {
     position: absolute;
-    top: calc(100% + 8px);
+    top: 45px;
     left: 0;
     width: 320px;
     background: #2f2f2f;
@@ -167,7 +171,7 @@
       &.open {
         transform: translateY(0);
         opacity: 1;
-        margin-top: 105px;
+        margin-top: 112px;
         transform: translateY(0);
         opacity: 1;
         height: auto;
