@@ -1,16 +1,4 @@
-<div class="admin-nav-gap">
-  <div class="container-fluid">
-    <ol class="breadcrumb">
-      <li>
-        <i class="fa fa-user admin-dashboard"></i
-        ><a href="javascript:void(0);" (click)="stateService.go('admin.users')"
-          >Users</a
-        >
-      </li>
-      <li class="active">{{ user?.displayName || 'Unknown User' }}</li>
-    </ol>
-  </div>
-</div>
+<admin-breadcrumb [breadcrumbs]="breadcrumbs"></admin-breadcrumb>
 
 <div class="container bottom-gap-l" *ngIf="user">
   <div class="page-header">

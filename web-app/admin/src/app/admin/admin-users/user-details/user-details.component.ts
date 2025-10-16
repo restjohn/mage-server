@@ -25,6 +25,7 @@ import * as moment from 'moment';
 import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
 import * as zxcvbnCommonPackage from '@zxcvbn-ts/language-common';
 import * as zxcvbnEnPackage from '@zxcvbn-ts/language-en';
+import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 
 interface Device {
   id: string;
@@ -155,6 +156,12 @@ export class UserDetailsComponent implements OnInit {
 
   teamActionButtons: any[] = [];
 
+  breadcrumbs: AdminBreadcrumb[] = [{
+    title: 'Users',
+    iconClass: 'fa fa-user',
+    state: {name: "admin.users"}
+  }]
+
   constructor(
     public stateService: StateService,
     private dialog: MatDialog,
@@ -224,6 +231,8 @@ export class UserDetailsComponent implements OnInit {
       this.setupActionButtons();
 
       this.setSelectedRoleFromUser();
+
+      this.breadcrumbs.push({title: user.displayName || "Unknown User"});
     });
 
     this.loginService

@@ -7,6 +7,7 @@ import { Subject } from 'rxjs';
 import { TeamsService } from '../teams-service';
 import { CreateTeamDialogComponent } from '../create-team/create-team.component';
 import { CardActionButton } from '../../../core/card-navbar/card-navbar.component';
+import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 
 /**
  * Team dashboard component that displays a paginated list of teams with search functionality.
@@ -27,6 +28,11 @@ export class TeamDashboardComponent implements OnInit, OnDestroy {
 
   dataSource = new MatTableDataSource<Team>();
   displayedColumns = ['name', 'description'];
+
+  breadcrumbs: AdminBreadcrumb[] = [{
+    title: 'Teams',
+    iconClass: 'fa fa-users'
+  }]
 
   actionButtons: CardActionButton[] = [{ label: 'New Team', type: 'btn-secondary', action: () => this.newTeam() }];
 

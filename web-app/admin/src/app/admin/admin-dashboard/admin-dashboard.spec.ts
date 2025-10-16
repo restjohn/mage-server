@@ -34,6 +34,7 @@ import { MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { StateService } from "@uirouter/angular";
 
 const TEST_USERS: User[] = [
   {
@@ -215,6 +216,7 @@ describe("AdminDashboardComponent", () => {
         { provide: LayerService, useValue: mockLayerService },
         { provide: UserPagingService, useValue: mockUserPagingService },
         { provide: '$injector', useValue: mockInjector },
+        { provide: StateService, useValue: mockState },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();

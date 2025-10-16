@@ -19,6 +19,7 @@ import { EventsService } from '../admin-event/events.service';
 import { TeamDetailsComponent } from './team-details/team-details.component';
 import { CoreModule } from '../../core/core.module';
 import { DeleteTeamComponent } from './delete-team/delete-team.component';
+import { AdminBreadcrumbModule } from '../admin-breadcrumb/admin-breadcrumb.module';
 
 @NgModule({
     declarations: [
@@ -41,7 +42,8 @@ import { DeleteTeamComponent } from './delete-team/delete-team.component';
         MatButtonModule,
         MatCheckboxModule,
         MatIconModule,
-        MatProgressSpinnerModule
+        MatProgressSpinnerModule,
+        AdminBreadcrumbModule,
     ],
     providers: [
         TeamsService,

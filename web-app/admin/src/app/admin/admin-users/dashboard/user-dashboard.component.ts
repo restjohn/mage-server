@@ -16,6 +16,7 @@ import { BulkUserComponent } from '../bulk-user/bulk-user.component';
 import { TeamsService } from '../../admin-teams/teams-service';
 import { Team } from '../../admin-teams/team';
 import pLimit from 'p-limit';
+import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 
 @Component({
   selector: 'admin-users',
@@ -53,6 +54,11 @@ export class UserDashboardComponent implements OnInit {
   showErrorTable = false;
   isFinalizing = false;
   isFinished = false;
+
+  breadcrumbs: AdminBreadcrumb[] = [{
+    title: 'Users',
+    iconClass: 'fa fa-user'
+  }]
 
   /**
    * Constructs the UserDashboardComponent with necessary services.
