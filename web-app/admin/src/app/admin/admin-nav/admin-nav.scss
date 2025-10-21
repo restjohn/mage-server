@@ -16,6 +16,9 @@
   left: 5px;
   z-index: 10000;
   display: flex;
+  @media (max-width: 599px) {
+    top: 66px !important;
+  }
 
   .nav-divider {
     left: 105px;
@@ -38,7 +41,7 @@
     cursor: pointer;
     transition: background 0.25s ease, transform 0.15s ease;
     position: fixed;
-    
+
     .label {
       font-weight: 400;
       color: #000;
@@ -155,7 +158,6 @@
       }
     }
   }
-
   @media (max-width: 768px) {
     .drawer {
       position: fixed;

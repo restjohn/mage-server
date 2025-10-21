@@ -413,6 +413,9 @@ body {
   font-weight: 400; */
   &:has(.banner-header) .nav-float-wrapper {
     top: 91px !important;
+    @media (max-width: 599px) {
+      top: 85px !important;
+    }
   }
 }
 
