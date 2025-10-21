@@ -63,7 +63,10 @@
     inset: 0;
     background: rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(1px);
-    margin-top: 116px;
+    margin-top: 120px;
+    @media (max-width: 599px) {
+      margin-top: 110px;
+    }
   }
 
   .drawer {
@@ -158,10 +161,10 @@
       }
     }
   }
-  @media (max-width: 768px) {
+  @media (max-width: 599px) {
     .drawer {
       position: fixed;
-      top: 0;
+      top: 25px;
       left: 0;
       width: 100vw;
       height: 100vh;
@@ -173,7 +176,7 @@
       &.open {
         transform: translateY(0);
         opacity: 1;
-        margin-top: 112px;
+        margin-top: 86px;
         transform: translateY(0);
         opacity: 1;
         height: auto;
