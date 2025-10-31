@@ -998,6 +998,7 @@ admin {
 
 .admin-main {
   flex: 1;
+  overflow: hidden !important;
 }
 
 .admin-main-content {
