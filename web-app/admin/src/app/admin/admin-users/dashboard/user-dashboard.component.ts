@@ -55,10 +55,14 @@ export class UserDashboardComponent implements OnInit {
   isFinalizing = false;
   isFinished = false;
 
-  breadcrumbs: AdminBreadcrumb[] = [{
-    title: 'Users',
-    iconClass: 'fa fa-user'
-  }]
+  breadcrumbs: AdminBreadcrumb[] = [
+    {
+      title: 'Users',
+      iconClass: 'fa fa-user'
+    }
+  ];
+
+  userStatusFilter: 'all' | 'active' | 'inactive' | 'disabled' = 'all';
 
   /**
    * Constructs the UserDashboardComponent with necessary services.
@@ -154,8 +158,28 @@ export class UserDashboardComponent implements OnInit {
     state.userFilter.limit = this.pageSize;
     state.userFilter.page = this.pageIndex;
 
+    switch(this.userStatusFilter) {
+      case 'active':
+        delete state.userFilter.enabled;
+        state.userFilter.active = true;
+        break;
+      case 'inactive':
+        delete state.userFilter.enabled;
+        state.userFilter.active = false;
+        break;
+      case 'disabled':
+        delete state.userFilter.active;
+        state.userFilter.enabled = false;
+        break;
+      default:
+        delete state.userFilter.active;
+        delete state.userFilter.enabled;
+        break;
+    }
+
     return this.userPagingService.refresh(this.stateAndData).then(() => {
       const users = this.userPagingService.users(state);
+      console.log(users, 'Take Two GirliePop');
       this.dataSource = users;
       this.totalUsers = state.pageInfo.totalCount || 0;
     });
@@ -183,6 +207,24 @@ export class UserDashboardComponent implements OnInit {
    * Executes a search query on the user list.
    */
   search(): void {
+    switch(this.userStatusFilter) {
+      case 'active':
+        delete this.stateAndData['all'].userFilter.enabled;
+        this.stateAndData['all'].userFilter.active = true;
+        break;
+      case 'inactive':
+        delete this.stateAndData['all'].userFilter.enabled;
+        this.stateAndData['all'].userFilter.active = false;
+        break;
+      case 'disabled':
+        delete this.stateAndData['all'].userFilter.active;
+        this.stateAndData['all'].userFilter.enabled = false;
+        break;
+      default:
+        delete this.stateAndData['all'].userFilter.active;
+        delete this.stateAndData['all'].userFilter.enabled;
+        break;
+    }
     this.userPagingService
       .search(this.stateAndData['all'], this.userSearch)
       .then((users) => {
@@ -312,6 +354,14 @@ export class UserDashboardComponent implements OnInit {
           });
       }
     });
+  }
+
+  onStatusFilterChange(
+    value: 'all' | 'active' | 'inactive' | 'disabled'
+  ): void {
+    this.userStatusFilter = value;
+    this.pageIndex = 0;
+    this.refreshUsers();
   }
 
   /**
