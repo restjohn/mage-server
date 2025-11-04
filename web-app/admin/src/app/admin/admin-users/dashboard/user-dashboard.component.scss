@@ -147,7 +147,7 @@ $max-height: 72.8vh;
 .table-scroll {
   height: 65.2vh;
   @media (max-width: 768px) {
-      height: 63.2vh
+    height: 63.2vh;
   }
   overflow-y: auto;
   max-height: 100%;
@@ -155,41 +155,41 @@ $max-height: 72.8vh;
   @media (max-height: 1100px) {
     height: 62vh;
     @media (max-width: 768px) {
-        height: 60vh
+      height: 60vh;
     }
   }
 
   @media (max-height: 1000px) {
     height: 57vh;
     @media (max-width: 768px) {
-        height: 55vh
+      height: 55vh;
     }
   }
 
   @media (max-height: 900px) {
     height: 52vh;
     @media (max-width: 768px) {
-        height: 50vh
+      height: 50vh;
     }
   }
 
   @media (max-height: 800px) {
     height: 45vh;
     @media (max-width: 768px) {
-        height: 43vh
+      height: 43vh;
     }
   }
 
   @media (max-height: 700px) {
     height: 35vh;
     @media (max-width: 768px) {
-        height: 33vh
+      height: 33vh;
     }
   }
   @media (max-height: 600px) {
     height: 23vh;
     @media (max-width: 768px) {
-        height: 21vh
+      height: 21vh;
     }
   }
 
@@ -397,6 +397,7 @@ $max-height: 72.8vh;
 }
 
 .button-group {
+  margin-top: -10px;
   button {
     white-space: nowrap;
   }
@@ -406,14 +407,29 @@ $max-height: 72.8vh;
   }
 }
 
-.status-filter {
-  width: 150px;
-  margin-left: 1rem;
-  margin-top: 12px;
-  font-size: 10px;
-}
-
 .filters {
+  margin-top: -10px;
   align-items: center !important;
   display: flex !important;
+}
+
+:host {
+  .status-filter {
+    width: 150px;
+    margin-left: 1rem;
+    margin-top: 17px;
+    font-size: 14px;
+
+    ::ng-deep .mat-form-field-appearance-outline .mat-form-field-infix {
+      padding: 10px;
+    }
+    ::ng-deep .mat-form-field-infix {
+      padding: 10px;
+    }
+
+    ::ng-deep .mat-form-field-label-wrapper {
+      top: -12px;
+      left: -7px;
+    }
+  }
 }
