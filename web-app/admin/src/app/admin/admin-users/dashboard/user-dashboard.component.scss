@@ -397,8 +397,9 @@ $max-height: 72.8vh;
 }
 
 .button-group {
-  margin-top: -10px;
+  margin-top: -20px;;
   button {
+    height: 43px;
     white-space: nowrap;
   }
 
@@ -417,7 +418,7 @@ $max-height: 72.8vh;
   .status-filter {
     width: 150px;
     margin-left: 1rem;
-    margin-top: 17px;
+    margin-top: 10px;
     font-size: 14px;
 
     ::ng-deep .mat-form-field-appearance-outline .mat-form-field-infix {
@@ -431,5 +432,9 @@ $max-height: 72.8vh;
       top: -12px;
       left: -7px;
     }
+  }
+  ::ng-deep input.search-input.ng-untouched.ng-pristine.ng-valid {
+    height: 43px;
+    margin-top: -10px;
   }
 }
