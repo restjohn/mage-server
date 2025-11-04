@@ -18,6 +18,13 @@ import { Team } from '../../admin-teams/team';
 import pLimit from 'p-limit';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 
+type UserFilter = {
+  limit?: number;
+  page?: number;
+  enabled?: boolean;
+  active?: boolean;
+};
+
 @Component({
   selector: 'admin-users',
   templateUrl: './user-dashboard.component.html',
@@ -145,6 +152,25 @@ export class UserDashboardComponent implements OnInit {
       });
   }
 
+  getFilter(): UserFilter {
+    const filterObject: UserFilter = {};
+
+    filterObject.limit = this.pageSize;
+    filterObject.page = this.pageIndex;
+    if (this.userStatusFilter === 'all') return filterObject;
+
+    if (this.userStatusFilter === 'disabled') {
+      filterObject.active = true;
+      filterObject.enabled = false;
+    } else if (this.userStatusFilter === 'active') {
+      filterObject.active = true;
+    } else {
+      filterObject.active = false;
+    }
+
+    return filterObject;
+  }
+
   /**
    * Refreshes the paginated list of users.
    */
@@ -154,32 +180,10 @@ export class UserDashboardComponent implements OnInit {
     state.pageSize = this.pageSize;
     state.pageIndex = this.pageIndex;
 
-    state.userFilter = state.userFilter || {};
-    state.userFilter.limit = this.pageSize;
-    state.userFilter.page = this.pageIndex;
-
-    switch(this.userStatusFilter) {
-      case 'active':
-        delete state.userFilter.enabled;
-        state.userFilter.active = true;
-        break;
-      case 'inactive':
-        delete state.userFilter.enabled;
-        state.userFilter.active = false;
-        break;
-      case 'disabled':
-        delete state.userFilter.active;
-        state.userFilter.enabled = false;
-        break;
-      default:
-        delete state.userFilter.active;
-        delete state.userFilter.enabled;
-        break;
-    }
+    state.userFilter = this.getFilter();
 
     return this.userPagingService.refresh(this.stateAndData).then(() => {
       const users = this.userPagingService.users(state);
-      console.log(users, 'Take Two GirliePop');
       this.dataSource = users;
       this.totalUsers = state.pageInfo.totalCount || 0;
     });
@@ -207,24 +211,8 @@ export class UserDashboardComponent implements OnInit {
    * Executes a search query on the user list.
    */
   search(): void {
-    switch(this.userStatusFilter) {
-      case 'active':
-        delete this.stateAndData['all'].userFilter.enabled;
-        this.stateAndData['all'].userFilter.active = true;
-        break;
-      case 'inactive':
-        delete this.stateAndData['all'].userFilter.enabled;
-        this.stateAndData['all'].userFilter.active = false;
-        break;
-      case 'disabled':
-        delete this.stateAndData['all'].userFilter.active;
-        this.stateAndData['all'].userFilter.enabled = false;
-        break;
-      default:
-        delete this.stateAndData['all'].userFilter.active;
-        delete this.stateAndData['all'].userFilter.enabled;
-        break;
-    }
+    this.stateAndData['all'].userFilter.active = this.getFilter();
+
     this.userPagingService
       .search(this.stateAndData['all'], this.userSearch)
       .then((users) => {
