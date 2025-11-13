@@ -4,7 +4,7 @@
   </div>
 
   <div class="dialog-content">
-    <div *ngIf="errorMessage" class="error-alert">
+    <div *ngIf="errorMessage" class="error-popover">
       <i class="fa fa-exclamation-triangle"></i>
       <span>{{ errorMessage }}</span>
     </div>
@@ -18,15 +18,16 @@
           formControlName="name"
           placeholder="Enter event name"
         />
-        <div
-          *ngIf="
-            eventForm.get('name').invalid &&
-            (eventForm.get('name').touched || eventForm.get('name').dirty)
-          "
-          class="field-error"
-        >
-          <i class="fa fa-exclamation-circle"></i>
-          Name is required
+        <div class="field-error">
+          <span
+            class="error-text"
+            [class.visible]="
+              eventForm.get('name').invalid &&
+              (eventForm.get('name').touched || eventForm.get('name').dirty)
+            "
+          >
+            Name is required
+          </span>
         </div>
       </div>
 

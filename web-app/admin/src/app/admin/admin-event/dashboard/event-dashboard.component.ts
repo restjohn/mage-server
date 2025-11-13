@@ -82,11 +82,11 @@ export class EventDashboardComponent implements OnInit {
     const term = this.eventSearch.trim().toLowerCase();
     this.filteredEvents = this.events.items.filter(
       (e) =>
-        !term ||
-        e.name?.toLowerCase().includes(term) ||
-        e.description?.toLowerCase().includes(term)
+        !term || (
+        e.name?.toLowerCase().includes(term) ??
+        e.description?.toLowerCase().includes(term))
     );
-    this.totalEvents = this.events.totalCount || 0;
+    this.totalEvents = this.events.totalCount ?? 0;
   }
 
   /** Handle search term change */
