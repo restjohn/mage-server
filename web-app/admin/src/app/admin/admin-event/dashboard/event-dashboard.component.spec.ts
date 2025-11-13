@@ -176,7 +176,7 @@ describe('EventDashboardComponent', () => {
 
   it('should handle window resize updating numChars and tooltip width', () => {
     spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1000);
-    component.onResize({});
+    component.onResize();
     expect(component.numChars).toBe(Math.ceil(1000 / 8.5));
     expect(component.toolTipWidth).toBe(1000 * 0.75 + 'px');
   });
