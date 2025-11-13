@@ -12,9 +12,10 @@ export interface SearchOptions {
     page?: number;
     page_size?: number;
     userId?: string;
+    state?: string;
 }
 
-interface EventsResponse {
+export interface EventsResponse {
     pageSize?: number;
     page?: number;
     items: Event[];
@@ -49,10 +50,17 @@ export class EventsService {
         if (options.userId !== undefined) {
             params = params.set('userId', options.userId);
         }
+        if (options.state !== undefined) {
+            params = params.set('state', options.state);
+        }
 
         params = params.set('includePagination', 'true');
 
         return this.http.get<EventsResponse>('/api/events', { params });
+    }
+
+    createEvent(teamData: Partial<Event>): Observable<Event> {
+        return this.http.post<Event>('/api/events', teamData);
     }
 
     addTeamToEvent(eventId: string, team: Team): Observable<Event> {

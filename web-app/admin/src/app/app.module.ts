@@ -149,6 +149,7 @@ import { AdminTeamsModule } from './admin/admin-teams/admin-teams.module';
 import { AdminDashboardModule } from './admin/admin-dashboard/admin-dashboard.module';
 import { MatMenuModule } from '@angular/material/menu';
 import { AdminUsersModule } from './admin/admin-users/admin-users.module';
+import { AdminEventsModule } from './admin/admin-event/admin-events.module';
 
 @NgModule({
   declarations: [
@@ -273,7 +274,8 @@ import { AdminUsersModule } from './admin/admin-users/admin-users.module';
     MatSlideToggleModule,
     MatStepperModule,
     InputMaskModule.forRoot(),
-    AdminDashboardModule
+    AdminDashboardModule,
+    AdminEventsModule
   ],
   providers: [
     mapServiceProvider,

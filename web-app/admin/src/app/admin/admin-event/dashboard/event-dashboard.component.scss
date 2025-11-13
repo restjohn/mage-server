@@ -116,81 +116,63 @@ $max-height: 72.8vh;
   border: 1px solid #e5e7eb;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  height: 78vh;
+  height: 75vh;
   overflow: hidden;
 
   @media (max-height: 1100px) {
-    height: 76vh;
+    height: 73vh;
   }
 
   @media (max-height: 1000px) {
-    height: 74vh;
-  }
-
-  @media (max-height: 900px) {
     height: 71vh;
   }
 
+  @media (max-height: 900px) {
+    height: 69vh;
+  }
+
   @media (max-height: 800px) {
-    height: 67vh;
+    height: 64vh;
   }
 
   @media (max-height: 700px) {
-    height: 60vh;
+    height: 57vh;
   }
 
   @media (max-height: 600px) {
-    height: 53vh;
+    height: 285px;
   }
 }
 
 .table-scroll {
-  height: 65.2vh;
+  height: 62.2vh;
   @media (max-width: 768px) {
-    height: 63.2vh;
+    height: 60.2vh;
   }
   overflow-y: auto;
   max-height: 100%;
 
   @media (max-height: 1100px) {
-    height: 62vh;
-    @media (max-width: 768px) {
-      height: 60vh;
-    }
+    height: 59vh;
   }
 
   @media (max-height: 1000px) {
-    height: 57vh;
-    @media (max-width: 768px) {
-      height: 55vh;
-    }
+    height: 55vh;
   }
 
   @media (max-height: 900px) {
     height: 52vh;
-    @media (max-width: 768px) {
-      height: 50vh;
-    }
   }
 
   @media (max-height: 800px) {
-    height: 45vh;
-    @media (max-width: 768px) {
-      height: 43vh;
-    }
+    height: 44vh;
   }
 
   @media (max-height: 700px) {
-    height: 35vh;
-    @media (max-width: 768px) {
-      height: 33vh;
-    }
+    height: 34vh;
   }
   @media (max-height: 600px) {
-    height: 23vh;
-    @media (max-width: 768px) {
-      height: 21vh;
-    }
+    height: 142.5px;
   }
 
   table {
@@ -260,6 +242,7 @@ $max-height: 72.8vh;
   }
 
   .d-flex {
+    display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
   }
@@ -433,14 +416,43 @@ $max-height: 72.8vh;
       left: -7px;
     }
   }
-  ::ng-deep input.search-input.ng-untouched.ng-pristine.ng-valid {
-    height: 43px;
-    margin-top: -10px;
-  }
   ::ng-deep input.search-input.ng-untouched.ng-pristine.ng-valid,
-  ::ng-deep input.search-input.ng-valid.ng-dirty.ng-touched ,
+  ::ng-deep input.search-input.ng-valid.ng-dirty.ng-touched,
   ::ng-deep input.search-input.ng-valid.ng-dirty.ng-untouched {
     height: 43px;
     margin-top: -10px;
   }
+}
+
+.d-flex {
+  display: flex;
+  gap: 25px;
+}
+
+.align-items-center{
+  align-items: center !important;
+}
+
+.icon {
+  font-size: 25px;
+}
+
+.ellipsis {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+::ng-deep .mat-tooltip-event-desc{
+  position: relative;
+  left: 0 !important;
+  font-size: 20px;
+  min-width: 75vw;
+}
+
+.w-100 {
+  width: 100% !important;
+}
+
+.w-90 {
+  width: 90% !important;
 }
