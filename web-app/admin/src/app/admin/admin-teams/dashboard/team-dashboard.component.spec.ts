@@ -129,7 +129,7 @@ describe('TeamDashboardComponent', () => {
     dialogRefSpy.afterClosed.and.returnValue(of(null));
     mockDialog.open.and.returnValue(dialogRefSpy);
 
-    component.newTeam();
+    component.createTeam();
 
     expect(mockDialog.open).toHaveBeenCalledWith(CreateTeamDialogComponent, {
       data: { team: {} }
@@ -137,12 +137,12 @@ describe('TeamDashboardComponent', () => {
   });
 
   it('should refresh teams after creating new team', () => {
-    const newTeam = { id: '4', name: 'New Team', description: 'New team description' };
+    const createTeam = { id: '4', name: 'New Team', description: 'New team description' };
     const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
-    dialogRefSpy.afterClosed.and.returnValue(of(newTeam));
+    dialogRefSpy.afterClosed.and.returnValue(of(createTeam));
     mockDialog.open.and.returnValue(dialogRefSpy);
 
-    component.newTeam();
+    component.createTeam();
 
     expect(mockTeamsService.getTeams).toHaveBeenCalled();
   });
@@ -152,7 +152,7 @@ describe('TeamDashboardComponent', () => {
     dialogRefSpy.afterClosed.and.returnValue(of(null));
     mockDialog.open.and.returnValue(dialogRefSpy);
 
-    component.newTeam();
+    component.createTeam();
 
     expect(mockTeamsService.getTeams).not.toHaveBeenCalled();
   });
