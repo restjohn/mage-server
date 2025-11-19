@@ -6,7 +6,6 @@
   </div>
 
   <div class="table-wrapper mat-elevation-z2">
-    <!-- Top Bar -->
     <div
       class="integrated-navbar d-flex align-items-center justify-content-between"
     >
@@ -31,17 +30,18 @@
         </mat-form-field>
       </div>
 
-      <button
-        *ngIf="hasEventCreatePermission"
-        mat-flat-button
-        color="primary"
-        (click)="createEvent()"
-      >
-        New Event
-      </button>
+      <div class="button-group">
+        <button
+          *ngIf="hasEventCreatePermission"
+          mat-flat-button
+          color="primary"
+          (click)="createEvent()"
+        >
+          New Event
+        </button>
+      </div>
     </div>
 
-    <!-- Event Table -->
     <div class="table-scroll" *ngIf="filteredEvents?.length; else noEvents">
       <table
         mat-table
@@ -80,12 +80,10 @@
       </table>
     </div>
 
-    <!-- Empty State -->
     <ng-template #noEvents>
       <div class="text-center p-4 muted">No events found.</div>
     </ng-template>
 
-    <!-- Pagination -->
     <div class="pagination">
       <mat-paginator
         [length]="totalEvents"

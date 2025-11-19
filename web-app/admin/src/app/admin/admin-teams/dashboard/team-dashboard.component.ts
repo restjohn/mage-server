@@ -34,8 +34,6 @@ export class TeamDashboardComponent implements OnInit, OnDestroy {
     iconClass: 'fa fa-users'
   }]
 
-  actionButtons: CardActionButton[] = [{ label: 'New Team', type: 'btn-secondary', action: () => this.newTeam() }];
-
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -113,7 +111,7 @@ export class TeamDashboardComponent implements OnInit, OnDestroy {
    * Opens the create team dialog and handles the result.
    * If a new team is created, refetches the teams list to include the new team.
    */
-  newTeam(): void {
+  createTeam(): void {
     const dialogRef = this.modal.open(CreateTeamDialogComponent, {
       data: { team: {} }
     });
