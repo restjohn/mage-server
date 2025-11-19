@@ -59,7 +59,7 @@ describe('TeamDashboardComponent', () => {
     expect(component.teamSearch).toBe('');
     expect(component.pageSize).toBe(10);
     expect(component.pageIndex).toBe(0);
-    expect(component.displayedColumns).toEqual(['name', 'description']);
+    expect(component.displayedColumns).toEqual(['name']);
   });
 
   it('should fetch teams on init', () => {
@@ -183,19 +183,8 @@ describe('TeamDashboardComponent', () => {
 
     const compiled = fixture.nativeElement;
     const headers = compiled.querySelectorAll('th.mat-header-cell');
-    expect(headers.length).toBe(2);
+    expect(headers.length).toBe(1);
     expect(headers[0].textContent).toContain('Name');
-    expect(headers[1].textContent).toContain('Description');
-  });
-
-  it('should add title attribute for description tooltips', () => {
-    fixture.detectChanges();
-
-    const compiled = fixture.nativeElement;
-    const descriptionCells = compiled.querySelectorAll('.description-cell');
-
-    expect(descriptionCells[0].getAttribute('title')).toBe('First team description');
-    expect(descriptionCells[1].getAttribute('title')).toBe('Second team description with much longer text that might wrap');
   });
 
   it('should cleanup subscriptions on destroy', () => {
