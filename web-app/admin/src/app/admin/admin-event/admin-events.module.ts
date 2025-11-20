@@ -12,22 +12,19 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-import { TeamDashboardComponent } from './dashboard/team-dashboard.component';
-import { CreateTeamDialogComponent } from './create-team/create-team.component';
-import { TeamsService } from './teams-service';
-import { EventsService } from '../admin-event/events.service';
-import { TeamDetailsComponent } from './team-details/team-details.component';
 import { CoreModule } from '../../core/core.module';
-import { DeleteTeamComponent } from './delete-team/delete-team.component';
 import { AdminBreadcrumbModule } from '../admin-breadcrumb/admin-breadcrumb.module';
+import { EventDashboardComponent } from './dashboard/event-dashboard.component';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
+import { EventService } from 'src/app/event/event.service';
+import { CreateEventDialogComponent } from './create-event/create-event.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
     declarations: [
-        TeamDashboardComponent,
-        CreateTeamDialogComponent,
-        TeamDetailsComponent,
-        DeleteTeamComponent
+        EventDashboardComponent,
+        CreateEventDialogComponent
     ],
     imports: [
         CommonModule,
@@ -45,15 +42,15 @@ import { MatTooltipModule } from '@angular/material/tooltip';
         MatIconModule,
         MatProgressSpinnerModule,
         AdminBreadcrumbModule,
+        MatSelectModule,
+        MatOptionModule,    
         MatTooltipModule,
     ],
-    providers: [
-        TeamsService,
-        EventsService
+    exports: [
+        EventDashboardComponent
     ],
-    entryComponents: [
-        CreateTeamDialogComponent,
-        DeleteTeamComponent
+    providers: [
+        EventService
     ]
 })
-export class AdminTeamsModule { }
+export class AdminEventsModule { }
