@@ -110,6 +110,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ needs.config.outputs.node_versions-lts }}
+          registry-url: "https://registry.npmjs.org"
       - name: install json util
         run: npm i -g json
       - name: download service packages
