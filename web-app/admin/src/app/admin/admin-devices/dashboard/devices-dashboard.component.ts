@@ -77,7 +77,6 @@ export class DeviceDashboardComponent implements OnInit {
   }
 
   /** Apply search term filter */
-  /** Apply search term filter */
   private applyFilters(): void {
     if (!this.devices) return;
 
