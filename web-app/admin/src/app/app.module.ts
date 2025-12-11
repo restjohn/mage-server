@@ -142,13 +142,15 @@ import { AdminAuthenticationSAMLComponent } from './admin/admin-authentication/a
 import { ButtonPreviewComponent } from './admin/admin-authentication/admin-authentication-create/button-preview/button-preview.component';
 import { AdminAuthenticationSettingsComponent } from './admin/admin-authentication/admin-authentication-settings.component';
 import { AdminSettingsUnsavedComponent } from './admin/admin-settings/admin-settings-unsaved/admin-settings-unsaved.component';
-import { AdminEventFormPreviewComponent } from './admin/admin-event/admin-event-form/admin-event-form-preview/admin-event-form-preview.component';
-import { AdminEventFormPreviewDialogComponent } from './admin/admin-event/admin-event-form/admin-event-form-preview/admin-event-form-preview-dialog.component';
+import { AdminEventFormModule } from './admin/admin-event/admin-event-form/admin-event-form.module';
 import { AdminMapComponent } from './admin/admin-map/admin-map.component';
 import { AdminTeamsModule } from './admin/admin-teams/admin-teams.module';
+import { AdminEventsModule } from './admin/admin-event/admin-events.module';
+import { AdminLayersModule } from './admin/admin-layers/admin-layers.module';
 import { AdminDashboardModule } from './admin/admin-dashboard/admin-dashboard.module';
 import { MatMenuModule } from '@angular/material/menu';
 import { AdminUsersModule } from './admin/admin-users/admin-users.module';
+import { ObservationModule } from './observation/observation.module';
 
 @NgModule({
   declarations: [
@@ -156,27 +158,7 @@ import { AdminUsersModule } from './admin/admin-users/admin-users.module';
     DMSValidatorDirective,
     MGRSValidatorDirective,
     FeedItemComponent,
-    ObservationEditComponent,
-    ObservationEditAttachmentComponent,
-    ObservationEditFormComponent,
-    ObservationEditFormPickerComponent,
-    ObservationEditMultiselectComponent,
-    ObservationEditCheckboxComponent,
-    ObservationEditSelectComponent,
-    ObservationEditEmailComponent,
-    ObservationEditNumberComponent,
-    ObservationEditTextComponent,
-    ObservationEditTextareaComponent,
-    ObservationEditRadioComponent,
-    ObservationEditGeometryComponent,
-    ObservationEditGeometryMapComponent,
-    ObservationEditGeometryFormComponent,
-    ObservationEditDateComponent,
-    MapClipComponent,
     BootstrapComponent,
-    AttachmentComponent,
-    FilenamePipe,
-    AttachUploadComponent,
     UserAvatarComponent,
     AdminSettingsComponent,
     PasswordPolicyComponent,
@@ -188,8 +170,6 @@ import { AdminUsersModule } from './admin/admin-users/admin-users.module';
     IconUploadComponent,
     ContactInfoComponent,
     DatetimePickerComponent,
-    ObservationEditDiscardComponent,
-    ObservationEditPasswordComponent,
     ContactComponent,
     ContactDialogComponent,
     AdminAuthenticationOidcComponent,
@@ -201,8 +181,6 @@ import { AdminUsersModule } from './admin/admin-users/admin-users.module';
     ButtonPreviewComponent,
     AdminAuthenticationSettingsComponent,
     AdminSettingsUnsavedComponent,
-    AdminEventFormPreviewComponent,
-    AdminEventFormPreviewDialogComponent,
     AdminMapComponent
   ],
   imports: [
@@ -215,6 +193,7 @@ import { AdminUsersModule } from './admin/admin-users/admin-users.module';
     ReactiveFormsModule,
     BrowserAnimationsModule,
     DragDropModule,
+    ObservationModule,
     MatBadgeModule,
     MatBottomSheetModule,
     MatDialogModule,
@@ -266,6 +245,9 @@ import { AdminUsersModule } from './admin/admin-users/admin-users.module';
     AdminModule,
     AdminTeamsModule,
     AdminUsersModule,
+    AdminEventsModule,
+    AdminLayersModule,
+    AdminEventFormModule,
     AdminFeedsModule,
     FeedItemSummaryModule,
     StaticIconModule,
@@ -303,5 +285,5 @@ import { AdminUsersModule } from './admin/admin-users/admin-users.module';
 })
 export class AppModule implements DoBootstrap {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public ngDoBootstrap(appRef: ApplicationRef): void {}
+  public ngDoBootstrap(appRef: ApplicationRef): void { }
 }
