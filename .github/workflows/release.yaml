@@ -107,10 +107,12 @@ jobs:
       contents: read
     steps:
       - name: setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ needs.config.outputs.node_versions-lts }}
           registry-url: "https://registry.npmjs.org"
+      - name: update npm
+        run: npm install -g npm@latest
       - name: install json util
         run: npm i -g json
       - name: download service packages
