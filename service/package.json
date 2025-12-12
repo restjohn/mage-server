@@ -1,11 +1,11 @@
 {
   "name": "@ngageoint/mage.service",
-  "version": "6.3.0",
-  "displayName": "MAGE Service",
-  "description": "MAGE is a geospatial situational awareness and data collection platform.  The MAGE Service is the ReST service API that the MAGE client apps use to interact with MAGE data.",
+  "version": "6.5.4",
+  "displayName": "Mage Service",
+  "description": "Mage is a geospatial situational awareness and data collection platform.  The Mage Service is the ReST service API that the Mage client apps use to interact with Mage data.",
   "keywords": [
     "NGA",
-    "MAGE",
+    "Mage",
     "situational awareness",
     "geospatial"
   ],
@@ -31,8 +31,8 @@
     "@ngageoint/geopackage": "4.2.6",
     "@ngageoint/mongodb-migrations": "1.0.0",
     "@node-saml/passport-saml": "4.0.4",
-    "@turf/centroid": "6.5.0",
-    "@turf/kinks": "6.5.0",
+    "@turf/centroid": "7.2.0",
+    "@turf/kinks": "7.2.0",
     "@types/geojson": "7946.0.16",
     "@types/json-schema": "7.0.15",
     "@types/mime-types": "2.1.4",
@@ -82,6 +82,7 @@
   },
   "devDependencies": {
     "@fluffy-spoon/substitute": "1.208.0",
+    "@types/adm-zip": "0.5.7",
     "@types/archiver": "5.3.4",
     "@types/async": "3.2.24",
     "@types/bson": "1.0.11",
