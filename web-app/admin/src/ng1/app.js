@@ -37,6 +37,7 @@ import { UserDashboardComponent } from '../app/admin/admin-users/dashboard/user-
 import { EventDashboardComponent } from '../app/admin/admin-event/dashboard/event-dashboard.component';
 import { LayerDashboardComponent } from '../app/admin/admin-layers/dashboard/layer-dashboard.component';
 import { DeviceDashboardComponent } from '../app/admin/admin-devices/dashboard/devices-dashboard.component';
+import { DeviceDetailsComponent } from '../app/admin/admin-devices/device-details/device-details.component';
 
 require('angular-minicolors');
 require('select2');
@@ -141,8 +142,11 @@ app
   .directive(
     'adminDevices',
     downgradeComponent({ component: DeviceDashboardComponent })
+  )
+  .directive(
+    'adminDevice',
+    downgradeComponent({ component: DeviceDetailsComponent })
   );
-
 
 app
   .component('navbar', require('./navbar/navbar.component'))
