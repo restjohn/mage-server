@@ -17,14 +17,10 @@
             <h2 class="page-title">{{ layer.name }}</h2>
         </div>
         <div class="header-actions" *ngIf="hasLayerEditPermission">
-            <button class="action-button" (click)="editLayer()">
-                <i class="fa fa-edit"></i>
-                Edit Layer
-            </button>
-            <!-- <button class="action-button" [ngClass]="editingDetails ? 'btn-primary' : ''" (click)="toggleEditDetails()">
+            <button class="action-button" [ngClass]="editingDetails ? 'btn-primary' : ''" (click)="toggleEditDetails()">
                 <i class="fa" [ngClass]="editingDetails ? 'fa-times' : 'fa-edit'"></i>
                 {{editingDetails ? 'Cancel' : 'Edit Layer'}}
-            </button> -->
+            </button>
             <button class="action-button" *ngIf="isLayerFileBased()" (click)="downloadLayer()"
                 [disabled]="(layer.type === 'GeoPackage' && layer.state === 'processing') || layer.validating">
                 <i class="fa fa-download"></i>
@@ -33,20 +29,25 @@
         </div>
     </div>
 
-    <div class="details-section">
-        <div class="details-card">
+    <div class="details-section" [class.full-width]="editingDetails">
+        <div class="details-card" [class.full-width]="editingDetails">
             <div class="details-form">
                 <div class="form-field">
                     <label class="field-label">Name:</label>
                     <div class="field-content">
-                        <span class="field-value">{{ layer.name }}</span>
+                        <span *ngIf="!editingDetails" class="field-value">{{ layer.name }}</span>
+                        <input *ngIf="editingDetails" type="text" class="form-input" [(ngModel)]="layerEditForm.name"
+                            placeholder="Layer name">
                     </div>
                 </div>
 
                 <div class="form-field">
                     <label class="field-label">Description:</label>
                     <div class="field-content">
-                        <span class="field-value">{{ layer.description || 'No description' }}</span>
+                        <span *ngIf="!editingDetails" class="field-value">{{ layer.description || 'No description'
+                            }}</span>
+                        <textarea *ngIf="editingDetails" class="form-input" rows="3"
+                            [(ngModel)]="layerEditForm.description" placeholder="Layer description"></textarea>
                     </div>
                 </div>
 
@@ -58,13 +59,18 @@
                 </div>
 
                 <div class="form-field" *ngIf="layer.type === 'Imagery'">
-                    <span class="field-label">Base Layer</span>
                     <div class="field-content">
-                        <span class="field-value">{{ layer.base }}</span>
+                        <span *ngIf="!editingDetails" class="field-label">Base Layer</span>
+                        <span *ngIf="!editingDetails" class="field-value">{{ layer.base }}</span>
+                        <label *ngIf="editingDetails" class="checkbox-label"
+                            style="display: flex; align-items: center;">
+                            <input type="checkbox" [(ngModel)]="layerEditForm.base" style="margin-right: 8px;" />
+                            <span class="field-label" style="margin: 0;">Base Layer</span>
+                        </label>
                     </div>
                 </div>
 
-                <div class="form-field" *ngIf="layer.type === 'Imagery'">
+                <div class="form-field" *ngIf="layer.type === 'Imagery' && !editingDetails">
                     <span class="field-label">Format</span>
                     <div class="field-content">
                         <span class="field-value">{{ layer.format }}</span>
@@ -74,9 +80,18 @@
                 <div class="form-field" *ngIf="layer.type === 'Imagery'">
                     <span class="field-label">URL</span>
                     <div class="field-content">
-                        <span class="field-value">{{ layer.url }}</span>
+                        <span *ngIf="!editingDetails" class="field-value">{{ layer.url }}</span>
+                        <div *ngIf="editingDetails" class="imagery-edit-section">
+                            <mage-imagery-layer-settings [config]="imageryConfig"
+                                [existingWmsLayers]="selectedWmsLayersString"
+                                (configChange)="onImageryConfigChange($event)"
+                                (wmsLayersSelected)="onWmsLayersSelected($event)">
+                            </mage-imagery-layer-settings>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Non-editing WMS display -->
 
                 <div class="form-field" *ngIf="layer.format === 'WMS' && layer.type === 'Imagery'">
                     <span class="field-label">Layers</span>
@@ -112,10 +127,18 @@
                         <span class="field-value">{{ layer.wms?.version }}</span>
                     </div>
                 </div>
+                <div class="form-actions" *ngIf="editingDetails">
+                    <button class="action-button btn-primary" (click)="saveLayerDetails()">
+                        <i class="fa fa-save"></i> Save
+                    </button>
+                    <button class="action-button" (click)="cancelEditDetails()">
+                        <i class="fa fa-times"></i> Cancel
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div *ngIf="hasLayerDeletePermission" class="danger-zone-card">
+        <div *ngIf="hasLayerDeletePermission && !editingDetails" class="danger-zone-card">
             <h3 class="danger-zone-title">Delete Layer</h3>
             <p class="danger-zone-description">
                 Deleting a layer will remove all information. This cannot be undone,

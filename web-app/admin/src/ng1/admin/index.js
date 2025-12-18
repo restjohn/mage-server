@@ -18,5 +18,4 @@ angular
     downgradeComponent({ component: AdminNavComponent })
   );
 
-require('./layers');
 require('./feeds');

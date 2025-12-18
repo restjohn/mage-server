@@ -62,37 +62,9 @@
             </div>
 
             <div *ngIf="layerForm.get('type').value === 'Imagery'" class="conditional-fields">
-                <div class="form-field">
-                    <label class="field-label">Layer URL</label>
-                    <input type="text" class="form-input" formControlName="url"
-                        placeholder="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    <div class="field-error">
-                        <span class="error-text" [class.visible]="
-                            layerForm.get('url').invalid &&
-                            (layerForm.get('url').touched || layerForm.get('url').dirty)
-                        ">
-                            URL is required for Imagery layers
-                        </span>
-                    </div>
-                </div>
-
-                <div class="form-field">
-                    <label class="field-label">Format</label>
-                    <div class="radio-group">
-                        <label class="radio-label">
-                            <input type="radio" formControlName="format" value="XYZ" />
-                            <span>XYZ</span>
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" formControlName="format" value="TMS" />
-                            <span>TMS</span>
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" formControlName="format" value="WMS" />
-                            <span>WMS</span>
-                        </label>
-                    </div>
-                </div>
+                <mage-imagery-layer-settings [config]="imageryConfig" (configChange)="onImageryConfigChange($event)"
+                    (wmsLayersSelected)="onWmsLayersSelected($event)">
+                </mage-imagery-layer-settings>
 
                 <div class="form-field">
                     <label class="checkbox-label">

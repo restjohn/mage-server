@@ -1,9 +1,11 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, AsyncValidatorFn } from '@angular/forms';
 import { LayersService, Layer } from '../layers.service';
 import { Observable, of } from 'rxjs';
 import { map, catchError, debounceTime, first } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { ImageryLayerConfig } from '../imagery-layer-settings/imagery-layer-settings.component';
 
 /**
  * Dialog component for creating new layers.
@@ -14,17 +16,28 @@ import { map, catchError, debounceTime, first } from 'rxjs/operators';
     templateUrl: './create-layer.component.html',
     styleUrls: ['./create-layer.component.scss']
 })
-export class CreateLayerDialogComponent {
+export class CreateLayerDialogComponent implements AfterViewInit {
     layerForm: FormGroup;
     errorMessage: string = '';
     geopackageFile: File | null = null;
     geopackageFileName: string = '';
 
+    // Imagery layer configuration for the helper component
+    imageryConfig: ImageryLayerConfig = {
+        url: '',
+        format: 'XYZ',
+        wmsVersion: '1.3.0',
+        wmsTransparent: true,
+        wmsStyles: ''
+    };
+    selectedWmsLayersString: string = '';
+
     constructor(
         public dialogRef: MatDialogRef<CreateLayerDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: { layer: Partial<Layer> },
         private fb: FormBuilder,
-        private layersService: LayersService
+        private layersService: LayersService,
+        private http: HttpClient
     ) {
         this.layerForm = this.fb.group({
             name: [
@@ -34,10 +47,11 @@ export class CreateLayerDialogComponent {
             ],
             type: [data.layer?.type ?? '', [Validators.required]],
             description: [data.layer?.description ?? ''],
-            url: [''],
-            format: ['XYZ'],
             base: [false]
         });
+    }
+    ngAfterViewInit(): void {
+        throw new Error('Method not implemented.');
     }
 
     /**
@@ -64,26 +78,21 @@ export class CreateLayerDialogComponent {
     }
 
     /**
-     * Handles layer type change to add/remove validators and reset fields
+     * Handles layer type change to reset fields
      */
     onTypeChange(): void {
         const type = this.layerForm.get('type')?.value;
-        const urlControl = this.layerForm.get('url');
-        const formatControl = this.layerForm.get('format');
-        const baseControl = this.layerForm.get('base');
 
-        urlControl?.clearValidators();
-        urlControl?.setValue('');
-        formatControl?.setValue('XYZ');
-        baseControl?.setValue(false);
+        this.imageryConfig = {
+            url: '',
+            format: 'XYZ',
+            wmsVersion: '1.3.0',
+            wmsTransparent: true,
+            wmsStyles: ''
+        };
+        this.selectedWmsLayersString = '';
         this.geopackageFile = null;
         this.geopackageFileName = '';
-
-        if (type === 'Imagery') {
-            urlControl?.setValidators([Validators.required]);
-        }
-
-        urlControl?.updateValueAndValidity();
     }
 
     /**
@@ -98,6 +107,20 @@ export class CreateLayerDialogComponent {
     }
 
     /**
+     * Handles imagery config changes from the helper component
+     */
+    onImageryConfigChange(config: ImageryLayerConfig): void {
+        this.imageryConfig = config;
+    }
+
+    /**
+     * Handles WMS layer selection changes from the helper component
+     */
+    onWmsLayersSelected(layers: string): void {
+        this.selectedWmsLayersString = layers;
+    }
+
+    /**
      * Handles form submission for creating a new layer.
      * Validates the form, creates the layer via the layers service, and closes the dialog on success.
      */
@@ -109,6 +132,11 @@ export class CreateLayerDialogComponent {
 
         if (this.layerForm.get('type')?.value === 'GeoPackage' && !this.geopackageFile) {
             this.errorMessage = 'Please select a GeoPackage file.';
+            return;
+        }
+
+        if (this.layerForm.get('type')?.value === 'Imagery' && !this.imageryConfig.url) {
+            this.errorMessage = 'Please enter a layer URL.';
             return;
         }
 
@@ -127,7 +155,6 @@ export class CreateLayerDialogComponent {
             formData.append('geopackage', this.geopackageFile);
             layerData = formData;
         } else {
-            // Use regular JSON for other layer types
             layerData = {
                 name: formValue.name,
                 type: formValue.type,
@@ -135,9 +162,19 @@ export class CreateLayerDialogComponent {
             };
 
             if (formValue.type === 'Imagery') {
-                layerData.url = formValue.url;
-                layerData.format = formValue.format;
+                layerData.url = this.imageryConfig.url;
+                layerData.format = this.imageryConfig.format;
                 layerData.base = formValue.base;
+
+                if (this.imageryConfig.format === 'WMS') {
+                    layerData.wms = {
+                        layers: this.selectedWmsLayersString || '',
+                        version: this.imageryConfig.wmsVersion,
+                        transparent: this.imageryConfig.wmsTransparent,
+                        format: this.imageryConfig.wmsTransparent ? 'image/png' : 'image/jpeg',
+                        styles: this.imageryConfig.wmsStyles || ''
+                    };
+                }
             }
         }
 
@@ -173,6 +210,9 @@ export class CreateLayerDialogComponent {
             return true;
         }
         if (typeControl.value === 'GeoPackage' && !this.geopackageFile) {
+            return true;
+        }
+        if (typeControl.value === 'Imagery' && !this.imageryConfig.url) {
             return true;
         }
 

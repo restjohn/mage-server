@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, ElementRef } from '@angular/core';
 import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -14,6 +14,7 @@ import { SearchModalComponent, SearchModalData, SearchModalResult, SearchModalCo
 import { DeleteLayerComponent } from '../delete-layer/delete-layer.component';
 import { Event } from 'src/app/filter/filter.types';
 import { Observable } from 'rxjs';
+import { ImageryLayerConfig } from '../imagery-layer-settings/imagery-layer-settings.component';
 
 interface UrlLayer {
   table: string;
@@ -86,8 +87,21 @@ export class LayerDetailsComponent implements OnInit {
   editingDetails = false;
   layerEditForm = {
     name: '',
-    description: ''
+    description: '',
+    format: '',
+    base: false
   };
+
+  imageryConfig: ImageryLayerConfig = {
+    url: '',
+    format: 'XYZ',
+    wmsVersion: '1.3.0',
+    wmsTransparent: true,
+    wmsStyles: ''
+  };
+  selectedWmsLayersString: string = '';
+
+  @ViewChild('previewMapContainer') previewMapContainer: ElementRef;
 
   constructor(
     private stateService: StateService,
@@ -364,8 +378,39 @@ export class LayerDetailsComponent implements OnInit {
     if (!this.editingDetails) {
       this.layerEditForm.name = this.layer?.name || '';
       this.layerEditForm.description = this.layer?.description || '';
+
+      if (this.layer?.type === 'Imagery') {
+        this.layerEditForm.format = this.layer.format || 'XYZ';
+        this.layerEditForm.base = !!this.layer.base;
+
+        this.imageryConfig = {
+          url: this.layer.url || '',
+          format: this.layer.format || 'XYZ',
+          wmsVersion: this.layer.wms?.version || '1.3.0',
+          wmsTransparent: this.layer.wms?.transparent !== false,
+          wmsStyles: this.layer.wms?.styles || ''
+        };
+
+        if (this.layer.format === 'WMS' && this.layer.wms?.layers) {
+          this.selectedWmsLayersString = this.layer.wms.layers;
+        }
+      }
     }
     this.editingDetails = !this.editingDetails;
+  }
+
+  /**
+   * Handles imagery config changes from the helper component
+   */
+  onImageryConfigChange(config: ImageryLayerConfig): void {
+    this.imageryConfig = config;
+  }
+
+  /**
+   * Handles WMS layer selection changes from the helper component
+   */
+  onWmsLayersSelected(layers: string): void {
+    this.selectedWmsLayersString = layers;
   }
 
   saveLayerDetails(): void {
@@ -373,11 +418,27 @@ export class LayerDetailsComponent implements OnInit {
       return;
     }
 
-    const updatedLayer = {
+    const updatedLayer: any = {
       name: this.layerEditForm.name,
       description: this.layerEditForm.description,
       type: this.layer.type
     };
+
+    if (this.layer.type === 'Imagery') {
+      updatedLayer.url = this.imageryConfig.url;
+      updatedLayer.format = this.imageryConfig.format;
+      updatedLayer.base = this.layerEditForm.base;
+
+      if (this.imageryConfig.format === 'WMS') {
+        updatedLayer.wms = {
+          layers: this.selectedWmsLayersString || '',
+          version: this.imageryConfig.wmsVersion,
+          transparent: this.imageryConfig.wmsTransparent,
+          format: this.imageryConfig.wmsTransparent ? 'image/png' : 'image/jpeg',
+          styles: this.imageryConfig.wmsStyles || ''
+        };
+      }
+    }
 
     this.layersService.updateLayer(String(this.layer.id), updatedLayer)
       .subscribe({
@@ -598,3 +659,4 @@ export class LayerDetailsComponent implements OnInit {
     });
   }
 }
+
