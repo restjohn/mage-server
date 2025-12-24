@@ -1,7 +1,5 @@
 import _ from 'underscore';
 import angular from 'angular';
-import fileUpload from './file-upload/file.upload.component';
-import fileBrowser from './file-upload/file.browser.component';
 import uiRouter from '@uirouter/angularjs';
 import {
   downgradeComponent,
@@ -155,14 +153,7 @@ app
 
 app
   .component('navbar', require('./navbar/navbar.component'))
-  .component('dateTime', require('./datetime/datetime.component'))
-  .component('fileUpload', fileUpload)
-  .component('fileBrowser', fileBrowser)
   .controller('NavController', require('./mage/mage-nav.controller'))
-  .directive(
-    'fileUploadGrid',
-    require('./file-upload/file-upload-grid.directive')
-  )
   .animation('.slide-down', function () {
     return {
       enter: function (element) {
@@ -178,10 +169,7 @@ app
 require('./mage');
 require('./authentication'); // for modal in admin pages if token expires
 require('./factories');
-require('./filters');
 require('./admin');
-require('./user');
-require('./material-components');
 
 config.$inject = [
   '$httpProvider',
@@ -221,8 +209,8 @@ function config(
             // Important when doing this the admin page also has to be permission based
             // and only show what each user can see.
             // Possible that each role should have an 'admin' permission to abstract this
-            myself.role.name === 'ADMIN_ROLE' ||
-              myself.role.name === 'EVENT_MANAGER_ROLE'
+            myself.role && (myself.role.name === 'ADMIN_ROLE' ||
+              myself.role.name === 'EVENT_MANAGER_ROLE')
               ? deferred.resolve(myself)
               : deferred.reject();
           });

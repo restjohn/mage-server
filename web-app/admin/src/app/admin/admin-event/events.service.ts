@@ -186,4 +186,14 @@ export class EventsService {
     deleteForm(eventId: string, formId: string): Observable<void> {
         return this.http.delete<void>(`/api/events/${eventId}/forms/${formId}`);
     }
+
+    addFeedToEvent(eventId: string, feedId: string): Observable<Event> {
+        return this.http.post<Event>(`/api/events/${eventId}/feeds`, feedId, {
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
+
+    removeFeedFromEvent(eventId: string, feedId: string): Observable<Event> {
+        return this.http.delete<Event>(`/api/events/${eventId}/feeds/${feedId}`);
+    }
 }
