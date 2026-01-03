@@ -37,6 +37,7 @@ import { LayerDashboardComponent } from '../app/admin/admin-layers/dashboard/lay
 import { LayerDetailsComponent } from '../app/admin/admin-layers/layer-details/layer-details.component';
 import { DeviceDashboardComponent } from '../app/admin/admin-devices/dashboard/devices-dashboard.component';
 import { DeviceDetailsComponent } from '../app/admin/admin-devices/device-details/device-details.component';
+import { AdminNavigationComponent } from '../app/navigation/admin-navigation.component';
 
 require('angular-minicolors');
 require('select2');
@@ -149,11 +150,11 @@ app
   .directive(
     'adminDevice',
     downgradeComponent({ component: DeviceDetailsComponent })
-  );
-
-app
-  .component('navbar', require('./navbar/navbar.component'))
-  .controller('NavController', require('./mage/mage-nav.controller'))
+  )
+  .directive(
+    'adminNavigation',
+    downgradeComponent({ component: AdminNavigationComponent })
+  )
   .animation('.slide-down', function () {
     return {
       enter: function (element) {
@@ -166,8 +167,10 @@ app
   })
   .config(config)
   .run(run);
-require('./mage');
+
 require('./authentication'); // for modal in admin pages if token expires
+// TODO (MIGRATE): Replace AngularJS factories with Angular providers and register them in `AppModule`.
+// - Migrate services incrementally, add downgrade adapters as temporary shims, then remove `./ng1/factories` when done.
 require('./factories');
 require('./admin');
 
@@ -191,6 +194,8 @@ function config(
 
   $animateProvider.classNameFilter(/ng-animatable/);
 
+  // TODO (MIGRATE): Port this AngularJS route resolve logic to an Angular Route Guard or Resolver.
+  // - Implement an `AdminGuard` that checks the migrated `UserService`'s permissions and opens login panel.
   function resolveAdmin() {
     return {
       user: [

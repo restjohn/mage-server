@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, ApplicationRef, DoBootstrap } from '@angular/core';
+import { NgModule, ApplicationRef, DoBootstrap, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { UpgradeModule } from '@angular/upgrade/static';
 import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
@@ -57,13 +57,9 @@ import { InputMaskModule } from '@ngneat/input-mask';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ColorPickerComponent } from './color-picker/color-picker.component';
 
-import { MapClipComponent } from './map/clip/clip.component';
 import { GeometryModule } from './geometry/geometry.module';
 import { MomentModule } from './moment/moment.module';
 import { BootstrapComponent } from './bootstrap/bootstrap.component';
-import { AttachmentComponent } from './observation/attachment/attachment.component';
-import { FilenamePipe } from './filename/filename.pipe';
-import { AttachUploadComponent } from './observation/attachment/attachment-upload/attachment-upload.component';
 import { UserAvatarComponent } from './user/user-avatar/user-avatar.component';
 import { TokenInterceptorService } from './http/token-interceptor.service';
 
@@ -91,20 +87,6 @@ import {
 import {
   DMSValidatorDirective,
   MGRSValidatorDirective,
-  ObservationEditCheckboxComponent,
-  ObservationEditDateComponent,
-  ObservationEditSelectComponent,
-  ObservationEditEmailComponent,
-  ObservationEditGeometryComponent,
-  ObservationEditGeometryFormComponent,
-  ObservationEditGeometryMapComponent,
-  ObservationEditMultiselectComponent,
-  ObservationEditNumberComponent,
-  ObservationEditRadioComponent,
-  ObservationEditTextComponent,
-  ObservationEditTextareaComponent,
-  ObservationEditFormComponent,
-  ObservationEditComponent
 } from './observation/observation-edit/observation-edit';
 
 import { FeedItemComponent } from './feed/feed-item/feed-item.component';
@@ -122,10 +104,6 @@ import {
 } from './admin/admin-settings/admin-settings';
 import { DatetimePickerComponent } from './datetime-picker/datetime-picker.component';
 import { CommonModule } from '@angular/common';
-import { ObservationEditFormPickerComponent } from './observation/observation-edit/observation-edit-form-picker.component';
-import { ObservationEditDiscardComponent } from './observation/observation-edit/observation-edit-discard/observation-edit-discard.component';
-import { ObservationEditAttachmentComponent } from './observation/observation-edit/observation-edit-attachment/observation-edit-attachment.component';
-import { ObservationEditPasswordComponent } from './observation/observation-edit/observation-edit-password/observation-edit-password.component';
 import { ContactComponent } from './contact/contact.component';
 import { ContactDialogComponent } from './contact/contact-dialog.component';
 import { AdminAuthenticationOidcComponent } from './admin/admin-authentication/admin-authentication-oidc/admin-authentication-oidc.component';
@@ -152,6 +130,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { AdminUsersModule } from './admin/admin-users/admin-users.module';
 import { ObservationModule } from './observation/observation.module';
 import { AdminDevicessModule } from './admin/admin-devices/admin-devices.module';
+import { AdminNavigationComponent } from './navigation/admin-navigation.component';
 
 @NgModule({
   declarations: [
@@ -182,7 +161,8 @@ import { AdminDevicessModule } from './admin/admin-devices/admin-devices.module'
     ButtonPreviewComponent,
     AdminAuthenticationSettingsComponent,
     AdminSettingsUnsavedComponent,
-    AdminMapComponent
+    AdminMapComponent,
+    AdminNavigationComponent
   ],
   imports: [
     CommonModule,
@@ -257,7 +237,7 @@ import { AdminDevicessModule } from './admin/admin-devices/admin-devices.module'
     MatStepperModule,
     InputMaskModule.forRoot(),
     AdminDashboardModule,
-    AdminDevicessModule,
+    AdminDevicessModule
   ],
   providers: [
     mapServiceProvider,
@@ -279,11 +259,22 @@ import { AdminDevicessModule } from './admin/admin-devices/admin-devices.module'
     loginServiceProvider,
     layerServiceProvider,
     {
+      provide: '$rootScope',
+      useFactory: (i: any) => i.get('$rootScope'),
+      deps: ['$injector']
+    },
+    {
+      provide: '$scope',
+      useFactory: (i: any) => i.get('$rootScope').$new(),
+      deps: ['$injector']
+    },
+    {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptorService,
       multi: true
     }
-  ]
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppModule implements DoBootstrap {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
