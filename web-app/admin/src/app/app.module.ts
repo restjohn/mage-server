@@ -104,8 +104,7 @@ import {
 } from './admin/admin-settings/admin-settings';
 import { DatetimePickerComponent } from './datetime-picker/datetime-picker.component';
 import { CommonModule } from '@angular/common';
-import { ContactComponent } from './contact/contact.component';
-import { ContactDialogComponent } from './contact/contact-dialog.component';
+import { ContactModule } from './contact/contact.module';
 import { AdminAuthenticationOidcComponent } from './admin/admin-authentication/admin-authentication-oidc/admin-authentication-oidc.component';
 import { AuthenticationDeleteComponent } from './admin/admin-authentication/admin-authentication-delete/admin-authentication-delete.component';
 import { AdminAuthenticationLocalComponent } from './admin/admin-authentication/admin-authentication-local/admin-authentication-local.component';
@@ -131,6 +130,7 @@ import { AdminUsersModule } from './admin/admin-users/admin-users.module';
 import { ObservationModule } from './observation/observation.module';
 import { AdminDevicessModule } from './admin/admin-devices/admin-devices.module';
 import { AdminNavigationComponent } from './navigation/admin-navigation.component';
+import { AuthenticationModule } from './authentication/authentication.module';
 
 @NgModule({
   declarations: [
@@ -150,8 +150,6 @@ import { AdminNavigationComponent } from './navigation/admin-navigation.componen
     IconUploadComponent,
     ContactInfoComponent,
     DatetimePickerComponent,
-    ContactComponent,
-    ContactDialogComponent,
     AdminAuthenticationOidcComponent,
     AdminAuthenticationLocalComponent,
     AdminAuthenticationComponent,
@@ -237,7 +235,9 @@ import { AdminNavigationComponent } from './navigation/admin-navigation.componen
     MatStepperModule,
     InputMaskModule.forRoot(),
     AdminDashboardModule,
-    AdminDevicessModule
+    AdminDevicessModule,
+    AuthenticationModule,
+    ContactModule
   ],
   providers: [
     mapServiceProvider,

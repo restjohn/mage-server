@@ -39,6 +39,14 @@ import { DeviceDashboardComponent } from '../app/admin/admin-devices/dashboard/d
 import { DeviceDetailsComponent } from '../app/admin/admin-devices/device-details/device-details.component';
 import { AdminNavigationComponent } from '../app/navigation/admin-navigation.component';
 
+import { LocalSigninComponent } from '../app/authentication/local-signin/local-signin.component';
+import { IdpSigninComponent } from '../app/authentication/idp-signin/idp-signin.component';
+import { LdapSigninComponent } from '../app/authentication/ldap-signin/ldap-signin.component';
+import { LocalSignupComponent } from '../app/authentication/local-signup/local-signup.component';
+import { SigninComponent } from '../app/authentication/signin/signin.component';
+import { AuthorizeComponent } from '../app/authentication/authorize/authorize.component';
+import { AuthenticationComponent } from '../app/authentication/authentication/authentication.component';
+
 require('angular-minicolors');
 require('select2');
 
@@ -155,6 +163,34 @@ app
     'adminNavigation',
     downgradeComponent({ component: AdminNavigationComponent })
   )
+  .directive(
+    'localSignin',
+    downgradeComponent({ component: LocalSigninComponent })
+  )
+  .directive(
+    'idpSignin',
+    downgradeComponent({ component: IdpSigninComponent })
+  )
+  .directive(
+    'ldapSignin',
+    downgradeComponent({ component: LdapSigninComponent })
+  )
+  .directive(
+    'localSignup',
+    downgradeComponent({ component: LocalSignupComponent })
+  )
+  .directive(
+    'signin',
+    downgradeComponent({ component: SigninComponent })
+  )
+  .directive(
+    'authorize',
+    downgradeComponent({ component: AuthorizeComponent })
+  )
+  .directive(
+    'authentication',
+    downgradeComponent({ component: AuthenticationComponent })
+  )
   .animation('.slide-down', function () {
     return {
       enter: function (element) {
@@ -167,10 +203,7 @@ app
   })
   .config(config)
   .run(run);
-
-require('./authentication'); // for modal in admin pages if token expires
 // TODO (MIGRATE): Replace AngularJS factories with Angular providers and register them in `AppModule`.
-// - Migrate services incrementally, add downgrade adapters as temporary shims, then remove `./ng1/factories` when done.
 require('./factories');
 require('./admin');
 
@@ -436,8 +469,8 @@ function config(
   });
 }
 
-run.$inject = ['$rootScope', '$uibModal', '$state', 'Api', 'UserService'];
-function run($rootScope, $uibModal, $state, Api, UserService) {
+run.$inject = ['$rootScope', '$uibModal', '$state', 'Api', 'UserService', 'authService'];
+function run($rootScope, $uibModal, $state, Api, UserService, authService) {
   $rootScope.$on('event:auth-loginRequired', function (e, response) {
     const stateExceptions = ['landing'];
     const requestExceptions = ['/api/users/myself/password'];
@@ -449,13 +482,27 @@ function run($rootScope, $uibModal, $state, Api, UserService) {
       $rootScope.loginDialogPresented = true;
       Api.get(function (api) {
         let successful = false;
+        const signinModalTemplate = `
+          <form class="form" method="post" autocomplete="off">
+            <div class="modal-header">
+              <h3 class="modal-title">Log in to continue to MAGE</h3>
+            </div>
+            <div class="modal-body">
+              <authentication 
+                [api]="api" 
+                [hide-signup]="hideSignup" 
+                (on-success)="onSuccess()" 
+                (on-failure)="logout()">
+              </authentication>
+            </div>
+          </form>
+        `;
         const options = {
-          template: require('./authentication/signin-modal.html'),
+          template: signinModalTemplate,
           controller: [
             '$scope',
             '$uibModalInstance',
-            'authService',
-            function ($scope, $uibModalInstance, authService) {
+            function ($scope, $uibModalInstance) {
               $uibModalInstance.scope = $scope;
               $scope.api = api;
               $scope.hideSignup = true;
