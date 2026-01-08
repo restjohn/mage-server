@@ -12,13 +12,13 @@
 
 .nav-float-wrapper {
   position: fixed;
-  top: calc(72px + var(--banner-offset, 0px));
+  top: 72px;
   left: 5px;
   z-index: 10000;
   display: flex;
 
   @media (max-width: 599px) {
-    top: calc(66px + var(--banner-offset, 0px)) !important;
+    top: 66px !important;
   }
 
   .nav-divider {
@@ -66,16 +66,16 @@
     inset: 0;
     background: rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(1px);
-    margin-top: calc(120px + var(--banner-offset, 0px));
+    margin-top: 120px;
 
     @media (max-width: 599px) {
-      margin-top: calc(110px + var(--banner-offset, 0px));
+      margin-top: 110px;
     }
   }
 
   .drawer {
     position: absolute;
-    top: calc(45px + var(--banner-offset, 0px));
+    top: 45px;
     left: 0;
     width: 320px;
     background: #2f2f2f;
@@ -170,7 +170,7 @@
   @media (max-width: 599px) {
     .drawer {
       position: fixed;
-      top: calc(25px + var(--banner-offset, 0px));
+      top: 25px;
       left: 0;
       width: 100vw;
       height: 100vh;
@@ -182,7 +182,7 @@
       &.open {
         transform: translateY(0);
         opacity: 1;
-        margin-top: calc(86px + var(--banner-offset, 0px));
+        margin-top: 86px;
         transform: translateY(0);
         opacity: 1;
         height: auto;

@@ -19,7 +19,6 @@ export class AdminNavComponent {
   @Input() unregisteredDevices: any[] = [];
   @Input() pluginTabs: PluginTab[] = [];
   @Input() token: string = '';
-  @Input() showHeader: boolean = false;
   @Output() pluginActiveChange = new EventEmitter<boolean>();
 
   private $state: any;
