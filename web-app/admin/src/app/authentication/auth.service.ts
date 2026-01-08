@@ -15,8 +15,7 @@ export interface SigninEvent {
  * Angular service that wraps the AngularJS authService functionality.
  * This service handles authentication login confirmation and HTTP buffer retry logic.
  * 
- * Note: We access AngularJS services lazily via Angular's Injector to avoid bootstrap timing issues
- * in the hybrid AngularJS/Angular app.
+ * TODO: Update this service when the migration from AngularJS to Angular is complete.
  */
 @Injectable({
     providedIn: 'root'
@@ -55,8 +54,6 @@ export class AuthService {
     }
 
     /**
-     * Call this function to indicate that authentication was successful and trigger a
-     * retry of all deferred requests.
      * @param configUpdater an optional function to update the config before retrying
      */
     loginConfirmed(configUpdater?: (config: any) => any): void {

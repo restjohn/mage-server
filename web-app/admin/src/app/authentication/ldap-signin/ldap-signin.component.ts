@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Inject, Input, Output, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, Output, ElementRef, ViewChild } from '@angular/core';
 import { UserService } from '../../upgrade/ajs-upgraded-providers';
 import { SigninEvent } from '../auth.service';
 import { AuthenticationStrategy, ContactInfo } from '../local-signin/local-signin.component';
@@ -8,7 +8,7 @@ import { AuthenticationStrategy, ContactInfo } from '../local-signin/local-signi
     templateUrl: './ldap-signin.component.html',
     styleUrls: ['./ldap-signin.component.scss']
 })
-export class LdapSigninComponent implements AfterViewInit {
+export class LdapSigninComponent {
     @Input() strategy: AuthenticationStrategy;
     @Output() onSignin = new EventEmitter<SigninEvent>();
 
@@ -58,17 +58,11 @@ export class LdapSigninComponent implements AfterViewInit {
         @Inject(UserService) private userService: any
     ) { }
 
-    ngAfterViewInit(): void {
-        // MDC text fields are initialized automatically in Angular Material
-    }
-
     signin(): void {
-        // Reset validation
         this.usernameValid = true;
         this.passwordValid = true;
         this.statusMessage = '';
 
-        // Validate fields
         if (!this.username || this.username.trim() === '') {
             this.usernameValid = false;
         }
@@ -76,7 +70,6 @@ export class LdapSigninComponent implements AfterViewInit {
             this.passwordValid = false;
         }
 
-        // Don't submit if validation fails
         if (!this.usernameValid || !this.passwordValid) {
             return;
         }
@@ -92,8 +85,6 @@ export class LdapSigninComponent implements AfterViewInit {
             (response: any) => {
                 this.statusTitle = 'Error signing in';
                 this.statusMessage = response.data || 'Please check your username and password and try again.';
-                // Don't mark individual fields as invalid on server error
-                // The general error message is sufficient
                 this.info = {
                     statusTitle: this.statusTitle,
                     statusMessage: this.statusMessage,

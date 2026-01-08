@@ -105,6 +105,7 @@ import {
 import { DatetimePickerComponent } from './datetime-picker/datetime-picker.component';
 import { CommonModule } from '@angular/common';
 import { ContactModule } from './contact/contact.module';
+import { BannerComponent } from './banner/banner.component';
 import { AdminAuthenticationOidcComponent } from './admin/admin-authentication/admin-authentication-oidc/admin-authentication-oidc.component';
 import { AuthenticationDeleteComponent } from './admin/admin-authentication/admin-authentication-delete/admin-authentication-delete.component';
 import { AdminAuthenticationLocalComponent } from './admin/admin-authentication/admin-authentication-local/admin-authentication-local.component';
@@ -140,6 +141,7 @@ import { AuthenticationModule } from './authentication/authentication.module';
     FeedItemComponent,
     BootstrapComponent,
     UserAvatarComponent,
+    BannerComponent,
     AdminSettingsComponent,
     PasswordPolicyComponent,
     AccountLockComponent,

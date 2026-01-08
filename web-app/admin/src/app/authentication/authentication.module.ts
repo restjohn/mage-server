@@ -8,7 +8,6 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { ContactModule } from '../contact/contact.module';
-import { AuthService } from './auth.service';
 import { LocalSigninComponent } from './local-signin/local-signin.component';
 import { IdpSigninComponent } from './idp-signin/idp-signin.component';
 import { LdapSigninComponent } from './ldap-signin/ldap-signin.component';

@@ -47,10 +47,6 @@ export class AuthenticationComponent implements OnInit {
         }
     }
 
-    hideStatus(): void {
-        // Placeholder for any status hiding logic
-    }
-
     returnToSignin(): void {
         this.userService.logout();
         this.action = 'signin';

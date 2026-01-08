@@ -19,13 +19,14 @@ export class AdminNavComponent {
   @Input() unregisteredDevices: any[] = [];
   @Input() pluginTabs: PluginTab[] = [];
   @Input() token: string = '';
+  @Input() showHeader: boolean = false;
   @Output() pluginActiveChange = new EventEmitter<boolean>();
 
   private $state: any;
   drawerOpen = false;
 
   navItems = [
-    { label: 'Dashboard', state: 'admin.dashboard', icon: 'fa fa-dashboard', count: 0},
+    { label: 'Dashboard', state: 'admin.dashboard', icon: 'fa fa-dashboard', count: 0 },
     { label: 'Users', state: 'admin.users', icon: 'fa fa-user', count: 0 },
     { label: 'Teams', state: 'admin.teams', icon: 'fa fa-users' },
     { label: 'Events', state: 'admin.events', icon: 'fa fa-calendar' },
@@ -89,14 +90,14 @@ export class AdminNavComponent {
   get pluginActive(): boolean {
     return Array.isArray(this.pluginTabs) && this.pluginTabs.some(p => p.state === this.stateName);
   }
-  
+
   get pluginBreadcrumbs() {
     if (!this.pluginActive) return [];
     const plugin = this.pluginTabs.find(p => p.state === this.stateName);
-    
+
     return [
-      { title: plugin.title, iconClass: plugin?.icon?.className || "fa fa-plug"}
+      { title: plugin.title, iconClass: plugin?.icon?.className || "fa fa-plug" }
     ];
   }
-  
+
 }

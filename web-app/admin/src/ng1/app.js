@@ -15,6 +15,7 @@ import { UserAvatarComponent } from '../app/user/user-avatar/user-avatar.compone
 import { UserReadService } from '@ngageoint/mage.web-core-lib/user';
 
 import { ContactComponent } from '../app/contact/contact.component';
+import { BannerComponent } from '../app/banner/banner.component';
 
 import { AdminSettingsComponent } from '../app/admin/admin-settings/admin-settings.component';
 import { AdminAuthenticationComponent } from '../app/admin/admin-authentication/admin-authentication.component';
@@ -107,6 +108,7 @@ app
     downgradeComponent({ component: AuthenticationCreateComponent })
   )
   .directive('contact', downgradeComponent({ component: ContactComponent }))
+  .directive('banner', downgradeComponent({ component: BannerComponent }))
   .directive(
     'adminEventFormPreview',
     downgradeComponent({ component: AdminEventFormPreviewComponent })

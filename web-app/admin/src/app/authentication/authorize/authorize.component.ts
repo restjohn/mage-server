@@ -1,5 +1,4 @@
-import { Component, EventEmitter, Inject, Input, OnInit, Output, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, EventEmitter, Inject, Input, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
 import { UserService } from '../../upgrade/ajs-upgraded-providers';
 import { ContactInfo } from '../local-signin/local-signin.component';
 
@@ -8,7 +7,7 @@ import { ContactInfo } from '../local-signin/local-signin.component';
     templateUrl: './authorize.component.html',
     styleUrls: ['./authorize.component.scss']
 })
-export class AuthorizeComponent implements OnInit, AfterViewInit {
+export class AuthorizeComponent implements OnInit {
     @Input() strategy: string;
     @Input() token: string;
     @Input() user: any;
@@ -64,17 +63,11 @@ export class AuthorizeComponent implements OnInit, AfterViewInit {
         );
     }
 
-    ngAfterViewInit(): void {
-        // MDC components initialize automatically
-    }
-
     authorize(): void {
-        // Reset validation
         this.deviceIdValid = true;
         this.statusMessage = '';
         this.status = 0;
 
-        // Validate field
         if (!this.uid || this.uid.trim() === '') {
             this.deviceIdValid = false;
             return;

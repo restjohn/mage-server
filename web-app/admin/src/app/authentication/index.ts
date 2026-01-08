@@ -1,4 +1,3 @@
-// Public API exports for authentication module
 export * from './authentication.module';
 export * from './auth.service';
 export * from './local-signin/local-signin.component';

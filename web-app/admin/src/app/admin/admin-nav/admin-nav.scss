@@ -2,7 +2,7 @@
   position: relative;
 }
 
-::ng-deep app-admin-side-nav > admin-breadcrumb {
+::ng-deep app-admin-side-nav>admin-breadcrumb {
   display: block;
   position: fixed;
   width: 100%;
@@ -12,12 +12,13 @@
 
 .nav-float-wrapper {
   position: fixed;
-  top: 72px;
+  top: calc(72px + var(--banner-offset, 0px));
   left: 5px;
   z-index: 10000;
   display: flex;
+
   @media (max-width: 599px) {
-    top: 66px !important;
+    top: calc(66px + var(--banner-offset, 0px)) !important;
   }
 
   .nav-divider {
@@ -50,9 +51,11 @@
       padding: 2px;
       user-select: none;
     }
+
     &:active {
       transform: translateY(1px);
     }
+
     i {
       font-size: 1.3rem;
     }
@@ -63,15 +66,16 @@
     inset: 0;
     background: rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(1px);
-    margin-top: 120px;
+    margin-top: calc(120px + var(--banner-offset, 0px));
+
     @media (max-width: 599px) {
-      margin-top: 110px;
+      margin-top: calc(110px + var(--banner-offset, 0px));
     }
   }
 
   .drawer {
     position: absolute;
-    top: 45px;
+    top: calc(45px + var(--banner-offset, 0px));
     left: 0;
     width: 320px;
     background: #2f2f2f;
@@ -143,6 +147,7 @@
           display: block;
         }
       }
+
       .text {
         font-size: 1rem;
         font-weight: 500;
@@ -161,10 +166,11 @@
       }
     }
   }
+
   @media (max-width: 599px) {
     .drawer {
       position: fixed;
-      top: 25px;
+      top: calc(25px + var(--banner-offset, 0px));
       left: 0;
       width: 100vw;
       height: 100vh;
@@ -176,7 +182,7 @@
       &.open {
         transform: translateY(0);
         opacity: 1;
-        margin-top: 86px;
+        margin-top: calc(86px + var(--banner-offset, 0px));
         transform: translateY(0);
         opacity: 1;
         height: auto;
@@ -192,14 +198,17 @@
 
       .nav-row {
         padding: 1rem 1.1rem;
+
         .icon {
           font-size: 1.6rem;
           width: 2rem;
         }
+
         .icon.plugin .plugin-icon {
           width: 1.6rem;
           height: 1.6rem;
         }
+
         .text {
           font-size: 1.1rem;
         }

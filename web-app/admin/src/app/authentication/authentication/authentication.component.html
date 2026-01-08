@@ -1,12 +1,8 @@
-<!-- Setup action - not commonly used in admin, keeping as placeholder -->
 <div *ngIf="action === 'setup'" class="setup-info-container ng-animatable fade-in">
-    <!-- setup component would go here if needed -->
     <p>Setup in progress...</p>
 </div>
 
-<!-- Disclaimer action -->
 <div *ngIf="action === 'disclaimer'" class="disclaimer-info-container ng-animatable fade-in">
-    <!-- disclaimer component would go here if needed -->
     <div class="disclaimer-container">
         <h2>Disclaimer</h2>
         <div class="disclaimer-text" *ngIf="api?.disclaimer?.text" [innerHTML]="api.disclaimer.text"></div>
@@ -17,14 +13,12 @@
     </div>
 </div>
 
-<!-- Authorize device action -->
 <div *ngIf="action === 'authorize-device'" class="device-id-container ng-animatable fade-in">
     <authorize [strategy]="strategy" [token]="token" [user]="user" (onAuthorized)="authorized()"
         (onCancel)="returnToSignin()">
     </authorize>
 </div>
 
-<!-- Signup action -->
 <div *ngIf="action === 'signup'" class="section-container ng-animatable fade-in">
     <div class="signup-container">
         <div class="wand-container">
@@ -36,7 +30,6 @@
     </div>
 </div>
 
-<!-- Inactive account action -->
 <div *ngIf="action === 'inactive-account'" class="section-container ng-animatable fade-in">
     <div class="signup-container">
         <div class="wand-container">
@@ -51,7 +44,6 @@
     </div>
 </div>
 
-<!-- Active account action -->
 <div *ngIf="action === 'active-account'" class="section-container ng-animatable fade-in">
     <div class="signup-container">
         <div class="wand-container">
@@ -65,7 +57,6 @@
     </div>
 </div>
 
-<!-- Disabled account action -->
 <div *ngIf="action === 'disabled-account'" class="section-container ng-animatable fade-in">
     <div class="signup-container">
         <div class="wand-container">
@@ -79,7 +70,6 @@
     </div>
 </div>
 
-<!-- Signin action (default) -->
 <div *ngIf="action === 'signin' || !action" class="signin-section-container ng-animatable fade-in">
     <div class="welcome" *ngIf="!hideSignup">
         <div class="welcome__title">Welcome to Mage</div>
@@ -89,9 +79,7 @@
     </signin>
 </div>
 
-<!-- About action -->
 <div *ngIf="action === 'about'" class="about-container ng-animatable fade-in">
-    <!-- about component would go here if needed -->
     <div class="about-content">
         <h2>About MAGE</h2>
         <p>Mobile Awareness GEOINT Environment</p>
@@ -102,7 +90,6 @@
     </div>
 </div>
 
-<!-- App store container - shown during signin -->
 <div class="app-store-container" *ngIf="(action === 'signin' || !action) && !hideSignup">
     <p>iOS or Android user? Check out our mobile app</p>
     <div class="app-store-badges">

@@ -10,10 +10,10 @@
 <body class="mdc-typography">
   <bootstrap>
     <div class="application">
-      <banner ng-if="myself" class="banner" type="header"></banner>
+      <banner *ngIf="myself" class="banner" [type]="'header'"></banner>
       <admin-navigation></admin-navigation>
       <ui-view class="route-content"></ui-view>
-      <banner ng-if="myself" class="banner" type="footer"></banner>
+      <banner *ngIf="myself" class="banner" [type]="'footer'"></banner>
     </div>
   </bootstrap>
 </body>
