@@ -2,7 +2,7 @@ import { Inject, Pipe, PipeTransform } from '@angular/core'
 import { center as turfCenter } from '@turf/center'
 import { Feature, Point } from 'geojson'
 import * as mgrs from 'mgrs'
-import { LocalStorageService } from '../upgrade/ajs-upgraded-providers'
+import { LocalStorageService } from 'src/app/http/local-storage.service'
 import * as DMS from './geometry-dms'
 
 @Pipe({

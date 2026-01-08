@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Compiler, Injector } from '@angular/core'
 import { of } from 'rxjs'
-import { LocalStorageService } from '../upgrade/ajs-upgraded-providers'
+import { LocalStorageService } from 'src/app/http/local-storage.service'
 import { PluginsById, PluginService } from './plugin.service'
 import { SystemJS } from './systemjs.service'
 
@@ -21,9 +21,9 @@ describe('PluginService', () => {
     import: jasmine.Spy<SystemJS.Context['import']>
   }
   const token = String(Date.now())
-  const localStorageService: LocalStorageService = {
-    getToken() { return token }
-  }
+  
+  let localStorageService: jasmine.SpyObj<LocalStorageService>;
+
   let service: PluginService
 
   beforeEach(() => {

@@ -15,12 +15,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DeviceDashboardComponent } from './devices-dashboard.component';
-import { DevicesResponse, DevicesService } from '../../services/admin-device.service';
+import { DevicesResponse, AdminDeviceService } from '../../services/admin-device.service';
 import { StateService } from '@uirouter/angular';
-import {
-  LocalStorageService,
-  UserService
-} from 'admin/src/app/upgrade/ajs-upgraded-providers';
+import { LocalStorageService } from 'src/app/http/local-storage.service';
+import { AdminUserService } from '../../services/admin-user.service';
 import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
 
 const mockDevices: Device[] = [
@@ -56,7 +54,7 @@ const mockDevicesResponse: DevicesResponse = {
 describe('DeviceDashboardComponent', () => {
   let component: DeviceDashboardComponent;
   let fixture: ComponentFixture<DeviceDashboardComponent>;
-  let deviceServiceSpy: jasmine.SpyObj<DevicesService>;
+  let deviceServiceSpy: jasmine.SpyObj<AdminDeviceService>;
   let userServiceSpy: any;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let stateSpy: jasmine.SpyObj<StateService>;
@@ -83,8 +81,8 @@ describe('DeviceDashboardComponent', () => {
         NoopAnimationsModule
       ],
       providers: [
-        { provide: DevicesService, useValue: deviceServiceSpy },
-        { provide: UserService, useValue: userServiceSpy },
+        { provide: AdminDeviceService, useValue: deviceServiceSpy },
+        { provide: AdminUserService, useValue: userServiceSpy },
         { provide: MatDialog, useValue: dialogSpy },
         { provide: StateService, useValue: stateSpy },
         { provide: LocalStorageService, useValue: localStorageSpy }

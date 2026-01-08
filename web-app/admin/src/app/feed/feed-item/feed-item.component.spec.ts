@@ -5,11 +5,12 @@ import { MatIconModule } from '@angular/material/icon'
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { GeometryModule } from '../../../app/geometry/geometry.module';
 import { MapClipComponent } from '../../../app/map/clip/clip.component';
-import { LocalStorageService, MapService } from '../../../app/upgrade/ajs-upgraded-providers';
+import { MapService } from '../../../app/upgrade/ajs-upgraded-providers';
 import { FeedItemComponent } from './feed-item.component';
 import { Component, ViewChild } from '@angular/core';
 import { MomentPipe } from '../../../app/moment/moment.pipe';
 import { Feed } from 'core-lib-src/feed';
+import { LocalStorageService } from 'src/app/http/local-storage.service';
 
 class MockLocalStorageService {
   getTimeFormat(): string {

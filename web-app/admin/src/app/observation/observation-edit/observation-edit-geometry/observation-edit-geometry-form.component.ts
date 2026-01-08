@@ -4,8 +4,9 @@ import { MatSnackBar } from '@angular/material/snack-bar'
 import mgrs from 'mgrs'
 import { Dimension, DimensionKey, DMSCoordinate, DMSParseError } from '../../../../app/geometry/geometry-dms'
 import * as DMS from '../../../../app/geometry/geometry-dms'
-import { GeometryService, LocalStorageService, MapService } from '../../../../app/upgrade/ajs-upgraded-providers'
+import { GeometryService, MapService } from '../../../../app/upgrade/ajs-upgraded-providers'
 import { createMask } from '@ngneat/input-mask'
+import { LocalStorageService } from 'src/app/http/local-storage.service';
 
 @Directive({
   selector: '[mgrs][formControlName],[mgrs][formControl],[mgrs][ngModel]',
@@ -96,7 +97,7 @@ export class ObservationEditGeometryFormComponent implements OnChanges, OnInit {
   constructor(
     @Inject(MapService) private mapService: any,
     @Inject(GeometryService) private geometryService: any,
-    @Inject(LocalStorageService) private localStorageService: any,
+    private localStorageService: LocalStorageService,
     private snackBar: MatSnackBar) {
     this.coordinateSystem = this.localStorageService.getCoordinateSystemEdit()
   }

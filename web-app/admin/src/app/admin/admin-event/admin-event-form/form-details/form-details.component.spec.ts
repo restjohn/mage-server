@@ -3,10 +3,11 @@ import { FormDetailsComponent } from './form-details.component';
 import { AdminEventsService } from '../../../services/admin-events.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { LocalStorageService, UserService } from '../../../../upgrade/ajs-upgraded-providers';
 import { StateService } from '@uirouter/angular';
 import { of, throwError } from 'rxjs';
 import { Event as MageEvent } from 'src/app/filter/filter.types';
+import { LocalStorageService } from 'src/app/http/local-storage.service';
+import { AdminUserService } from '../../../services/admin-user.service';
 
 describe('FormDetailsComponent', () => {
   let component: FormDetailsComponent;
@@ -14,7 +15,7 @@ describe('FormDetailsComponent', () => {
   let mockEventsService: jasmine.SpyObj<AdminEventsService>;
   let mockDialog: jasmine.SpyObj<MatDialog>;
   let mockSnackBar: jasmine.SpyObj<MatSnackBar>;
-  let mockLocalStorageService: any;
+  let mockLocalStorageService: jasmine.SpyObj<LocalStorageService>;
   let mockUserService: any;
   let mockStateService: any;
 
@@ -48,9 +49,11 @@ describe('FormDetailsComponent', () => {
     ]);
     mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
     mockSnackBar = jasmine.createSpyObj('MatSnackBar', ['open']);
-    mockLocalStorageService = {
-      getToken: jasmine.createSpy('getToken').and.returnValue('test-token')
-    };
+    mockLocalStorageService = jasmine.createSpyObj<LocalStorageService>(
+      'LocalStorageService',
+      ['getToken']
+    );
+    mockLocalStorageService.getToken.and.returnValue('test-token');
     mockUserService = {
       myself: jasmine.createSpy('myself')
     };
@@ -69,7 +72,7 @@ describe('FormDetailsComponent', () => {
         { provide: MatDialog, useValue: mockDialog },
         { provide: MatSnackBar, useValue: mockSnackBar },
         { provide: LocalStorageService, useValue: mockLocalStorageService },
-        { provide: UserService, useValue: mockUserService },
+        { provide: AdminUserService, useValue: mockUserService },
         { provide: StateService, useValue: mockStateService }
       ]
     })

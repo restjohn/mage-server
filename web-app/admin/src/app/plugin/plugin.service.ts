@@ -70,7 +70,7 @@ import { Inject, Injectable, Injector, NgModuleRef, createNgModule } from '@angu
 import { HttpClient } from '@angular/common/http'
 import { SystemJS, SYSTEMJS } from './systemjs.service'
 import { PluginHooks } from '@ngageoint/mage.web-core-lib/plugin'
-import { LocalStorageService } from '../upgrade/ajs-upgraded-providers'
+import { LocalStorageService } from 'src/app/http/local-storage.service'
 
 function registerSharedLibInContext(system: SystemJS.Context, libId: string, lib: any): void {
   system.register(libId, [], _export => {

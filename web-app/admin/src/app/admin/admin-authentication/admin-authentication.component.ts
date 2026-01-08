@@ -13,7 +13,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   Team,
   Event,
-  LocalStorageService,
   AuthenticationConfigurationService
 } from '../../upgrade/ajs-upgraded-providers';
 import { AdminBreadcrumb } from '../admin-breadcrumb/admin-breadcrumb.model';
@@ -25,6 +24,7 @@ import { AdminSettingsUnsavedComponent } from '../admin-settings/admin-settings-
 import { TransitionService } from '@uirouter/core';
 import { lastValueFrom, Subject, takeUntil } from 'rxjs';
 import { AdminUserService } from '../services/admin-user.service';
+import { LocalStorageService } from 'src/app/http/local-storage.service';
 
 @Component({
   selector: 'admin-authentication',
@@ -66,8 +66,7 @@ export class AdminAuthenticationComponent
     public team: any,
     @Inject(Event)
     public event: any,
-    @Inject(LocalStorageService)
-    public localStorageService: any,
+    public localStorageService: LocalStorageService,
     @Inject(AuthenticationConfigurationService)
     private authenticationConfigurationService: any,
     private userService: AdminUserService

@@ -17,10 +17,8 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { EventDashboardComponent } from './event-dashboard.component';
 import { AdminEventsService } from '../../services/admin-events.service';
 import { StateService } from '@uirouter/angular';
-import {
-  LocalStorageService,
-  UserService
-} from 'admin/src/app/upgrade/ajs-upgraded-providers';
+import { AdminUserService } from '../../services/admin-user.service';
+import { LocalStorageService } from 'src/app/http/local-storage.service';
 
 const mockEventsResponse = {
   totalCount: 2,
@@ -91,7 +89,7 @@ describe('EventDashboardComponent', () => {
       ],
       providers: [
         { provide: AdminEventsService, useValue: eventServiceSpy },
-        { provide: UserService, useValue: userServiceSpy },
+        { provide: AdminUserService, useValue: userServiceSpy },
         { provide: MatDialog, useValue: dialogSpy },
         { provide: StateService, useValue: stateSpy },
         { provide: LocalStorageService, useValue: localStorageSpy }

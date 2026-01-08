@@ -5,14 +5,14 @@ import { of } from 'rxjs';
 import { StateService } from '@uirouter/angular';
 import { UserDetailsComponent } from './user-details.component';
 import {
-  UserService,
   LoginService,
   DevicePagingService,
   Team,
-  LocalStorageService
 } from '../../../upgrade/ajs-upgraded-providers';
 import { AdminTeamsService } from '../../services/admin-teams-service';
 import { AdminEventsService } from '../../services/admin-events.service';
+import { AdminUserService } from '../../services/admin-user.service';
+import { LocalStorageService } from 'src/app/http/local-storage.service';
 
 describe('UserDetailsComponent', () => {
   let component: UserDetailsComponent;
@@ -103,7 +103,7 @@ describe('UserDetailsComponent', () => {
       providers: [
         { provide: StateService, useValue: mockStateService },
         { provide: MatDialog, useValue: mockDialog },
-        { provide: UserService, useValue: mockUserService },
+        { provide: AdminUserService, useValue: mockUserService },
         { provide: LoginService, useValue: mockLoginService },
         { provide: DevicePagingService, useValue: mockDevicePagingService },
         { provide: Team, useValue: mockTeam },
@@ -197,7 +197,7 @@ describe('UserDetailsComponent', () => {
       providers: [
         { provide: StateService, useValue: mockStateService },
         { provide: MatDialog, useValue: mockDialog },
-        { provide: UserService, useValue: erring },
+        { provide: AdminEventsService, useValue: erring },
         { provide: LoginService, useValue: mockLoginService },
         { provide: DevicePagingService, useValue: mockDevicePagingService },
         { provide: Team, useValue: mockTeam },

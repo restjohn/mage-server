@@ -22,9 +22,11 @@ import { MatOptionModule, MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { FormsModule } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
-import { LocalStorageService, Settings, Team, Event, AuthenticationConfigurationService, UserService } from '../../../app/upgrade/ajs-upgraded-providers';
+import { Settings, Team, Event, AuthenticationConfigurationService } from '../../../app/upgrade/ajs-upgraded-providers';
 import { Subject, Observable } from 'rxjs';
 import { StateService, TransitionService } from '@uirouter/core';
+import { AdminUserService } from '../services/admin-user.service';
+import { LocalStorageService } from 'src/app/http/local-storage.service';
 
 class MockSnackbarRef {
   private readonly afterDismissedObservable = new Subject<MatSnackBarDismiss>()
@@ -115,7 +117,7 @@ describe('AdminSettingsComponent', () => {
         { provide: AuthenticationConfigurationService, useClass: MockAuthenticationConfigurationService },
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MatSnackBar, useClass: MockSnackbar },
-        { provide: UserService, useValue: mockUserService },
+        { provide: AdminUserService, useValue: mockUserService },
         { provide: StateService, useClass: MockStateService },
         { provide: TransitionService, useClass: MockTransitionService }
       ],

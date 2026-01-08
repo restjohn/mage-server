@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { NgModel } from '@angular/forms';
 import * as moment from 'moment'
-import { LocalStorageService } from '../http/local-storage.service';
 
 @Component({
   selector: 'datetime-picker',

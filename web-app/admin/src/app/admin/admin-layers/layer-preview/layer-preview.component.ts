@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, SimpleChanges, AfterViewInit, ElementRef, 
 import { HttpClient } from '@angular/common/http';
 import * as L from 'leaflet';
 import { Layer } from '../layers.service';
-import { LocalStorageService } from '../../../upgrade/ajs-upgraded-providers';
+import { LocalStorageService } from 'src/app/http/local-storage.service';
 
 interface LayerBounds {
     bounds?: number[];

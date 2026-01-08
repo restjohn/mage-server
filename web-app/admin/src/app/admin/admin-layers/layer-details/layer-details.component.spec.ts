@@ -7,8 +7,9 @@ import { StateService } from '@uirouter/angular';
 import { LayerDetailsComponent } from './layer-details.component';
 import { LayersService } from '../layers.service';
 import { AdminEventsService } from '../../services/admin-events.service';
-import { LocalStorageService, UserService } from '../../../upgrade/ajs-upgraded-providers';
 import { of, Observable } from 'rxjs';
+import { LocalStorageService } from 'src/app/http/local-storage.service';
+import { AdminUserService } from '../../services/admin-user.service';
 
 describe('LayerDetailsComponent', () => {
   let component: LayerDetailsComponent;
@@ -65,7 +66,7 @@ describe('LayerDetailsComponent', () => {
         { provide: LayersService, useValue: mockLayersService },
         { provide: AdminEventsService, useValue: mockEventsService },
         { provide: LocalStorageService, useValue: mockLocalStorageService },
-        { provide: UserService, useValue: mockUserService }
+        { provide: AdminUserService, useValue: mockUserService }
       ]
     })
       .compileComponents();

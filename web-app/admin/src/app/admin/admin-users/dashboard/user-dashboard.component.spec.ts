@@ -9,8 +9,6 @@ import { UserDashboardComponent } from './user-dashboard.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import {
-  LocalStorageService,
-  UserService,
   UserPagingService
 } from 'admin/src/app/upgrade/ajs-upgraded-providers';
 import { AdminTeamsService } from '../../services/admin-teams-service';
@@ -25,6 +23,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
+import { LocalStorageService } from 'src/app/http/local-storage.service';
 
 describe('UserDashboardComponent', () => {
   let component: UserDashboardComponent;
@@ -139,7 +138,7 @@ describe('UserDashboardComponent', () => {
         { provide: MatDialog, useValue: dialogSpy },
         { provide: Router, useValue: routerSpy },
         { provide: LocalStorageService, useValue: localStorageSpy },
-        { provide: UserService, useValue: userServiceSpy },
+        { provide: AdminTeamsService, useValue: userServiceSpy },
         { provide: UserPagingService, useValue: pagingServiceSpy },
         { provide: AdminTeamsService, useValue: teamsServiceSpy },
         { provide: StateService, useValue: stateServiceSpy },
