@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { StateService } from '@uirouter/angular';
-import { EventsService } from '../../events.service';
+import { AdminEventsService } from '../../../services/admin-events.service';
 import { LocalStorageService, UserService } from '../../../../upgrade/ajs-upgraded-providers';
 import { Event as MageEvent } from 'src/app/filter/filter.types';
 import { AdminBreadcrumb } from '../../../admin-breadcrumb/admin-breadcrumb.model';
@@ -102,7 +102,7 @@ export class FormDetailsComponent implements OnInit {
   private pendingIconUploads: Array<{ primary: string; file: File; variant?: string; previewUrl: string }> = [];
 
   constructor(
-    private eventsService: EventsService,
+    private eventsService: AdminEventsService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     @Inject(LocalStorageService) private localStorageService: any,

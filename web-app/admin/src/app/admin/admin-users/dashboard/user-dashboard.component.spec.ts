@@ -13,7 +13,7 @@ import {
   UserService,
   UserPagingService
 } from 'admin/src/app/upgrade/ajs-upgraded-providers';
-import { TeamsService } from '../../admin-teams/teams-service';
+import { AdminTeamsService } from '../../services/admin-teams-service';
 import { StateService } from '@uirouter/angular';
 import { of } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -141,7 +141,7 @@ describe('UserDashboardComponent', () => {
         { provide: LocalStorageService, useValue: localStorageSpy },
         { provide: UserService, useValue: userServiceSpy },
         { provide: UserPagingService, useValue: pagingServiceSpy },
-        { provide: TeamsService, useValue: teamsServiceSpy },
+        { provide: AdminTeamsService, useValue: teamsServiceSpy },
         { provide: StateService, useValue: stateServiceSpy },
         { provide: '$injector', useValue: injectorSpy }
       ]

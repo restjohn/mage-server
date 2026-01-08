@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 
 import { DeleteTeamComponent } from './delete-team.component';
-import { TeamsService } from '../teams-service';
+import { AdminTeamsService } from '../../services/admin-teams-service';
 import { UserService } from 'admin/src/app/upgrade/ajs-upgraded-providers';
 import { Team } from '../team';
 
@@ -13,7 +13,7 @@ describe('DeleteTeamComponent', () => {
   let component: DeleteTeamComponent;
   let fixture: ComponentFixture<DeleteTeamComponent>;
   let mockDialogRef: jasmine.SpyObj<MatDialogRef<DeleteTeamComponent>>;
-  let mockTeamsService: jasmine.SpyObj<TeamsService>;
+  let mockTeamsService: jasmine.SpyObj<AdminTeamsService>;
   let mockUserService: jasmine.SpyObj<any>;
 
   const mockTeam: Team = {
@@ -40,7 +40,7 @@ describe('DeleteTeamComponent', () => {
       providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { team: mockTeam } },
-        { provide: TeamsService, useValue: mockTeamsService },
+        { provide: AdminTeamsService, useValue: mockTeamsService },
         { provide: UserService, useValue: mockUserService }
       ]
     }).compileComponents();

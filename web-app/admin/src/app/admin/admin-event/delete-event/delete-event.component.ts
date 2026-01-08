@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { EventsService } from '../events.service';
+import { AdminEventsService } from '../../services/admin-events.service';
 import { Event as MageEvent } from 'src/app/filter/filter.types';
 
 /**
@@ -26,7 +26,7 @@ export class DeleteEventComponent {
     constructor(
         public dialogRef: MatDialogRef<DeleteEventComponent>,
         @Inject(MAT_DIALOG_DATA) public data: { event: MageEvent },
-        private eventsService: EventsService
+        private eventsService: AdminEventsService
     ) {
         this.event = data.event;
     }

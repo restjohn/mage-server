@@ -13,7 +13,7 @@ import { User } from 'core-lib-src/user';
 import { CreateUserModalComponent } from '../create-user/create-user.component';
 import { Role } from '../user';
 import { BulkUserComponent } from '../bulk-user/bulk-user.component';
-import { TeamsService } from '../../admin-teams/teams-service';
+import { AdminTeamsService } from '../../services/admin-teams-service';
 import { Team } from '../../admin-teams/team';
 import pLimit from 'p-limit';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
@@ -86,7 +86,7 @@ export class UserDashboardComponent implements OnInit {
     private router: Router,
     private localStorageService: LocalStorageService,
     private stateService: StateService,
-    @Inject(TeamsService) private teamService: TeamsService,
+    private teamService: AdminTeamsService,
     @Inject(UserService) private userService,
     @Inject(UserPagingService) private userPagingService
   ) {

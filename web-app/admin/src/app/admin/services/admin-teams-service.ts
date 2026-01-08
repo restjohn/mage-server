@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Team } from './team';
+import { Team } from '../admin-teams/team';
 import { User } from '@ngageoint/mage.web-core-lib/user';
 
 export interface SearchOptions {
@@ -31,7 +31,7 @@ interface membersResponse {
 @Injectable({
     providedIn: 'root'
 })
-export class TeamsService {
+export class AdminTeamsService {
 
     constructor(private http: HttpClient) { }
 

@@ -7,14 +7,14 @@ import { of, throwError } from 'rxjs';
 import { StateService } from '@uirouter/angular';
 
 import { EventDetailsComponent } from './event-details.component';
-import { EventsService } from '../../admin-event/events.service';
-import { TeamsService } from '../../admin-teams/teams-service';
+import { AdminEventsService } from '../../services/admin-events.service';
+import { AdminTeamsService } from '../../services/admin-teams-service';
 
 describe('EventDetailsComponent', () => {
   let component: EventDetailsComponent;
   let fixture: ComponentFixture<EventDetailsComponent>;
-  let eventsService: jasmine.SpyObj<EventsService>;
-  let teamsService: jasmine.SpyObj<TeamsService>;
+  let eventsService: jasmine.SpyObj<AdminEventsService>;
+  let teamsService: jasmine.SpyObj<AdminTeamsService>;
   let dialog: jasmine.SpyObj<MatDialog>;
   let stateService: jasmine.SpyObj<StateService>;
 
@@ -48,16 +48,16 @@ describe('EventDetailsComponent', () => {
       declarations: [EventDetailsComponent],
       imports: [NoopAnimationsModule],
       providers: [
-        { provide: EventsService, useValue: eventsServiceSpy },
-        { provide: TeamsService, useValue: teamsServiceSpy },
+        { provide: AdminEventsService, useValue: eventsServiceSpy },
+        { provide: AdminTeamsService, useValue: teamsServiceSpy },
         { provide: MatDialog, useValue: dialogSpy },
         { provide: StateService, useValue: stateServiceSpy }
       ]
     })
       .compileComponents();
 
-    eventsService = TestBed.inject(EventsService) as jasmine.SpyObj<EventsService>;
-    teamsService = TestBed.inject(TeamsService) as jasmine.SpyObj<TeamsService>;
+    eventsService = TestBed.inject(AdminEventsService) as jasmine.SpyObj<AdminEventsService>;
+    teamsService = TestBed.inject(AdminTeamsService) as jasmine.SpyObj<AdminTeamsService>;
     dialog = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
     stateService = TestBed.inject(StateService) as jasmine.SpyObj<StateService>;
 

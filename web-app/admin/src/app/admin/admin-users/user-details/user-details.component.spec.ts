@@ -11,8 +11,8 @@ import {
   Team,
   LocalStorageService
 } from '../../../upgrade/ajs-upgraded-providers';
-import { TeamsService } from '../../admin-teams/teams-service';
-import { EventsService } from '../../admin-event/events.service';
+import { AdminTeamsService } from '../../services/admin-teams-service';
+import { AdminEventsService } from '../../services/admin-events.service';
 
 describe('UserDetailsComponent', () => {
   let component: UserDetailsComponent;
@@ -86,11 +86,11 @@ describe('UserDetailsComponent', () => {
 
   const mockTeamsService = {
     getTeams: jasmine.createSpy('getTeams').and.returnValue(of([{ items: [{ id: 't1', name: 'Team One' }], totalCount: 1 }]))
-  } as unknown as TeamsService;
+  } as unknown as AdminTeamsService;
 
   const mockEventsService = {
     getEvents: jasmine.createSpy('getEvents').and.returnValue(of({ items: [{ id: 'e1', name: 'Event One' }], totalCount: 1 }))
-  } as unknown as EventsService;
+  } as unknown as AdminEventsService;
 
   const mockLocalStorageService = {
     getToken: jasmine.createSpy('getToken').and.returnValue('token-123')
@@ -107,8 +107,8 @@ describe('UserDetailsComponent', () => {
         { provide: LoginService, useValue: mockLoginService },
         { provide: DevicePagingService, useValue: mockDevicePagingService },
         { provide: Team, useValue: mockTeam },
-        { provide: TeamsService, useValue: mockTeamsService },
-        { provide: EventsService, useValue: mockEventsService },
+        { provide: AdminTeamsService, useValue: mockTeamsService },
+        { provide: AdminEventsService, useValue: mockEventsService },
         { provide: LocalStorageService, useValue: mockLocalStorageService }
       ]
     })
@@ -201,8 +201,8 @@ describe('UserDetailsComponent', () => {
         { provide: LoginService, useValue: mockLoginService },
         { provide: DevicePagingService, useValue: mockDevicePagingService },
         { provide: Team, useValue: mockTeam },
-        { provide: TeamsService, useValue: mockTeamsService },
-        { provide: EventsService, useValue: mockEventsService },
+        { provide: AdminTeamsService, useValue: mockTeamsService },
+        { provide: AdminEventsService, useValue: mockEventsService },
         { provide: LocalStorageService, useValue: mockLocalStorageService }
       ]
     }).compileComponents();

@@ -15,7 +15,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { EventDashboardComponent } from './event-dashboard.component';
-import { EventsService } from '../events.service';
+import { AdminEventsService } from '../../services/admin-events.service';
 import { StateService } from '@uirouter/angular';
 import {
   LocalStorageService,
@@ -63,7 +63,7 @@ const mockEventsResponse = {
 describe('EventDashboardComponent', () => {
   let component: EventDashboardComponent;
   let fixture: ComponentFixture<EventDashboardComponent>;
-  let eventServiceSpy: jasmine.SpyObj<EventsService>;
+  let eventServiceSpy: jasmine.SpyObj<AdminEventsService>;
   let userServiceSpy: any;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let stateSpy: jasmine.SpyObj<StateService>;
@@ -90,7 +90,7 @@ describe('EventDashboardComponent', () => {
         NoopAnimationsModule
       ],
       providers: [
-        { provide: EventsService, useValue: eventServiceSpy },
+        { provide: AdminEventsService, useValue: eventServiceSpy },
         { provide: UserService, useValue: userServiceSpy },
         { provide: MatDialog, useValue: dialogSpy },
         { provide: StateService, useValue: stateSpy },

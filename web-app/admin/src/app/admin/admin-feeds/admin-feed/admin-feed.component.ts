@@ -12,7 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar'
 import { trigger, state, transition, style, animate } from '@angular/animations'
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model'
 import { AdminFeedDeleteComponent } from './admin-feed-delete/admin-feed-delete.component'
-import { EventsService } from '../../admin-event/events.service'
+import { AdminEventsService } from '../../services/admin-events.service'
 
 @Component({
   selector: 'app-admin-feed',
@@ -76,7 +76,7 @@ export class AdminFeedComponent implements OnInit {
     private stateService: StateService,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private eventsService: EventsService,
+    private eventsService: AdminEventsService,
     @Inject(UserService) private userService: { myself: { id: string, role: { permissions: Array<string> } } },
     @Inject(Event) private eventResource: any
   ) {

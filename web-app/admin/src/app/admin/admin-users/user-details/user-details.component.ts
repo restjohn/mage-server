@@ -9,8 +9,8 @@ import { NgForm } from '@angular/forms';
 import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
 import { DeleteUserComponent } from '../delete-user/delete-user.component';
-import { TeamsService } from '../../admin-teams/teams-service';
-import { EventsService } from '../../admin-event/events.service';
+import { AdminTeamsService } from '../../services/admin-teams-service';
+import { AdminEventsService } from '../../services/admin-events.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { PageEvent } from '@angular/material/paginator';
 import {
@@ -170,8 +170,8 @@ export class UserDetailsComponent implements OnInit {
     @Inject(DevicePagingService) private devicePagingService: any,
     @Inject(Team) private teamService: any,
     @Inject(LocalStorageService) private localStorageService: any,
-    @Inject(TeamsService) private teamsService: TeamsService,
-    @Inject(EventsService) private eventsService: EventsService,
+    private teamsService: AdminTeamsService,
+    private eventsService: AdminEventsService,
   ) {
     this.deviceStateAndData = this.devicePagingService.constructDefault();
   }

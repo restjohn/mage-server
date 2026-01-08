@@ -41,7 +41,7 @@ const setParams = (options: any): HttpParams => {
 @Injectable({
     providedIn: 'root'
 })
-export class DevicesService {
+export class AdminDeviceService {
 
     constructor(private http: HttpClient) { }
 

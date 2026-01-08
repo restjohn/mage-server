@@ -4,8 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { UserService } from '../../../upgrade/ajs-upgraded-providers';
-import { TeamsService } from '../teams-service';
-import { EventsService } from '../../admin-event/events.service';
+import { AdminTeamsService } from '../../services/admin-teams-service';
+import { AdminEventsService } from '../../services/admin-events.service';
 import { Team } from '../team';
 import { User } from '@ngageoint/mage.web-core-lib/user';
 import { Event } from 'src/app/filter/filter.types';
@@ -117,8 +117,8 @@ export class TeamDetailsComponent implements OnInit {
     private stateService: StateService,
     private dialog: MatDialog,
     @Inject(UserService) private UserService,
-    @Inject(TeamsService) private teamService: TeamsService,
-    @Inject(EventsService) private eventsService: EventsService
+    private teamService: AdminTeamsService,
+    private eventsService: AdminEventsService
   ) { }
 
   /**

@@ -2,7 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable, forkJoin } from 'rxjs';
 import { Team } from '../team';
-import { TeamsService } from '../teams-service';
+import { AdminTeamsService } from '../../services/admin-teams-service';
 import { UserService } from 'admin/src/app/upgrade/ajs-upgraded-providers';
 
 /**
@@ -30,7 +30,7 @@ export class DeleteTeamComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<DeleteTeamComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { team: Team },
-    private teamsService: TeamsService,
+    private teamsService: AdminTeamsService,
     @Inject(UserService) private UserService
   ) {
     this.team = data.team;

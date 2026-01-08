@@ -6,10 +6,10 @@ import {
   UserService
 } from 'admin/src/app/upgrade/ajs-upgraded-providers';
 import {
-  EventsService,
   SearchOptions,
-  EventsResponse
-} from '../events.service';
+  EventsResponse,
+  AdminEventsService
+} from '../../services/admin-events.service';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { Event } from 'src/app/filter/filter.types';
 import { CreateEventDialogComponent } from '../create-event/create-event.component';
@@ -47,7 +47,7 @@ export class EventDashboardComponent implements OnInit {
   constructor(
     private modal: MatDialog,
     private stateService: StateService,
-    private eventService: EventsService,
+    private eventService: AdminEventsService,
     @Inject(UserService) private userService
   ) { }
 

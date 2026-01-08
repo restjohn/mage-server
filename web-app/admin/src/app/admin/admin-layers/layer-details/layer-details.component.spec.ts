@@ -6,7 +6,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { StateService } from '@uirouter/angular';
 import { LayerDetailsComponent } from './layer-details.component';
 import { LayersService } from '../layers.service';
-import { EventsService } from '../../admin-event/events.service';
+import { AdminEventsService } from '../../services/admin-events.service';
 import { LocalStorageService, UserService } from '../../../upgrade/ajs-upgraded-providers';
 import { of, Observable } from 'rxjs';
 
@@ -63,7 +63,7 @@ describe('LayerDetailsComponent', () => {
       providers: [
         { provide: StateService, useValue: mockStateService },
         { provide: LayersService, useValue: mockLayersService },
-        { provide: EventsService, useValue: mockEventsService },
+        { provide: AdminEventsService, useValue: mockEventsService },
         { provide: LocalStorageService, useValue: mockLocalStorageService },
         { provide: UserService, useValue: mockUserService }
       ]

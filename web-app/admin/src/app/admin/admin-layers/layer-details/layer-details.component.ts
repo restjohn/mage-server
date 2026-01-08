@@ -6,7 +6,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { HttpClient } from '@angular/common/http';
 import { LayersService, Layer } from '../layers.service';
-import { EventsService } from '../../admin-event/events.service';
+import { AdminEventsService } from '../../services/admin-events.service';
 import { LocalStorageService, UserService } from '../../../upgrade/ajs-upgraded-providers';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { CardActionButton } from '../../../core/card-navbar/card-navbar.component';
@@ -106,7 +106,7 @@ export class LayerDetailsComponent implements OnInit {
   constructor(
     private stateService: StateService,
     private layersService: LayersService,
-    private eventsService: EventsService,
+    private eventsService: AdminEventsService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private http: HttpClient,

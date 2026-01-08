@@ -42,7 +42,7 @@ const setParams = (options: any): HttpParams => {
 @Injectable({
     providedIn: 'root'
 })
-export class EventsService {
+export class AdminEventsService {
     constructor(private http: HttpClient) { }
 
     getEvents(options: SearchOptions): Observable<EventsResponse> {

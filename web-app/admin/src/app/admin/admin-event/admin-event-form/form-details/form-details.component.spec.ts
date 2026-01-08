@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormDetailsComponent } from './form-details.component';
-import { EventsService } from '../../events.service';
+import { AdminEventsService } from '../../../services/admin-events.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { LocalStorageService, UserService } from '../../../../upgrade/ajs-upgraded-providers';
@@ -11,7 +11,7 @@ import { Event as MageEvent } from 'src/app/filter/filter.types';
 describe('FormDetailsComponent', () => {
   let component: FormDetailsComponent;
   let fixture: ComponentFixture<FormDetailsComponent>;
-  let mockEventsService: jasmine.SpyObj<EventsService>;
+  let mockEventsService: jasmine.SpyObj<AdminEventsService>;
   let mockDialog: jasmine.SpyObj<MatDialog>;
   let mockSnackBar: jasmine.SpyObj<MatSnackBar>;
   let mockLocalStorageService: any;
@@ -65,7 +65,7 @@ describe('FormDetailsComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [FormDetailsComponent],
       providers: [
-        { provide: EventsService, useValue: mockEventsService },
+        { provide: AdminEventsService, useValue: mockEventsService },
         { provide: MatDialog, useValue: mockDialog },
         { provide: MatSnackBar, useValue: mockSnackBar },
         { provide: LocalStorageService, useValue: mockLocalStorageService },

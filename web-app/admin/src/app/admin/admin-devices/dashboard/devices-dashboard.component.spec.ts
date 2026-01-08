@@ -15,7 +15,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DeviceDashboardComponent } from './devices-dashboard.component';
-import { DevicesResponse, DevicesService } from '../devices.service';
+import { DevicesResponse, DevicesService } from '../../services/admin-device.service';
 import { StateService } from '@uirouter/angular';
 import {
   LocalStorageService,

@@ -7,10 +7,10 @@ import {
   UserService
 } from 'admin/src/app/upgrade/ajs-upgraded-providers';
 import {
+  AdminDeviceService,
   DevicesResponse,
-  DevicesService,
   SearchOptions
-} from '../devices.service';
+} from '../../services/admin-device.service';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
 import { CreateDeviceDialogComponent } from '../create-device/create-device.component';
@@ -49,7 +49,7 @@ export class DeviceDashboardComponent implements OnInit {
     private modal: MatDialog,
     private localStorageService: LocalStorageService,
     private stateService: StateService,
-    private deviceService: DevicesService,
+    private deviceService: AdminDeviceService,
     @Inject(UserService) private userService
   ) {}
 

@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { EventsService } from '../events.service';
+import { AdminEventsService } from '../../services/admin-events.service';
 import { Event } from 'src/app/filter/filter.types';
 
 /**
@@ -21,7 +21,7 @@ export class CreateEventDialogComponent {
     public dialogRef: MatDialogRef<CreateEventDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { event: Partial<Event> },
     private fb: FormBuilder,
-    private eventsService: EventsService
+    private eventsService: AdminEventsService
   ) {
     this.eventForm = this.fb.group({
       name: [data.event?.name ?? '', [Validators.required]],

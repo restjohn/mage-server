@@ -4,7 +4,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Team } from '../team';
 import { Subject } from 'rxjs';
-import { TeamsService } from '../teams-service';
+import { AdminTeamsService } from '../../services/admin-teams-service';
 import { CreateTeamDialogComponent } from '../create-team/create-team.component';
 import { CardActionButton } from '../../../core/card-navbar/card-navbar.component';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
@@ -41,7 +41,7 @@ export class TeamDashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private modal: MatDialog,
-    private teamService: TeamsService
+    private teamService: AdminTeamsService
   ) { }
 
   /**

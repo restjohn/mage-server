@@ -9,10 +9,10 @@ import { NgForm } from '@angular/forms';
 import { Event as MageEvent, Layer } from 'src/app/filter/filter.types';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { CardActionButton } from '../../../core/card-navbar/card-navbar.component';
-import { EventsService } from '../../admin-event/events.service';
+import { AdminEventsService } from '../../services/admin-events.service';
 import { User as MageUser } from '@ngageoint/mage.web-core-lib/user';
 import { Team } from '../../admin-teams/team';
-import { TeamsService } from '../../admin-teams/teams-service';
+import { AdminTeamsService } from '../../services/admin-teams-service';
 import { SearchModalComponent, SearchModalData, SearchModalResult, SearchModalColumn } from '../../../core/search-modal/search-modal.component';
 import { DeleteEventComponent } from '../delete-event/delete-event.component';
 import { CreateFormDialogComponent } from '../create-form/create-form.component';
@@ -107,8 +107,8 @@ export class EventDetailsComponent implements OnInit, OnDestroy {
   layers: Layer[] = [];
 
   constructor(
-    @Inject(EventsService) private eventsService: EventsService,
-    private teamsService: TeamsService,
+    private eventsService: AdminEventsService,
+    private teamsService: AdminTeamsService,
     private stateService: StateService,
     private dialog: MatDialog
   ) { }

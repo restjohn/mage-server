@@ -7,14 +7,14 @@ import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 
 import { TeamDashboardComponent } from './team-dashboard.component';
-import { TeamsService } from '../teams-service';
+import { AdminTeamsService } from '../../services/admin-teams-service';
 import { Team } from '../team';
 import { CreateTeamDialogComponent } from '../create-team/create-team.component';
 
 describe('TeamDashboardComponent', () => {
   let component: TeamDashboardComponent;
   let fixture: ComponentFixture<TeamDashboardComponent>;
-  let mockTeamsService: jasmine.SpyObj<TeamsService>;
+  let mockTeamsService: jasmine.SpyObj<AdminTeamsService>;
   let mockDialog: jasmine.SpyObj<MatDialog>;
 
   const mockTeams: Team[] = [
@@ -41,14 +41,14 @@ describe('TeamDashboardComponent', () => {
         FormsModule
       ],
       providers: [
-        { provide: TeamsService, useValue: teamsServiceSpy },
+        { provide: AdminTeamsService, useValue: teamsServiceSpy },
         { provide: MatDialog, useValue: dialogSpy }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(TeamDashboardComponent);
     component = fixture.componentInstance;
-    mockTeamsService = TestBed.inject(TeamsService) as jasmine.SpyObj<TeamsService>;
+    mockTeamsService = TestBed.inject(AdminTeamsService) as jasmine.SpyObj<AdminTeamsService>;
     mockDialog = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
 
     mockTeamsService.getTeams.and.returnValue(of(mockTeamsResponse));

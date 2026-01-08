@@ -6,8 +6,8 @@ import { StateService } from '@uirouter/angular';
 import { of, throwError } from 'rxjs';
 
 import { TeamDetailsComponent } from './team-details.component';
-import { TeamsService } from '../teams-service';
-import { EventsService } from '../../admin-event/events.service';
+import { AdminTeamsService } from '../../services/admin-teams-service';
+import { AdminEventsService } from '../../services/admin-events.service';
 import { UserService } from '../../../upgrade/ajs-upgraded-providers';
 import { Team } from '../team';
 import { User } from '@ngageoint/mage.web-core-lib/user';
@@ -21,8 +21,8 @@ describe('TeamDetailsComponent', () => {
   let mockStateService: jasmine.SpyObj<StateService>;
   let mockDialog: jasmine.SpyObj<MatDialog>;
   let mockUserService: jasmine.SpyObj<any>;
-  let mockTeamsService: jasmine.SpyObj<TeamsService>;
-  let mockEventsService: jasmine.SpyObj<EventsService>;
+  let mockTeamsService: jasmine.SpyObj<AdminTeamsService>;
+  let mockEventsService: jasmine.SpyObj<AdminEventsService>;
 
   const mockTeam: Team = {
     id: 'team123' as any,
@@ -85,8 +85,8 @@ describe('TeamDetailsComponent', () => {
         { provide: StateService, useValue: mockStateService },
         { provide: MatDialog, useValue: mockDialog },
         { provide: UserService, useValue: mockUserService },
-        { provide: TeamsService, useValue: mockTeamsService },
-        { provide: EventsService, useValue: mockEventsService }
+        { provide: AdminTeamsService, useValue: mockTeamsService },
+        { provide: AdminEventsService, useValue: mockEventsService }
       ]
     }).compileComponents();
 
