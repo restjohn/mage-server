@@ -5,6 +5,7 @@ import {
   ElementRef,
   ViewChild
 } from '@angular/core';
+import { EMPTY, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,12 +15,12 @@ import { AdminEventsService } from '../../services/admin-events.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { PageEvent } from '@angular/material/paginator';
 import {
-  UserService,
   LoginService,
   DevicePagingService,
-  Team,
-  LocalStorageService
+  Team
 } from '../../../upgrade/ajs-upgraded-providers';
+import { AdminUserService } from '../../services/admin-user.service';
+import { LocalStorageService } from 'src/app/http/local-storage.service';
 import { User } from '../user';
 import * as moment from 'moment';
 import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
@@ -75,6 +76,9 @@ export class UserDetailsComponent implements OnInit {
   userEvents: any[] = [];
   team: any = {};
   isSelf: boolean = false;
+
+  private destroy$ = new Subject<void>();
+  private currentUser: User | null = null;
 
   hasUserEditPermission: boolean = false;
   hasUserDeletePermission: boolean = false;
@@ -156,22 +160,24 @@ export class UserDetailsComponent implements OnInit {
 
   teamActionButtons: any[] = [];
 
-  breadcrumbs: AdminBreadcrumb[] = [{
-    title: 'Users',
-    iconClass: 'fa fa-user',
-    state: {name: "admin.users"}
-  }]
+  breadcrumbs: AdminBreadcrumb[] = [
+    {
+      title: 'Users',
+      iconClass: 'fa fa-user',
+      state: { name: 'admin.users' }
+    }
+  ];
 
   constructor(
     public stateService: StateService,
     private dialog: MatDialog,
-    @Inject(UserService) private userService: any,
+    private userService: AdminUserService,
     @Inject(LoginService) private loginService: any,
     @Inject(DevicePagingService) private devicePagingService: any,
     @Inject(Team) private teamService: any,
-    @Inject(LocalStorageService) private localStorageService: any,
+    private localStorageService: LocalStorageService,
     private teamsService: AdminTeamsService,
-    private eventsService: AdminEventsService,
+    private eventsService: AdminEventsService
   ) {
     this.deviceStateAndData = this.devicePagingService.constructDefault();
   }
@@ -187,53 +193,63 @@ export class UserDetailsComponent implements OnInit {
       user: { id: userId }
     };
 
-    this.hasUserEditPermission =
-      this.userService.myself?.role?.permissions?.includes('UPDATE_USER') ||
-      false;
-    this.hasUserDeletePermission =
-      this.userService.myself?.role?.permissions?.includes('DELETE_USER') ||
-      false;
-    this.canEditRole =
-      this.userService.myself?.role?.permissions?.includes(
-        'UPDATE_USER_ROLE'
-      ) || false;
-    this.canUpdatePassword =
-      this.userService.myself?.role?.permissions?.includes(
-        'UPDATE_USER_ROLE'
-      ) || false;
+    this.userService.myself$
+      .pipe(
+        take(1),
+        switchMap((myself) => (myself ? EMPTY : this.userService.getMyself())),
+        takeUntil(this.destroy$)
+      )
+      .subscribe();
 
-    this.userService.getRoles().then((roles: any[]) => {
-      this.roles = roles;
-      this.setSelectedRoleFromUser();
-    });
+    this.userService.myself$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((myself) => {
+        this.currentUser = myself;
 
-    this.userService.getUser(userId).then((user: User) => {
-      this.user = user;
-      // determine if viewing own profile to adjust UI (e.g., hide disable card)
-      this.isSelf =
-        !!this.userService.myself && this.userService.myself.id === user.id;
+        const permissions = myself?.role?.permissions ?? [];
 
-      const anyUser: any = user as any;
-      if (anyUser.icon && anyUser.icon.type === 'create') {
-        this.iconMetadata = {
-          type: 'create',
-          text: anyUser.icon.text,
-          color: anyUser.icon.color || this.iconMetadata.color
-        };
-      } else if (user.iconUrl) {
-        this.iconMetadata = { type: 'upload' };
-      } else {
-        this.iconMetadata = { type: 'none' };
-      }
+        this.hasUserEditPermission = permissions.includes('UPDATE_USER');
+        this.hasUserDeletePermission = permissions.includes('DELETE_USER');
+        this.canEditRole = permissions.includes('UPDATE_USER_ROLE');
+        this.canUpdatePassword = permissions.includes('UPDATE_USER_ROLE');
+      });
 
-      this.loadUserTeams();
-      this.loadUserEvents();
-      this.setupActionButtons();
+    this.userService
+      .getRoles()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((roles) => {
+        this.roles = roles;
+        this.setSelectedRoleFromUser();
+      });
 
-      this.setSelectedRoleFromUser();
+    this.userService
+      .getUser(userId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((user) => {
+        this.user = user;
 
-      this.breadcrumbs.push({title: user.displayName || "Unknown User"});
-    });
+        this.isSelf = !!this.currentUser && this.currentUser.id === user.id;
+
+        const anyUser: any = user;
+        if (anyUser.icon?.type === 'create') {
+          this.iconMetadata = {
+            type: 'create',
+            text: anyUser.icon.text,
+            color: anyUser.icon.color
+          };
+        } else if (user.iconUrl) {
+          this.iconMetadata = { type: 'upload' };
+        } else {
+          this.iconMetadata = { type: 'none' };
+        }
+
+        this.loadUserTeams();
+        this.loadUserEvents();
+        this.setupActionButtons();
+        this.setSelectedRoleFromUser();
+
+        this.breadcrumbs.push({ title: user.displayName || 'Unknown User' });
+      });
 
     this.loginService
       .query({ filter: this.filter, limit: this.loginResultsLimit })
@@ -848,7 +864,24 @@ export class UserDetailsComponent implements OnInit {
       this.saving = false;
     };
 
-    this.userService.updateUser(this.editUser.id, userToSave, success, error);
+    this.userService
+      .updateUser(this.editUser.id, userToSave)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (updatedUser) => {
+          this.user = updatedUser;
+          this.isEditingUser = false;
+          this.editUser = null;
+          this.saving = false;
+          this.iconPreviewUrl = null;
+          this.avatarPreviewUrl = null;
+          this.removeIconSelected = false;
+        },
+        error: (err) => {
+          this.error = err?.error || 'Failed to update user';
+          this.saving = false;
+        }
+      });
   }
 
   /**
@@ -905,12 +938,11 @@ export class UserDetailsComponent implements OnInit {
    */
   deleteUser(user: User): void {
     this.userService
-      .deleteUser(user)
-      .then(() => {
-        this.stateService.go('admin.users');
-      })
-      .catch((err) => {
-        console.error('Failed to delete user:', err);
+      .deleteUser(user.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => this.stateService.go('admin.users'),
+        error: (err) => console.error('Failed to delete user:', err)
       });
   }
 
@@ -935,7 +967,10 @@ export class UserDetailsComponent implements OnInit {
    */
   activateUser(user: User): void {
     user.active = true;
-    this.userService.updateUser(user.id, user, () => {});
+    this.userService
+      .updateUser(user.id, user)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe();
   }
 
   /**
@@ -944,7 +979,10 @@ export class UserDetailsComponent implements OnInit {
    */
   enableUser(user: User): void {
     user.enabled = true;
-    this.userService.updateUser(user.id, user, () => {});
+    this.userService
+      .updateUser(user.id, user)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe();
   }
 
   /**
@@ -953,7 +991,10 @@ export class UserDetailsComponent implements OnInit {
    */
   disableUser(user: User): void {
     user.enabled = false;
-    this.userService.updateUser(user.id, user, () => {});
+    this.userService
+      .updateUser(user.id, user)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe();
   }
 
   /**
@@ -1172,6 +1213,7 @@ export class UserDetailsComponent implements OnInit {
       };
       return;
     }
+
     if (this.newPassword !== this.newPasswordConfirm) {
       this.passwordStatus = {
         status: 'danger',
@@ -1181,10 +1223,12 @@ export class UserDetailsComponent implements OnInit {
     }
 
     this.updatingPassword = true;
+
     const authentication = {
       password: this.newPassword,
       passwordconfirm: this.newPasswordConfirm
     };
+
     const onSuccess = () => {
       this.passwordStrengthScore = 0;
       this.passwordStrengthType = null;
@@ -1192,6 +1236,7 @@ export class UserDetailsComponent implements OnInit {
       this.newPassword = '';
       this.newPasswordConfirm = '';
       this.updatingPassword = false;
+
       this.passwordStatus = {
         status: 'success',
         msg: 'Password successfully updated.'
@@ -1200,31 +1245,23 @@ export class UserDetailsComponent implements OnInit {
       this.changePassword = false;
       this.cancelEdit();
     };
-    const onError = (response: any) => {
+
+    const onError = (error: any) => {
       this.updatingPassword = false;
       const msg =
-        response?.data || response?.responseText || 'Failed to update password';
+        error?.data || error?.responseText || 'Failed to update password';
       this.passwordStatus = { status: 'danger', msg };
     };
 
-    const result = this.userService.updatePassword(
-      this.user.id,
-      authentication
-    );
-    if (result && typeof result.then === 'function') {
-      result.then(onSuccess, onError);
-    } else {
-      try {
-        this.userService.updatePassword(
-          this.user.id,
-          authentication,
-          onSuccess,
-          onError
-        );
-      } catch (e) {
-        onError(e);
-      }
-    }
+    this.userService
+      .updatePassword(this.user.id, authentication)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({ next: onSuccess, error: onError });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**

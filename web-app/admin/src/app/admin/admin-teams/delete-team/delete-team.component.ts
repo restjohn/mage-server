@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable, forkJoin } from 'rxjs';
 import { Team } from '../team';
 import { AdminTeamsService } from '../../services/admin-teams-service';
-import { UserService } from 'admin/src/app/upgrade/ajs-upgraded-providers';
+import { AdminUserService } from '../../services/admin-user.service';
 
 /**
  * Modal component for confirming team deletion.
@@ -25,22 +25,18 @@ export class DeleteTeamComponent implements OnInit {
    * @param dialogRef - Reference to the dialog for closing and returning results
    * @param data - Injected data containing the team to delete
    * @param teamsService - Service for team operations
-   * @param UserService - Service for user operations
+   * @param adminUserService - Service for user operations
    */
   constructor(
     public dialogRef: MatDialogRef<DeleteTeamComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { team: Team },
     private teamsService: AdminTeamsService,
-    @Inject(UserService) private UserService
+    private adminUserService: AdminUserService
   ) {
     this.team = data.team;
   }
 
-  /**
-   * Component initialization lifecycle hook.
-   */
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   /**
    * Deletes the team and optionally its users if the option is selected.
@@ -81,16 +77,22 @@ export class DeleteTeamComponent implements OnInit {
       return;
     }
 
-    const deletePromises: Observable<any>[] = users.map(user =>
-      this.UserService.deleteUser(user)
-    );
+    const deleteRequests: Observable<any>[] = users
+      .filter(u => !!u?.id)
+      .map(u => this.adminUserService.deleteUser(String(u.id)));
 
-    forkJoin(deletePromises).subscribe({
+    if (deleteRequests.length === 0) {
+      this.dialogRef.close(this.team);
+      return;
+    }
+
+    forkJoin(deleteRequests).subscribe({
       next: () => {
         this.dialogRef.close(this.team);
       },
       error: (error) => {
         console.error('Error deleting users:', error);
+        // keep existing behavior: close anyway
         this.dialogRef.close(this.team);
       }
     });

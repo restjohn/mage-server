@@ -1,15 +1,15 @@
-import { Component, OnInit, Inject, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { StateService } from '@uirouter/angular';
-import {
-  UserService
-} from 'admin/src/app/upgrade/ajs-upgraded-providers';
+
+import { AdminUserService } from '../../services/admin-user.service';
 import {
   SearchOptions,
   EventsResponse,
   AdminEventsService
 } from '../../services/admin-events.service';
+
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { Event } from 'src/app/filter/filter.types';
 import { CreateEventDialogComponent } from '../create-event/create-event.component';
@@ -48,8 +48,8 @@ export class EventDashboardComponent implements OnInit {
     private modal: MatDialog,
     private stateService: StateService,
     private eventService: AdminEventsService,
-    @Inject(UserService) private userService
-  ) { }
+    private adminUserService: AdminUserService
+  ) {}
 
   ngOnInit(): void {
     this.initPermissions();
@@ -59,8 +59,16 @@ export class EventDashboardComponent implements OnInit {
 
   /** Initialize permission flags */
   private initPermissions(): void {
-    const permissions = this.userService.myself?.role?.permissions || [];
-    this.hasEventCreatePermission = permissions.includes('CREATE_USER');
+    // Pull the current user using the new Angular service (Observable)
+    this.adminUserService.getMyself().subscribe({
+      next: (myself) => {
+        const permissions = myself?.role?.permissions || [];
+        this.hasEventCreatePermission = permissions.includes('CREATE_USER');
+      },
+      error: () => {
+        this.hasEventCreatePermission = false;
+      }
+    });
   }
 
   /** Fetch and apply filters to the event list */
@@ -70,8 +78,7 @@ export class EventDashboardComponent implements OnInit {
         this.events = events;
         this.filteredEvents = events.items;
         this.totalEvents = events.totalCount ?? 0;
-      }
-      ,
+      },
       error: (err) => console.error('Error fetching events:', err)
     });
   }

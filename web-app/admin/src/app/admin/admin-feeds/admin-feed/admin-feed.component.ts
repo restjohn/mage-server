@@ -1,10 +1,10 @@
 import _ from 'underscore'
-import { Component, OnInit, Inject, ElementRef, ViewChild } from '@angular/core'
+import { Component, OnInit, ElementRef, ViewChild, Inject } from '@angular/core'
 import { UntypedFormControl } from '@angular/forms'
 import { Observable } from 'rxjs'
 import { map, startWith, debounceTime, switchMap } from 'rxjs/operators'
 import { StateService } from '@uirouter/angular'
-import { UserService, Event } from '../../../upgrade/ajs-upgraded-providers'
+import { Event } from '../../../upgrade/ajs-upgraded-providers'
 import { ServiceType, FeedTopic, Service, FeedExpanded, FeedService } from '@ngageoint/mage.web-core-lib/feed'
 import { MatDialog } from '@angular/material/dialog'
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete'
@@ -13,6 +13,7 @@ import { trigger, state, transition, style, animate } from '@angular/animations'
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model'
 import { AdminFeedDeleteComponent } from './admin-feed-delete/admin-feed-delete.component'
 import { AdminEventsService } from '../../services/admin-events.service'
+import { AdminUserService } from '../../services/admin-user.service'
 
 @Component({
   selector: 'app-admin-feed',
@@ -20,7 +21,7 @@ import { AdminEventsService } from '../../services/admin-events.service'
   styleUrls: ['./admin-feed.component.scss'],
   animations: [
     trigger('slide', [
-      state('1', style({ height: '*', opacity: 1, })),
+      state('1', style({ height: '*', opacity: 1 })),
       state('0', style({ height: '0', opacity: 0 })),
       transition('1 => 0', animate('400ms ease-in-out')),
       transition('0 => 1', animate('400ms ease-in-out'))
@@ -61,7 +62,7 @@ export class AdminFeedComponent implements OnInit {
   eventModel: any
   filteredChoices: Observable<any[]>
   events = []
-  nonFeedEvents: Array<Event> = []
+  nonFeedEvents: Array<any> = []
   feedEvents = [] as any[]
   loadingEvents = false
 
@@ -69,7 +70,9 @@ export class AdminFeedComponent implements OnInit {
   feedServiceType: ServiceType
   feedTopic: FeedTopic
 
-  @ViewChild("eventSelect", { static: false }) eventSelect: ElementRef
+  private myself: any | null = null
+
+  @ViewChild('eventSelect', { static: false }) eventSelect: ElementRef
 
   constructor(
     private feedService: FeedService,
@@ -77,16 +80,45 @@ export class AdminFeedComponent implements OnInit {
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private eventsService: AdminEventsService,
-    @Inject(UserService) private userService: { myself: { id: string, role: { permissions: Array<string> } } },
+    private adminUserService: AdminUserService,
     @Inject(Event) private eventResource: any
   ) {
-    this.hasFeedCreatePermission = _.contains(userService.myself.role.permissions, 'FEEDS_CREATE_FEED')
-    this.hasFeedEditPermission = _.contains(userService.myself.role.permissions, 'FEEDS_CREATE_FEED')
-    this.hasFeedDeletePermission = _.contains(userService.myself.role.permissions, 'FEEDS_CREATE_FEED')
-    this.hasUpdateEventPermission = _.contains(userService.myself.role.permissions, 'UPDATE_EVENT')
+    // initialize flags defensively; real values set in ngOnInit once myself is loaded
+    this.hasFeedCreatePermission = false
+    this.hasFeedEditPermission = false
+    this.hasFeedDeletePermission = false
+    this.hasUpdateEventPermission = false
   }
 
   ngOnInit(): void {
+    // Load current user + permissions via the new Angular service
+    this.adminUserService.getMyself().subscribe({
+      next: (myself) => {
+        this.myself = myself
+
+        const perms: string[] = myself?.role?.permissions || []
+        this.hasFeedCreatePermission = perms.includes('FEEDS_CREATE_FEED')
+        this.hasFeedEditPermission = perms.includes('FEEDS_CREATE_FEED')
+        this.hasFeedDeletePermission = perms.includes('FEEDS_CREATE_FEED')
+        this.hasUpdateEventPermission = perms.includes('UPDATE_EVENT')
+
+        // continue with feed load after we have myself (so ACL filtering works)
+        this.initFeed()
+      },
+      error: () => {
+        this.myself = null
+        this.hasFeedCreatePermission = false
+        this.hasFeedEditPermission = false
+        this.hasFeedDeletePermission = false
+        this.hasUpdateEventPermission = false
+
+        // still load feed; ACL filtering will be conservative
+        this.initFeed()
+      }
+    })
+  }
+
+  private initFeed(): void {
     if (this.stateService.params.feedId) {
       this.feedService.fetchFeed(this.stateService.params.feedId).subscribe(feed => {
         this.feed = feed
@@ -99,40 +131,41 @@ export class AdminFeedComponent implements OnInit {
         this.feedLoaded = Promise.resolve(true)
         this.service = this.feed.service as Service
         this.feedTopic = this.feed.topic as FeedTopic
+
         this.feedService.fetchServiceType(this.service.serviceType as string).subscribe(serviceType => {
           this.feedServiceType = serviceType
-        });
+        })
 
-        this.loadAllEvents();
+        this.loadAllEvents()
         this.filteredChoices = this.searchControl.valueChanges.pipe(
           startWith(''),
           debounceTime(300),
           switchMap(value => {
-            const searchTerm = !value || typeof value === 'string' ? value : value.name;
-            return this.loadAvailableEvents(searchTerm || '');
+            const searchTerm = !value || typeof value === 'string' ? value : value.name
+            return this.loadAvailableEvents(searchTerm || '')
           })
-        );
-      });
+        )
+      })
     }
   }
 
   loadAllEvents(): void {
-    this.loadingEvents = true;
+    this.loadingEvents = true
     this.eventsService.getEvents({
       feedId: this.feed.id,
       page: this.eventsPage,
       page_size: this.eventsPerPage
     }).subscribe({
       next: (response) => {
-        this.feedEvents = response.items || [];
-        this.totalFeedEvents = response.totalCount || 0;
-        this.loadingEvents = false;
+        this.feedEvents = response.items || []
+        this.totalFeedEvents = response.totalCount || 0
+        this.loadingEvents = false
       },
       error: (err) => {
-        console.error('Error loading feed events:', err);
-        this.loadingEvents = false;
+        console.error('Error loading feed events:', err)
+        this.loadingEvents = false
       }
-    });
+    })
   }
 
   loadAvailableEvents(searchTerm: string): Observable<any[]> {
@@ -143,18 +176,19 @@ export class AdminFeedComponent implements OnInit {
       page_size: 20
     }).pipe(
       map(response => {
-        let events = response.items || [];
+        let events = response.items || []
 
         if (!this.hasUpdateEventPermission) {
+          const myId = this.myself?.id
           events = events.filter(event => {
-            const permissions = event.acl?.[this.userService.myself.id]?.permissions || [];
-            return permissions.includes('update');
-          });
+            const permissions = myId ? (event.acl?.[myId]?.permissions || []) : []
+            return permissions.includes('update')
+          })
         }
 
-        return events;
+        return events
       })
-    );
+    )
   }
 
   toggleNewEvent(): void {
@@ -173,32 +207,32 @@ export class AdminFeedComponent implements OnInit {
       this.eventModel = null
       this.addEvent = false
 
-      this.loadAllEvents();
+      this.loadAllEvents()
 
       this.snackBar.open(`Feed added to event ${event.name}`, undefined, {
-        duration: 5 * 1000,
-      });
-    });
+        duration: 5 * 1000
+      })
+    })
   }
 
   removeFeedFromEvent($event: MouseEvent, event: any): void {
-    $event.stopPropagation();
+    $event.stopPropagation()
 
     this.eventResource.removeFeed({ id: event.id, feedId: this.feed.id }, removed => {
       this.searchControl.reset()
 
-      this.loadAllEvents();
+      this.loadAllEvents()
 
       this.snackBar.open(`Feed removed from event ${event.name}`, undefined, {
-        duration: 5 * 1000,
-      });
-    });
+        duration: 5 * 1000
+      })
+    })
   }
 
   onEventsPageChange(event: any): void {
-    this.eventsPage = event.pageIndex;
-    this.eventsPerPage = event.pageSize;
-    this.loadAllEvents();
+    this.eventsPage = event.pageIndex
+    this.eventsPerPage = event.pageSize
+    this.loadAllEvents()
   }
 
   editFeed(): void {
@@ -216,7 +250,7 @@ export class AdminFeedComponent implements OnInit {
           this.goToFeeds()
         })
       }
-    });
+    })
   }
 
   goToFeeds(): void {
@@ -226,5 +260,4 @@ export class AdminFeedComponent implements OnInit {
   goToEvent(event: any): void {
     this.stateService.go('admin.event', { eventId: event.id })
   }
-
 }

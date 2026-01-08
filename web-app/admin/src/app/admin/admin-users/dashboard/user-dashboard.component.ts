@@ -2,21 +2,22 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
+import { from, lastValueFrom, EMPTY } from 'rxjs';
+import { mergeMap, tap, catchError, finalize } from 'rxjs/operators';
 
 import { StateService } from '@uirouter/angular';
 import {
-  LocalStorageService,
-  UserService,
   UserPagingService
 } from 'admin/src/app/upgrade/ajs-upgraded-providers';
+import { LocalStorageService } from 'src/app/http/local-storage.service';
 import { User } from 'core-lib-src/user';
 import { CreateUserModalComponent } from '../create-user/create-user.component';
 import { Role } from '../user';
 import { BulkUserComponent } from '../bulk-user/bulk-user.component';
 import { AdminTeamsService } from '../../services/admin-teams-service';
 import { Team } from '../../admin-teams/team';
-import pLimit from 'p-limit';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
+import { AdminUserService } from '../../services/admin-user.service';
 
 type UserFilter = {
   limit?: number;
@@ -87,7 +88,7 @@ export class UserDashboardComponent implements OnInit {
     private localStorageService: LocalStorageService,
     private stateService: StateService,
     private teamService: AdminTeamsService,
-    @Inject(UserService) private userService,
+    private userService: AdminUserService,
     @Inject(UserPagingService) private userPagingService
   ) {
     this.token = this.localStorageService.getToken();
@@ -122,15 +123,17 @@ export class UserDashboardComponent implements OnInit {
    * Initializes permission flags for the current user.
    */
   private initPermissions(): void {
-    const permissions = this.userService.myself.role?.permissions || [];
-    this.hasUserCreatePermission = permissions.includes('CREATE_USER');
+    this.userService.myself$.subscribe(user => {
+      const permissions = user?.role?.permissions ?? [];
+      this.hasUserCreatePermission = permissions.includes('CREATE_USER');
+    });
   }
 
   /**
    * Loads available user roles from the server.
    */
   private loadRoles(): void {
-    this.userService.getRoles().then((roles: any[]) => {
+    this.userService.getRoles().subscribe((roles: any[]) => {
       this.roles = roles;
     });
   }
@@ -273,26 +276,23 @@ export class UserDashboardComponent implements OnInit {
       disableClose: true,
       data: { roles: this.roles }
     });
-
-    dialogRef.afterClosed().subscribe((newUser) => {
-      if (newUser?.confirmed) {
-        new Promise((resolve, reject) => {
-          this.userService.createUser(
-            newUser.user,
-            (user) => resolve(user),
-            (err) => reject(err),
-            null
-          );
-        })
-          .catch((err) => {
-            console.error(err);
-          })
-          .finally(() => {
-            this.refreshUsers();
-          });
+  
+    dialogRef.afterClosed().subscribe(newUser => {
+      if (!newUser?.confirmed) {
+        return;
       }
+  
+      this.userService.createUser(newUser.user).subscribe({
+        next: () => {
+          this.refreshUsers();
+        },
+        error: err => {
+          console.error(err);
+          this.refreshUsers();
+        }
+      });
     });
-  }
+  }  
 
   /**
    * Opens a modal for bulk user import.
@@ -357,43 +357,48 @@ export class UserDashboardComponent implements OnInit {
    * @param users Array of user data to create
    * @returns A promise that resolves to the list of successfully created users
    */
-  async bulkCreateUsers(users: any[]): Promise<User[]> {
+  async bulkCreateUsers(users: User[]): Promise<User[]> {
     const usersAdded: User[] = [];
+  
     this.bulkErrors = [];
     this.bulkProgress.total = users.length;
     this.bulkProgress.completed = 0;
     this.bulkProgress.failed = 0;
-
-    const limit = pLimit(100);
-
-    const tasks = users.map((userData) =>
-      limit(
-        () =>
-          new Promise<void>((resolve) => {
-            const success = (ret: any) => {
-              usersAdded.push(ret);
-              this.bulkProgress.completed++;
-              resolve();
-            };
-            const error = (err: any) => {
-              this.bulkProgress.failed++;
-              this.bulkProgress.completed++;
-
-              this.bulkErrors.push({
-                user: userData,
-                error: err?.responseText || 'Unknown error'
-              });
-
-              console.error(`Failed to create user ${userData.username}`, err);
-              resolve();
-            };
-
-            this.userService.createUser(userData, success, error);
-          })
+  
+    const CONCURRENCY = 100;
+  
+    await lastValueFrom(
+      from(users).pipe(
+        mergeMap(
+          userData =>
+            this.userService.createUser(userData).pipe(
+              tap(createdUser => {
+                usersAdded.push(createdUser);
+              }),
+              catchError(err => {
+                this.bulkProgress.failed++;
+  
+                this.bulkErrors.push({
+                  user: userData,
+                  error: err?.error || err?.message || 'Unknown error'
+                });
+  
+                console.error(
+                  `Failed to create user ${userData.username}`,
+                  err
+                );
+  
+                return EMPTY; // continue stream
+              }),
+              finalize(() => {
+                this.bulkProgress.completed++;
+              })
+            ),
+          CONCURRENCY
+        )
       )
     );
-
-    await Promise.allSettled(tasks);
+  
     this.refreshUsers();
     return usersAdded;
   }

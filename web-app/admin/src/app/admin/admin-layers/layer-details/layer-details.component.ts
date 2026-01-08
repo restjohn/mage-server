@@ -7,10 +7,16 @@ import { MatTableDataSource } from '@angular/material/table';
 import { HttpClient } from '@angular/common/http';
 import { LayersService, Layer } from '../layers.service';
 import { AdminEventsService } from '../../services/admin-events.service';
-import { LocalStorageService, UserService } from '../../../upgrade/ajs-upgraded-providers';
+import { LocalStorageService } from 'src/app/http/local-storage.service';
+import { AdminUserService } from '../../services/admin-user.service';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { CardActionButton } from '../../../core/card-navbar/card-navbar.component';
-import { SearchModalComponent, SearchModalData, SearchModalResult, SearchModalColumn } from '../../../core/search-modal/search-modal.component';
+import {
+  SearchModalComponent,
+  SearchModalData,
+  SearchModalResult,
+  SearchModalColumn
+} from '../../../core/search-modal/search-modal.component';
 import { DeleteLayerComponent } from '../delete-layer/delete-layer.component';
 import { Event } from 'src/app/filter/filter.types';
 import { Observable } from 'rxjs';
@@ -84,6 +90,8 @@ export class LayerDetailsComponent implements OnInit {
   hasLayerEditPermission = false;
   hasLayerDeletePermission = false;
 
+  private myself: any | null = null;
+
   editingDetails = false;
   layerEditForm = {
     name: '',
@@ -111,7 +119,7 @@ export class LayerDetailsComponent implements OnInit {
     private snackBar: MatSnackBar,
     private http: HttpClient,
     @Inject(LocalStorageService) private localStorageService: any,
-    @Inject(UserService) private userService: any
+    private adminUserService: AdminUserService
   ) { }
 
   ngOnInit(): void {
@@ -121,15 +129,29 @@ export class LayerDetailsComponent implements OnInit {
       return;
     }
 
-    const permissions = this.userService.myself?.role?.permissions || [];
-    this.hasLayerEditPermission = permissions.includes('UPDATE_LAYER');
-    this.hasLayerDeletePermission = permissions.includes('DELETE_LAYER');
+    // Permissions + current user now come from AdminUserService
+    this.adminUserService.getMyself().subscribe({
+      next: (myself) => {
+        this.myself = myself;
+
+        const permissions: string[] = myself?.role?.permissions || [];
+        this.hasLayerEditPermission = permissions.includes('UPDATE_LAYER');
+        this.hasLayerDeletePermission = permissions.includes('DELETE_LAYER');
+
+        this.updateActionButtons();
+      },
+      error: () => {
+        this.myself = null;
+        this.hasLayerEditPermission = false;
+        this.hasLayerDeletePermission = false;
+
+        this.updateActionButtons();
+      }
+    });
 
     this.fileUploadUrl = `/api/layers/${layerId}/kml?access_token=${this.localStorageService.getToken()}`;
 
     this.loadLayer(layerId);
-
-    this.updateActionButtons();
   }
 
   private loadLayer(layerId: string): void {
@@ -236,42 +258,27 @@ export class LayerDetailsComponent implements OnInit {
     });
   }
 
-  /**
-   * Handles event search input changes.
-   */
   onEventSearchChange(searchTerm?: string): void {
     this.eventSearchTerm = searchTerm || '';
     this.eventsPageIndex = 0;
     this.getEventsPage();
   }
 
-  /**
-   * Handles event pagination changes.
-   */
   onEventsPageChange(event: PageEvent): void {
     this.eventsPageIndex = event.pageIndex;
     this.eventsPageSize = event.pageSize;
     this.getEventsPage();
   }
 
-  /**
-   * Toggles event edit mode and updates action buttons.
-   */
   toggleEditEvents(): void {
     this.editEvents = !this.editEvents;
     this.updateActionButtons();
   }
 
-  /**
-   * Navigates to event details page.
-   */
   gotoEvent(event: Event): void {
     this.stateService.go('admin.event', { eventId: event.id });
   }
 
-  /**
-   * Opens search dialog to add events to layer.
-   */
   addEventToLayer(): void {
     if (!this.layer?.id) {
       return;
@@ -286,7 +293,7 @@ export class LayerDetailsComponent implements OnInit {
         searchFunction: (searchTerm: string, page: number, pageSize: number): Observable<any> => {
           return new Observable(observer => {
             const searchOptions: any = {
-              page: page,
+              page,
               page_size: pageSize,
               excludeLayerId: String(this.layer.id)
             };
@@ -298,17 +305,22 @@ export class LayerDetailsComponent implements OnInit {
             this.eventsService.getEvents(searchOptions).subscribe({
               next: (response) => {
                 let filteredEvents = response.items || [];
-                if (!this.userService.myself?.role?.permissions?.includes('UPDATE_EVENT')) {
-                  filteredEvents = filteredEvents.filter(event => {
-                    const permissions = event.acl?.[this.userService.myself.id]?.permissions || [];
-                    return permissions.includes('update');
+
+                const myPerms: string[] = this.myself?.role?.permissions || [];
+                const canUpdateAnyEvent = myPerms.includes('UPDATE_EVENT');
+                const myId = this.myself?.id;
+
+                if (!canUpdateAnyEvent) {
+                  filteredEvents = filteredEvents.filter(ev => {
+                    const aclPerms = myId ? (ev.acl?.[myId]?.permissions || []) : [];
+                    return aclPerms.includes('update');
                   });
                 }
 
                 observer.next({
                   items: filteredEvents,
                   totalCount: response.totalCount || filteredEvents.length,
-                  pageSize: pageSize,
+                  pageSize,
                   pageIndex: page
                 });
                 observer.complete();
@@ -337,7 +349,6 @@ export class LayerDetailsComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result: SearchModalResult) => {
       if (result && result.selectedItem && this.layer?.id) {
         const selectedEvent = result.selectedItem;
-        console.log('Adding layer to selected event:', selectedEvent);
 
         this.eventsService.addLayerToEvent(String(selectedEvent.id), { id: this.layer.id }).subscribe({
           next: () => {
@@ -353,9 +364,6 @@ export class LayerDetailsComponent implements OnInit {
     });
   }
 
-  /**
-   * Removes layer from event.
-   */
   removeEventFromLayer(event: Event, mouseEvent?: MouseEvent): void {
     if (mouseEvent) {
       mouseEvent.stopPropagation();
@@ -399,16 +407,10 @@ export class LayerDetailsComponent implements OnInit {
     this.editingDetails = !this.editingDetails;
   }
 
-  /**
-   * Handles imagery config changes from the helper component
-   */
   onImageryConfigChange(config: ImageryLayerConfig): void {
     this.imageryConfig = config;
   }
 
-  /**
-   * Handles WMS layer selection changes from the helper component
-   */
   onWmsLayersSelected(layers: string): void {
     this.selectedWmsLayersString = layers;
   }
@@ -514,7 +516,6 @@ export class LayerDetailsComponent implements OnInit {
         return;
       }
 
-      // 50MB in bytes
       const maxSize = 50 * 1024 * 1024;
       if (file.size > maxSize) {
         this.uploads[index].error = `File size exceeds 50MB limit.`;
@@ -536,7 +537,11 @@ export class LayerDetailsComponent implements OnInit {
     }
 
     if (this.layer.type !== 'Feature') {
-      this.snackBar.open(`Cannot upload to layer of type "${this.layer.type}". Only Feature (Static) layers support file uploads.`, 'Close', { duration: 5000 });
+      this.snackBar.open(
+        `Cannot upload to layer of type "${this.layer.type}". Only Feature (Static) layers support file uploads.`,
+        'Close',
+        { duration: 5000 }
+      );
       return;
     }
 
@@ -596,6 +601,7 @@ export class LayerDetailsComponent implements OnInit {
             };
             errorCount++;
             this.snackBar.open(`Failed to upload ${upload.file.name}: ${errorMessage}`, 'Close', { duration: 8000 });
+
             if (successCount + errorCount === uploadCount) {
               this.onAllUploadsComplete(successCount, errorCount);
             }
@@ -659,4 +665,3 @@ export class LayerDetailsComponent implements OnInit {
     });
   }
 }
-

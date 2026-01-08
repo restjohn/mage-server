@@ -1,14 +1,12 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
-import {
-  DeviceService,
-  UserService
-} from '../../../upgrade/ajs-upgraded-providers';
 import { DeleteDeviceComponent } from '../delete-device/delete-device.component';
 import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
 import { User } from '../../admin-users/user';
+import { AdminUserService } from '../../services/admin-user.service';
+import { AdminDeviceService } from '../../services/admin-device.service';
 
 @Component({
   selector: 'mage-device-details',
@@ -39,16 +37,14 @@ export class DeviceDetailsComponent implements OnInit {
   deviceEditForm: {
     uid?: string;
     description?: string;
-    userAgent?: string;
     userId?: string;
-    userDisplayName?: string;
   } = {};
 
   constructor(
     public stateService: StateService,
     private dialog: MatDialog,
-    @Inject(DeviceService) private deviceService: any,
-    @Inject(UserService) private userService: any
+    private deviceService: AdminDeviceService,
+    private adminUserService: AdminUserService
   ) {}
 
   ngOnInit(): void {
@@ -56,35 +52,39 @@ export class DeviceDetailsComponent implements OnInit {
     if (!deviceId) return;
 
     this.hasUpdatePermission =
-      this.userService.myself?.role?.permissions?.includes('UPDATE_DEVICE') ||
-      false;
+      this.adminUserService.hasPermission('UPDATE_DEVICE');
 
     this.hasDeletePermission =
-      this.userService.myself?.role?.permissions?.includes('DELETE_DEVICE') ||
-      false;
+      this.adminUserService.hasPermission('DELETE_DEVICE');
 
-    this.deviceService.getDevice(deviceId).then((device: Device) => {
-      this.device = device;
-      this.breadcrumbs.push({ title: device?.uid || 'Device' });
+    this.deviceService.getDeviceById(deviceId).subscribe({
+      next: (device: Device) => {
+        this.device = device;
+        this.breadcrumbs.push({ title: device?.uid || 'Device' });
 
-      this.currentUserDisplayName = device?.user?.displayName || null;
-      this.selectedUserDisplayName = null;
+        this.currentUserDisplayName = device?.user?.displayName || null;
+        this.selectedUserDisplayName = null;
 
-      this.resetEditForm();
+        this.resetEditForm();
+      },
+      error: () => {
+        this.error = 'Failed to load device';
+      }
     });
   }
 
   toggleEditDetails(): void {
-    if (this.editingDetails) {
-      this.cancelEditDetails();
-    } else {
-      this.editingDetails = true;
-      this.resetEditForm();
-    }
+    this.editingDetails ? this.cancelEditDetails() : this.startEdit();
+  }
+
+  private startEdit(): void {
+    this.editingDetails = true;
+    this.resetEditForm();
   }
 
   private resetEditForm(): void {
     if (!this.device) return;
+
     this.deviceEditForm = {
       uid: this.device.uid,
       description: this.device.description,
@@ -113,48 +113,42 @@ export class DeviceDetailsComponent implements OnInit {
     this.saving = true;
     this.error = null;
 
-    const payload: any = {
-      uid: this.deviceEditForm.uid,
-      name: (this.device as any).name,
-      description: this.deviceEditForm.description,
-      userId: this.deviceEditForm.userId || null
-    };
-
-    const updated: any = {
-      ...this.device,
+    const payload: Partial<Device> = {
       uid: this.deviceEditForm.uid,
       description: this.deviceEditForm.description,
-      userId: this.deviceEditForm.userId || null,
-      name: (this.device as any).name
+      user: this.deviceEditForm.userId
+        ? { id: this.deviceEditForm.userId } as any
+        : null
     };
 
-    this.deviceService.updateDevice(updated).then(
-      () => {
+    this.deviceService.updateDevice(this.device.id, payload).subscribe({
+      next: () => {
         this.editingDetails = false;
         this.saving = false;
 
-        this.deviceService.getDevice(this.device!.id).then((d: Device) => {
+        this.deviceService.getDeviceById(this.device!.id).subscribe(d => {
           this.device = d;
           this.currentUserDisplayName = d?.user?.displayName || null;
           this.resetEditForm();
         });
       },
-      (err: any) => {
-        this.error =
-          err?.responseText || err?.data || 'Failed to update device';
+      error: (err) => {
+        this.error = err?.error?.message || 'Failed to update device';
         this.saving = false;
       }
-    );
+    });
   }
 
   registerDevice(device: Device): void {
-    device.registered = true;
-    this.deviceService.updateDevice(device);
+    if (!device.id) return;
+
+    this.deviceService.updateDevice(device.id, { registered: true }).subscribe();
   }
 
   unregisterDevice(device: Device): void {
-    device.registered = false;
-    this.deviceService.updateDevice(device);
+    if (!device.id) return;
+
+    this.deviceService.updateDevice(device.id, { registered: false }).subscribe();
   }
 
   confirmDeleteDevice(): void {
@@ -165,13 +159,16 @@ export class DeviceDetailsComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result?: { confirmed?: boolean }) => {
-      if (result?.confirmed) this.deleteDevice();
+      if (result?.confirmed) {
+        this.deleteDevice();
+      }
     });
   }
 
   private deleteDevice(): void {
-    if (!this.device) return;
-    this.deviceService.deleteDevice(this.device).then(() => {
+    if (!this.device?.id) return;
+
+    this.deviceService.deleteDevice(this.device.id).subscribe(() => {
       this.stateService.go('admin.devices');
     });
   }
@@ -185,7 +182,8 @@ export class DeviceDetailsComponent implements OnInit {
       return 'fa fa-desktop admin-desktop-icon';
     if (userAgent.includes('android'))
       return 'fa fa-android admin-android-icon';
-    if (userAgent.includes('ios')) return 'fa fa-apple admin-apple-icon';
+    if (userAgent.includes('ios'))
+      return 'fa fa-apple admin-apple-icon';
 
     return 'fa fa-mobile admin-generic-icon';
   }

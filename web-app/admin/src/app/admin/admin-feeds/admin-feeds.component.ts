@@ -1,6 +1,5 @@
 import _ from 'underscore'
-import { Component, OnInit, Inject } from '@angular/core'
-import { UserService } from '../../upgrade/ajs-upgraded-providers'
+import { Component, OnInit } from '@angular/core'
 import { Feed, Service, FeedService } from '@ngageoint/mage.web-core-lib/feed'
 import { StateService } from '@uirouter/angular'
 import { MatDialog } from '@angular/material/dialog'
@@ -8,6 +7,7 @@ import { forkJoin } from 'rxjs'
 import { AdminFeedDeleteComponent } from './admin-feed/admin-feed-delete/admin-feed-delete.component'
 import { AdminServiceDeleteComponent } from './admin-service/admin-service-delete/admin-service-delete.component'
 import { AdminBreadcrumb } from '../admin-breadcrumb/admin-breadcrumb.model'
+import { AdminUserService } from '../services/admin-user.service'
 
 @Component({
   selector: 'admin-feeds',
@@ -33,24 +33,35 @@ export class AdminFeedsComponent implements OnInit {
   servicePage = 0
   itemsPerPage = 10
 
-  hasServiceDeletePermission: boolean
-  hasFeedCreatePermission: boolean
-  hasFeedEditPermission: boolean
-  hasFeedDeletePermission: boolean
+  hasServiceDeletePermission = false
+  hasFeedCreatePermission = false
+  hasFeedEditPermission = false
+  hasFeedDeletePermission = false
 
   constructor(
     private feedService: FeedService,
     private stateService: StateService,
     public dialog: MatDialog,
-    @Inject(UserService) userService: { myself: { role: {permissions: Array<string>}}}
-  ) {
-    this.hasServiceDeletePermission = _.contains(userService.myself.role.permissions, 'FEEDS_CREATE_SERVICE')
-    this.hasFeedCreatePermission = _.contains(userService.myself.role.permissions, 'FEEDS_CREATE_FEED')
-    this.hasFeedEditPermission = _.contains(userService.myself.role.permissions, 'FEEDS_CREATE_FEED')
-    this.hasFeedDeletePermission = _.contains(userService.myself.role.permissions, 'FEEDS_CREATE_FEED')
-  }
+    private adminUserService: AdminUserService
+  ) {}
 
   ngOnInit(): void {
+    this.adminUserService.getMyself().subscribe({
+      next: (myself) => {
+        const permissions: string[] = myself?.role?.permissions || []
+        this.hasServiceDeletePermission = permissions.includes('FEEDS_CREATE_SERVICE')
+        this.hasFeedCreatePermission = permissions.includes('FEEDS_CREATE_FEED')
+        this.hasFeedEditPermission = permissions.includes('FEEDS_CREATE_FEED')
+        this.hasFeedDeletePermission = permissions.includes('FEEDS_CREATE_FEED')
+      },
+      error: () => {
+        this.hasServiceDeletePermission = false
+        this.hasFeedCreatePermission = false
+        this.hasFeedEditPermission = false
+        this.hasFeedDeletePermission = false
+      }
+    })
+
     forkJoin([
       this.feedService.fetchServices(),
       this.feedService.fetchAllFeeds()
@@ -123,9 +134,9 @@ export class AdminFeedsComponent implements OnInit {
           this._feeds = this._feeds.filter(feed => feed.service === service.id)
           this.updateFilteredFeeds()
           this.updateFilteredServices()
-        });
+        })
       }
-    });
+    })
   }
 
   deleteFeed($event: MouseEvent, feed: Feed): void {
@@ -140,16 +151,16 @@ export class AdminFeedsComponent implements OnInit {
         this.feedService.deleteFeed(feed).subscribe(() => {
           this._feeds = this._feeds.filter(f => f.id !== feed.id)
           this.updateFilteredFeeds()
-        });
+        })
       }
-    });
+    })
   }
 
-  private sortByTitle(a: {title: string}, b: {title: string}): number {
+  private sortByTitle(a: { title: string }, b: { title: string }): number {
     return a.title < b.title ? -1 : 1
   }
 
-  private filterByTitleAndSummary(text: string): (item: {title: string, summary?: string | null}) => boolean {
+  private filterByTitleAndSummary(text: string): (item: { title: string, summary?: string | null }) => boolean {
     return (item: { title: string, summary?: string | null }): boolean => {
       const textLowerCase = text.toLowerCase()
       const title = item.title.toLowerCase()
@@ -157,5 +168,4 @@ export class AdminFeedsComponent implements OnInit {
       return title.indexOf(textLowerCase) !== -1 || summary.indexOf(textLowerCase) !== -1
     }
   }
-
 }

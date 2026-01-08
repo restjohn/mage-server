@@ -1,18 +1,25 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { UserService } from '../../../upgrade/ajs-upgraded-providers';
+import { Observable } from 'rxjs';
+
+import { AdminUserService } from '../../services/admin-user.service';
 import { AdminTeamsService } from '../../services/admin-teams-service';
 import { AdminEventsService } from '../../services/admin-events.service';
+
 import { Team } from '../team';
 import { User } from '@ngageoint/mage.web-core-lib/user';
 import { Event } from 'src/app/filter/filter.types';
 import { DeleteTeamComponent } from '../delete-team/delete-team.component';
 import { CardActionButton } from '../../../core/card-navbar/card-navbar.component';
-import { SearchModalComponent, SearchModalData, SearchModalResult, SearchModalColumn } from '../../../core/search-modal/search-modal.component';
-import { Observable } from 'rxjs';
+import {
+  SearchModalComponent,
+  SearchModalData,
+  SearchModalResult,
+  SearchModalColumn
+} from '../../../core/search-modal/search-modal.component';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 
 /**
@@ -28,15 +35,21 @@ import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 export class TeamDetailsComponent implements OnInit {
   team: Team;
   teamId: string;
+
   hasUpdatePermission = false;
   hasDeletePermission = false;
+
+  private myself: any | null = null;
+
   editingDetails = false;
   editingMembers = false;
   editingEvents = false;
+
   editForm = {
     name: '',
     description: ''
   };
+
   loadingMembers = true;
   membersPageIndex = 0;
   membersPageSize = 5;
@@ -66,8 +79,8 @@ export class TeamDetailsComponent implements OnInit {
   breadcrumbs: AdminBreadcrumb[] = [{
     title: 'Teams',
     iconClass: 'fa fa-users',
-    state: {name: "admin.teams"}
-  }]
+    state: { name: 'admin.teams' }
+  }];
 
   /**
    * Configures buttons for main team actions, member management, and event management.
@@ -110,48 +123,57 @@ export class TeamDetailsComponent implements OnInit {
     }
   }
 
-  /**
-   * Component constructor. Injects required services for team management.
-   */
   constructor(
     private stateService: StateService,
     private dialog: MatDialog,
-    @Inject(UserService) private UserService,
+    private adminUserService: AdminUserService,
     private teamService: AdminTeamsService,
     private eventsService: AdminEventsService
-  ) { }
+  ) {}
 
-  /**
-   * Retrieves team ID from route parameters, loads team data,
-   * sets up permissions, and initializes members and events data.
-   */
   ngOnInit(): void {
     this.teamId = this.stateService.params.teamId;
-    if (this.teamId) {
-      this.teamService.getTeamById(this.teamId).subscribe((team: Team) => {
-        this.team = team;
 
-        const myAccess = this.team.acl[this.UserService.myself.id];
-        const aclPermissions = myAccess ? myAccess.permissions : [];
+    if (!this.teamId) return;
 
-        this.hasUpdatePermission = this.UserService.myself.role.permissions.includes('UPDATE_TEAM') || aclPermissions.includes('update');
-        this.hasDeletePermission = this.UserService.myself.role.permissions.includes('DELETE_TEAM') || aclPermissions.includes('delete');
-
-        this.updateActionButtons();
-        this.getMembers();
-        this.getTeamEvents();
-        this.breadcrumbs.push({title: this.team.name})
-      });
-    }
+    // Load current user first (permissions depend on it)
+    this.adminUserService.getMyself().subscribe({
+      next: (myself) => {
+        this.myself = myself;
+        this.loadTeam();
+      },
+      error: () => {
+        this.myself = null;
+        this.loadTeam(); // still load team; permissions will be ACL-only / false
+      }
+    });
   }
 
-  /**
-   * Fetches team members with pagination and search filtering.
-   */
+  private loadTeam(): void {
+    this.teamService.getTeamById(this.teamId).subscribe((team: Team) => {
+      this.team = team;
+
+      const myId = this.myself?.id;
+      const globalPerms: string[] = this.myself?.role?.permissions || [];
+
+      const myAccess = myId ? (this.team?.acl?.[myId] ?? null) : null;
+      const aclPermissions: string[] = myAccess?.permissions || [];
+
+      this.hasUpdatePermission =
+        globalPerms.includes('UPDATE_TEAM') || aclPermissions.includes('update');
+
+      this.hasDeletePermission =
+        globalPerms.includes('DELETE_TEAM') || aclPermissions.includes('delete');
+
+      this.updateActionButtons();
+      this.getMembers();
+      this.getTeamEvents();
+      this.breadcrumbs.push({ title: this.team.name });
+    });
+  }
+
   getMembers(): void {
-    if (!this.team?.id) {
-      return;
-    }
+    if (!this.team?.id) return;
 
     this.teamService.getMembers({
       id: this.team.id,
@@ -173,9 +195,6 @@ export class TeamDetailsComponent implements OnInit {
     });
   }
 
-  /**
-   * Fetches events associated with this team with pagination and search filtering.
-   */
   getTeamEvents(): void {
     this.eventsService.getEvents({
       term: this.teamEventSearch,
@@ -190,29 +209,18 @@ export class TeamDetailsComponent implements OnInit {
     });
   }
 
-  /**
-   * Handles pagination changes for the members table.
-   * @param event - Material paginator event containing new page
-   */
   onMembersPageChange(event: PageEvent): void {
     this.membersPageSize = event.pageSize;
     this.membersPageIndex = event.pageIndex;
     this.getMembers();
   }
 
-  /**
-   * Handles search term changes for members filtering.
-   * @param searchTerm - The search term to filter members
-   */
   onMembersSearchChange(searchTerm: string = ''): void {
     this.membersPageIndex = 0;
     this.memberSearchTerm = searchTerm;
     this.getMembers();
   }
 
-  /**
-   * Toggles the editing state for team details.
-   */
   toggleEditDetails(): void {
     if (!this.editingDetails) {
       this.editForm.name = this.team.name;
@@ -222,26 +230,17 @@ export class TeamDetailsComponent implements OnInit {
     this.updateActionButtons();
   }
 
-  /**
-   * Saves the edited team details.
-   */
   saveTeamDetails(): void {
     const name = this.editForm.name;
     const description = this.editForm.description;
 
-    this.teamService.editTeam(this.team.id, {
-      name: name,
-      description: description
-    }).subscribe((updatedTeam: Team) => {
+    this.teamService.editTeam(this.team.id, { name, description }).subscribe((updatedTeam: Team) => {
       this.team = updatedTeam;
       this.editingDetails = false;
       this.updateActionButtons();
     });
   }
 
-  /**
-   * Cancels the editing of team details.
-   */
   cancelEditDetails(): void {
     this.editingDetails = false;
     this.updateActionButtons();
@@ -250,16 +249,10 @@ export class TeamDetailsComponent implements OnInit {
     this.editForm.description = this.team?.description;
   }
 
-  /**
-   * Navigates back to the teams list page.
-   */
   goToTeams(): void {
     this.stateService.go('admin.teams');
   }
 
-  /**
-   * Opens a search modal to add new members to the team.
-   */
   addMember(): void {
     const dialogRef = this.dialog.open(SearchModalComponent, {
       panelClass: 'search-modal-dialog',
@@ -272,7 +265,7 @@ export class TeamDetailsComponent implements OnInit {
           return this.teamService.getNonMembers({
             id: this.team?.id || '',
             term: searchTerm,
-            page: page,
+            page,
             page_size: pageSize
           });
         },
@@ -301,7 +294,6 @@ export class TeamDetailsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: SearchModalResult) => {
       if (result && result.selectedItem) {
-        console.log('Selected user to add:', result.selectedItem);
         this.teamService.addUserToTeam(this.team.id, result.selectedItem).subscribe({
           next: () => {
             this.getMembers();
@@ -312,11 +304,6 @@ export class TeamDetailsComponent implements OnInit {
     });
   }
 
-  /**
-   * Removes a member from the team.
-   * @param $event - The mouse event
-   * @param user - The user to remove from the team
-   */
   removeMember($event: MouseEvent, user: User): void {
     $event.stopPropagation();
     this.teamService.removeMember(this.team.id, user.id).subscribe({
@@ -330,65 +317,36 @@ export class TeamDetailsComponent implements OnInit {
     });
   }
 
-  /**
-   * Navigates to the user profile page for the specified user.
-   * @param user - The user to view
-   */
   goToUserProfile(user: User): void {
     this.stateService.go('admin.user', { userId: user.id });
   }
 
-  /**
-   * Navigates to the team access control page.
-   */
   goToAccess(): void {
     this.stateService.go('admin.teamAccess', { teamId: this.team.id });
   }
 
-  /**
-   * Toggles the editing state for user roles.
-   */
   toggleEditRoles(): void {
     this.editingMembers = !this.editingMembers;
     this.updateActionButtons();
   }
 
-  /**
-   * Toggles the editing state for events.
-   */
   toggleEditEvents(): void {
     this.editingEvents = !this.editingEvents;
     this.updateActionButtons();
   }
 
-  /**
-   * Gets the role of a user in the current team.
-   * @param user - The user to get the role for
-   * @returns The user's role in the team or 'GUEST' as default
-   */
   getUserRole(user: User): string {
-    const userAcl = this.team?.acl[user.id];
+    const userAcl = this.team?.acl?.[user.id];
     return userAcl?.role || 'GUEST';
   }
 
-  /**
-   * Gets the CSS class for a user's role badge.
-   * @param user - The user to get the role class for
-   * @returns The CSS class for the role badge
-   */
   getRoleClass(user: User): string {
     const role = this.getUserRole(user);
     return `user-role-badge role-${role.toLowerCase()}`;
   }
 
-  /**
-   * Updates a user's role in the team.
-   * @param user - The user whose role to update
-   * @param event - The change event containing the new role
-   */
   updateUserRole(user: User, event: any): void {
     const newRole = event.target.value;
-    console.log(`Updating user ${user.displayName} role to ${newRole}`);
 
     this.teamService.updateUserRole(this.team.id, user.id, newRole).subscribe({
       next: (updatedTeam: Team) => {
@@ -401,9 +359,6 @@ export class TeamDetailsComponent implements OnInit {
     });
   }
 
-  /**
-   * Opens a search modal to add an event to the team.
-   */
   addEventToTeam(): void {
     const dialogRef = this.dialog.open(SearchModalComponent, {
       panelClass: 'search-modal-dialog',
@@ -414,7 +369,7 @@ export class TeamDetailsComponent implements OnInit {
         searchFunction: (searchTerm: string, page: number, pageSize: number): Observable<any> => {
           return this.eventsService.getEvents({
             term: searchTerm,
-            page: page,
+            page,
             page_size: pageSize,
             excludeTeamId: this.team.id
           });
@@ -439,45 +394,25 @@ export class TeamDetailsComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result: SearchModalResult) => {
       if (result && result.selectedItem) {
         this.eventsService.addTeamToEvent(result.selectedItem.id.toString(), this.team).subscribe({
-          next: () => {
-            this.getTeamEvents();
-          },
-          error: (error) => {
-            console.error('Error adding event to team:', error);
-          }
+          next: () => this.getTeamEvents(),
+          error: (error) => console.error('Error adding event to team:', error)
         });
       }
     });
   }
 
-  /**
-   * Removes an event from the team.
-   * @param $event - The mouse event
-   * @param event - The event to remove from the team
-   */
   removeEventFromTeam($event: MouseEvent, event: Event): void {
     $event.stopPropagation();
     this.eventsService.removeEventFromTeam(event.id.toString(), this.team.id.toString()).subscribe({
-      next: () => {
-        this.getTeamEvents();
-      },
-      error: (error) => {
-        console.error('Error removing event:', error);
-      }
+      next: () => this.getTeamEvents(),
+      error: (error) => console.error('Error removing event:', error)
     });
   }
 
-  /**
-   * Navigates to the event details page for the specified event.
-   * @param event - The event whose details to view
-   */
   goToEventPage(event: Event): void {
     this.stateService.go('admin.event', { eventId: event.id });
   }
 
-  /**
-   * Opens a confirmation dialog to delete the team.
-   */
   deleteTeam(): void {
     const dialogRef = this.dialog.open(DeleteTeamComponent, {
       data: { team: this.team }
@@ -490,20 +425,12 @@ export class TeamDetailsComponent implements OnInit {
     });
   }
 
-  /**
-   * Handles pagination changes for the events table.
-   * @param event - Material paginator event containing new page
-   */
   onEventsPageChange(event: PageEvent): void {
     this.eventsPageSize = event.pageSize;
     this.teamEventsPage = event.pageIndex;
     this.getTeamEvents();
   }
 
-  /**
-   * Handles search term changes for team events filtering.
-   * @param searchTerm - The search term to filter events
-   */
   onTeamEventSearchChange(searchTerm?: string): void {
     this.teamEventsPage = 0;
     this.teamEventSearch = searchTerm;

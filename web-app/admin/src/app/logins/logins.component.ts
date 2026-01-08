@@ -1,9 +1,6 @@
 import { Component, OnInit, Inject, Input } from '@angular/core';
 import * as moment from 'moment';
-import * as _ from 'underscore';
 import {
-  UserService,
-  DeviceService,
   LoginService,
   UserPagingService,
   DevicePagingService
@@ -17,6 +14,8 @@ import {
   DevicesResponse,
   UsersResponse
 } from 'admin/src/@types/dashboard/admin-dashboard';
+import { AdminDeviceService } from '../admin/services/admin-device.service';
+import { AdminUserService } from '../admin/services/admin-user.service';
 
 @Component({
   selector: 'mage-logins',
@@ -61,8 +60,8 @@ export class LoginsComponent implements OnInit {
   private $state: any;
 
   constructor(
-    @Inject(UserService) private userService: any,
-    @Inject(DeviceService) private deviceService: any,
+    private adminUserService: AdminUserService,
+    private deviceService: AdminDeviceService,
     @Inject(LoginService) private loginService: any,
     @Inject(UserPagingService) private userPagingService: any,
     @Inject(DevicePagingService) private devicePagingService: any,
@@ -386,9 +385,6 @@ export class LoginsComponent implements OnInit {
   }
 
   hasPermission(permission: string): boolean {
-    return _.contains(
-      this.userService.myself?.role?.permissions || [],
-      permission
-    );
+    return this.adminUserService.hasPermission(permission);
   }
 }

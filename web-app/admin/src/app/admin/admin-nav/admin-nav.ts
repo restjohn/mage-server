@@ -1,5 +1,5 @@
 import { Component, Inject, Input, SimpleChanges, EventEmitter, Output } from '@angular/core';
-import { UserService } from '../../upgrade/ajs-upgraded-providers';
+import { AdminUserService } from '../services/admin-user.service';
 
 interface PluginTab {
   id: string;
@@ -38,7 +38,7 @@ export class AdminNavComponent {
   ];
 
   constructor(
-    @Inject(UserService) private userService: any,
+    private adminUserService: AdminUserService,
     @Inject('$injector') private $injector: any
   ) {
     this.$state = this.$injector.get('$state');
@@ -73,7 +73,7 @@ export class AdminNavComponent {
   }
 
   hasPermission(permission: string): boolean {
-    return this.userService.myself?.role?.permissions?.includes(permission);
+    return this.adminUserService.hasPermission(permission);
   }
 
   onClick(route: string): void {
@@ -89,14 +89,13 @@ export class AdminNavComponent {
   get pluginActive(): boolean {
     return Array.isArray(this.pluginTabs) && this.pluginTabs.some(p => p.state === this.stateName);
   }
-  
+
   get pluginBreadcrumbs() {
     if (!this.pluginActive) return [];
     const plugin = this.pluginTabs.find(p => p.state === this.stateName);
-    
+
     return [
-      { title: plugin.title, iconClass: plugin?.icon?.className || "fa fa-plug"}
+      { title: plugin.title, iconClass: plugin?.icon?.className || "fa fa-plug" }
     ];
   }
-  
 }

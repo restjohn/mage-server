@@ -3,10 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { StateService } from '@uirouter/angular';
 import {
-  LocalStorageService,
-  UserService
-} from 'admin/src/app/upgrade/ajs-upgraded-providers';
-import {
   AdminDeviceService,
   DevicesResponse,
   SearchOptions
@@ -14,6 +10,8 @@ import {
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
 import { CreateDeviceDialogComponent } from '../create-device/create-device.component';
+import { AdminUserService } from '../../services/admin-user.service';
+import { takeUntil, Subject } from 'rxjs';
 
 @Component({
   selector: 'admin-devices',
@@ -45,24 +43,35 @@ export class DeviceDashboardComponent implements OnInit {
     { title: 'Devices', iconClass: 'fa fa-mobile' }
   ];
 
+  private destroy$ = new Subject<void>();
+  currentUser: any = null;
+
   constructor(
     private modal: MatDialog,
-    private localStorageService: LocalStorageService,
     private stateService: StateService,
     private deviceService: AdminDeviceService,
-    @Inject(UserService) private userService
+    private userService: AdminUserService
   ) {}
 
   ngOnInit(): void {
-    this.initPermissions();
+    this.subscribeToUser();
     this.refreshDevices();
     this.updateResponsiveLayout();
   }
 
-  /** Initialize permission flags */
-  private initPermissions(): void {
-    const permissions = this.userService.myself?.role?.permissions || [];
-    this.hasDeviceCreatePermission = permissions.includes('CREATE_USER');
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /** Subscribe to current user and compute permissions */
+  private subscribeToUser(): void {
+    this.userService.myself$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        this.currentUser = user;
+        this.hasDeviceCreatePermission = user?.role?.permissions?.includes('CREATE_USER') || false;
+      });
   }
 
   /** Fetch and apply filters to the device list */
@@ -165,23 +174,24 @@ export class DeviceDashboardComponent implements OnInit {
     this.toolTipWidth = `${window.innerWidth * 0.75}px`;
   }
 
+  /** Determine icon class for device */
   iconClass(device: Device): string {
     if (!device) return 'fa fa-mobile admin-generic-icon';
-  
+
     const userAgent = (device.userAgent || '').toLowerCase();
-  
+
     if (device.appVersion === 'Web Client') {
       return 'fa fa-desktop admin-desktop-icon';
     }
-  
+
     if (userAgent.includes('android')) {
       return 'fa fa-android admin-android-icon';
     }
-  
+
     if (userAgent.includes('ios')) {
       return 'fa fa-apple admin-apple-icon';
     }
-  
+
     return 'fa fa-mobile admin-generic-icon';
   }
 }

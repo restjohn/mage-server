@@ -1,12 +1,12 @@
-import { Component, OnInit, Inject, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { StateService } from '@uirouter/angular';
-import { UserService } from 'admin/src/app/upgrade/ajs-upgraded-providers';
+
 import { LayersService, Layer } from '../layers.service';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { CreateLayerDialogComponent } from '../create-layer/create-layer.component';
-import _ from 'underscore';
+import { AdminUserService } from '../../services/admin-user.service';
 
 @Component({
   selector: 'mage-layer-dashboard',
@@ -41,8 +41,8 @@ export class LayerDashboardComponent implements OnInit {
     private modal: MatDialog,
     private stateService: StateService,
     private layersService: LayersService,
-    @Inject(UserService) private userService: any
-  ) { }
+    private adminUserService: AdminUserService
+  ) {}
 
   ngOnInit(): void {
     this.initPermissions();
@@ -52,10 +52,19 @@ export class LayerDashboardComponent implements OnInit {
 
   /** Initialize permission flags */
   private initPermissions(): void {
-    const permissions = this.userService.myself?.role?.permissions || [];
-    this.hasLayerCreatePermission = _.contains(permissions, 'CREATE_LAYER');
-    this.hasLayerEditPermission = _.contains(permissions, 'UPDATE_LAYER');
-    this.hasLayerDeletePermission = _.contains(permissions, 'DELETE_LAYER');
+    this.adminUserService.getMyself().subscribe({
+      next: (myself) => {
+        const permissions: string[] = myself?.role?.permissions || [];
+        this.hasLayerCreatePermission = permissions.includes('CREATE_LAYER');
+        this.hasLayerEditPermission = permissions.includes('UPDATE_LAYER');
+        this.hasLayerDeletePermission = permissions.includes('DELETE_LAYER');
+      },
+      error: () => {
+        this.hasLayerCreatePermission = false;
+        this.hasLayerEditPermission = false;
+        this.hasLayerDeletePermission = false;
+      }
+    });
   }
 
   /** Fetch and apply filters to the layer list */
@@ -76,7 +85,8 @@ export class LayerDashboardComponent implements OnInit {
     const term = this.layerSearch.trim().toLowerCase();
 
     this.filteredLayers = this.layers.filter(layer => {
-      const matchesSearch = !term ||
+      const matchesSearch =
+        !term ||
         layer.name?.toLowerCase().includes(term) ||
         layer.description?.toLowerCase().includes(term) ||
         layer.url?.toLowerCase().includes(term);
@@ -191,4 +201,3 @@ export class LayerDashboardComponent implements OnInit {
     this.toolTipWidth = `${window.innerWidth * 0.75}px`;
   }
 }
-
