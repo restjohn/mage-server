@@ -1,11 +1,11 @@
 import {
   Component,
   OnInit,
-  Inject,
+  OnDestroy,
   ElementRef,
   ViewChild
 } from '@angular/core';
-import { EMPTY, Subject, switchMap, take, takeUntil } from 'rxjs';
+import { catchError, EMPTY, finalize, map, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,11 +14,6 @@ import { AdminTeamsService } from '../../services/admin-teams-service';
 import { AdminEventsService } from '../../services/admin-events.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { PageEvent } from '@angular/material/paginator';
-import {
-  LoginService,
-  DevicePagingService,
-  Team
-} from '../../../upgrade/ajs-upgraded-providers';
 import { AdminUserService } from '../../services/admin-user.service';
 import { LocalStorageService } from 'src/app/http/local-storage.service';
 import { User } from '../user';
@@ -27,14 +22,10 @@ import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
 import * as zxcvbnCommonPackage from '@zxcvbn-ts/language-common';
 import * as zxcvbnEnPackage from '@zxcvbn-ts/language-en';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
-
-interface Device {
-  id: string;
-  uid: string;
-  userAgent: string;
-  appVersion?: string;
-  iconClass?: string;
-}
+import { LoginService } from 'admin/src/app/services/login.service';
+import { DevicePagingService } from 'admin/src/app/services/device-paging.service';
+import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
+import { TeamService } from 'admin/src/app/services/team.service';
 
 interface Login {
   id: string;
@@ -70,7 +61,7 @@ const CANDIDATE_TEAMS_KEY = 'all.search';
 /**
  * Admin component for viewing and managing a user's details, teams, events, devices, logins, and credentials.
  */
-export class UserDetailsComponent implements OnInit {
+export class UserDetailsComponent implements OnInit, OnDestroy {
   user: User;
   userTeams: any[] = [];
   userEvents: any[] = [];
@@ -172,9 +163,9 @@ export class UserDetailsComponent implements OnInit {
     public stateService: StateService,
     private dialog: MatDialog,
     private userService: AdminUserService,
-    @Inject(LoginService) private loginService: any,
-    @Inject(DevicePagingService) private devicePagingService: any,
-    @Inject(Team) private teamService: any,
+    private loginService: LoginService,
+    private devicePagingService: DevicePagingService,
+    private teamService: TeamService,
     private localStorageService: LocalStorageService,
     private teamsService: AdminTeamsService,
     private eventsService: AdminEventsService
@@ -263,11 +254,14 @@ export class UserDetailsComponent implements OnInit {
     delete this.deviceStateAndData['registered'];
     delete this.deviceStateAndData['unregistered'];
 
-    this.devicePagingService.refresh(this.deviceStateAndData).then(() => {
-      this.devices = this.devicePagingService.devices(
-        this.deviceStateAndData[this.deviceState]
-      );
-    });
+    this.devicePagingService
+      .refresh(this.deviceStateAndData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.devices = this.devicePagingService.devices(
+          this.deviceStateAndData[this.deviceState]
+        );
+      });
 
     try {
       zxcvbnOptions.setOptions({
@@ -661,7 +655,6 @@ export class UserDetailsComponent implements OnInit {
   ): void {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    // Use the canvas' existing size (set by template) and scale drawing accordingly
     const size = Math.min(canvas.width || 75, canvas.height || 75);
     canvas.width = size;
     canvas.height = size;
@@ -672,7 +665,7 @@ export class UserDetailsComponent implements OnInit {
     ctx.fillStyle = this.hexToRgb(color, 1);
 
     const centerX = size / 2;
-    const circleY = size * (17 / 44); // proportional to old 44px design
+    const circleY = size * (17 / 44);
     const circleR = size * (16 / 44);
     const innerR = size * (13 / 44);
     const baseY = size * (43 / 44);
@@ -848,22 +841,6 @@ export class UserDetailsComponent implements OnInit {
       userToSave['avatar'] = (this.editUser as any).avatar;
     }
 
-    const success = (updatedUser: User) => {
-      this.user = updatedUser;
-      this.isEditingUser = false;
-      this.editUser = null;
-      this.saving = false;
-      this.iconPreviewUrl = null;
-      this.avatarPreviewUrl = null;
-      this.removeIconSelected = false;
-    };
-
-    const error = (response: any) => {
-      this.error =
-        response.responseText || response.data || 'Failed to update user';
-      this.saving = false;
-    };
-
     this.userService
       .updateUser(this.editUser.id, userToSave)
       .pipe(takeUntil(this.destroy$))
@@ -888,14 +865,18 @@ export class UserDetailsComponent implements OnInit {
    * Add the current user to the selected non-member team.
    */
   addUserToTeam(): void {
-    this.teamService.addUser(
-      { id: this.nonUserTeam.id },
-      this.user,
-      (team: any) => {
-        this.userTeams.push(team);
-        this.nonUserTeam = null;
-      }
-    );
+    if (!this.nonUserTeam?.id || !this.user?.id) return;
+
+    this.teamService
+      .addUser(this.nonUserTeam.id, this.user.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (team: any) => {
+          this.userTeams.push(team);
+          this.nonUserTeam = null;
+        },
+        error: () => {}
+      });
   }
 
   /**
@@ -907,21 +888,21 @@ export class UserDetailsComponent implements OnInit {
     $event.stopPropagation();
     const wasLastItemOnPage = (this.userTeams?.length || 0) <= 1;
 
-    this.teamService.removeUser(
-      { id: team.id, userId: this.user.id },
-      (removedTeam: any) => {
-        // Optimistically update total count
-        this.totalUserTeams = Math.max(0, (this.totalUserTeams || 0) - 1);
+    this.teamService
+      .removeUser(team.id, this.user.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.totalUserTeams = Math.max(0, (this.totalUserTeams || 0) - 1);
 
-        // If we removed the last item on a non-first page, go back a page
-        if (wasLastItemOnPage && this.userTeamsPageIndex > 0) {
-          this.userTeamsPageIndex = this.userTeamsPageIndex - 1;
-        }
+          if (wasLastItemOnPage && this.userTeamsPageIndex > 0) {
+            this.userTeamsPageIndex = this.userTeamsPageIndex - 1;
+          }
 
-        // Refresh the current page from the server so rows and totals are accurate
-        this.loadUserTeams();
-      }
-    );
+          this.loadUserTeams();
+        },
+        error: () => {}
+      });
   }
 
   /**
@@ -1035,28 +1016,31 @@ export class UserDetailsComponent implements OnInit {
    * @param searchString - Regex or plain text search
    * @returns Promise resolving to matching devices
    */
-  searchLogins(searchString: string): Promise<Device[]> {
+  searchLogins(searchString: string): Observable<Device[]> {
     this.isSearchingDevices = true;
-
+  
     if (searchString == null) {
       searchString = '.*';
     }
-
+  
     return this.devicePagingService
       .search(this.deviceStateAndData[this.deviceState], searchString)
-      .then((devices: Device[]) => {
-        this.loginSearchResults = devices;
-        this.isSearchingDevices = false;
-
-        if (this.loginSearchResults.length === 0) {
-          const noDevice = {
-            userAgent: 'No Results Found'
-          } as Device;
-          this.loginSearchResults.push(noDevice);
-        }
-
-        return this.loginSearchResults;
-      });
+      .pipe(
+        map((devices: Device[]) => {
+          this.loginSearchResults = devices || [];
+          if (this.loginSearchResults.length === 0) {
+            this.loginSearchResults = [{ userAgent: 'No Results Found' } as Device];
+          }
+          return this.loginSearchResults;
+        }),
+        catchError(() => {
+          this.loginSearchResults = [{ userAgent: 'No Results Found' } as Device];
+          return of(this.loginSearchResults);
+        }),
+        finalize(() => {
+          this.isSearchingDevices = false;
+        })
+      );
   }
 
   /**

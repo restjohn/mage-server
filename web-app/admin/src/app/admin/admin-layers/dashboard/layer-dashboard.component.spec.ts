@@ -5,8 +5,8 @@ import { of, throwError } from 'rxjs';
 
 import { LayerDashboardComponent } from './layer-dashboard.component';
 import { LayersService, Layer } from '../layers.service';
-import { UserService } from 'admin/src/app/upgrade/ajs-upgraded-providers';
 import { PageEvent } from '@angular/material/paginator';
+import { AdminUserService } from '../../services/admin-user.service';
 
 describe('LayerDashboardComponent', () => {
   let component: LayerDashboardComponent;
@@ -62,7 +62,7 @@ describe('LayerDashboardComponent', () => {
         { provide: LayersService, useValue: mockLayersService },
         { provide: MatDialog, useValue: mockDialog },
         { provide: StateService, useValue: mockStateService },
-        { provide: UserService, useValue: mockUserService }
+        { provide: AdminUserService, useValue: mockUserService }
       ]
     })
       .compileComponents();

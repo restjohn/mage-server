@@ -23,7 +23,7 @@ export class ObservationEditGeometryComponent implements OnChanges {
   mapFeature: any
   editFeature: any
 
-  constructor(private element: ElementRef, @Inject(LocalStorageService) private localStorageService: any) { }
+  constructor(private element: ElementRef, private localStorageService: LocalStorageService) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.formGroup && changes.formGroup.currentValue) {

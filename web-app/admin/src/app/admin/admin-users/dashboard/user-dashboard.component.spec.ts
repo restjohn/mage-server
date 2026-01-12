@@ -8,9 +8,7 @@ import {
 import { UserDashboardComponent } from './user-dashboard.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import {
-  UserPagingService
-} from 'admin/src/app/upgrade/ajs-upgraded-providers';
+import { UserPagingService } from 'admin/src/app/services/user-paging.service';
 import { AdminTeamsService } from '../../services/admin-teams-service';
 import { StateService } from '@uirouter/angular';
 import { of } from 'rxjs';

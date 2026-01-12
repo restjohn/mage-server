@@ -8,12 +8,12 @@ import { of, throwError } from 'rxjs';
 import { TeamDetailsComponent } from './team-details.component';
 import { AdminTeamsService } from '../../services/admin-teams-service';
 import { AdminEventsService } from '../../services/admin-events.service';
-import { UserService } from '../../../upgrade/ajs-upgraded-providers';
 import { Team } from '../team';
 import { User } from '@ngageoint/mage.web-core-lib/user';
 import { Event } from 'src/app/filter/filter.types';
 import { DeleteTeamComponent } from '../delete-team/delete-team.component';
 import { SearchModalComponent } from '../../../core/search-modal/search-modal.component';
+import { AdminUserService } from '../../services/admin-user.service';
 
 describe('TeamDetailsComponent', () => {
   let component: TeamDetailsComponent;
@@ -84,7 +84,7 @@ describe('TeamDetailsComponent', () => {
       providers: [
         { provide: StateService, useValue: mockStateService },
         { provide: MatDialog, useValue: mockDialog },
-        { provide: UserService, useValue: mockUserService },
+        { provide: AdminUserService, useValue: mockUserService },
         { provide: AdminTeamsService, useValue: mockTeamsService },
         { provide: AdminEventsService, useValue: mockEventsService }
       ]

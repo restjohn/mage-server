@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AdminNavComponent } from './admin-nav';
-import { UserService } from '../../upgrade/ajs-upgraded-providers';
+import { AdminUserService } from '../services/admin-user.service';
 
 describe('AdminNavComponent', () => {
   let component: AdminNavComponent;
@@ -17,7 +17,7 @@ describe('AdminNavComponent', () => {
     TestBed.configureTestingModule({
       declarations: [AdminNavComponent],
       providers: [
-        { provide: UserService, useValue: mockUserService },
+        { provide: AdminUserService, useValue: mockUserService },
         { provide: '$injector', useValue: { get: () => mockState } }
       ]
     });

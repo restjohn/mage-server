@@ -8,7 +8,7 @@ import * as moment from 'moment';
 })
 export class MomentPipe implements PipeTransform {
 
-  constructor(@Inject(LocalStorageService) private localStorageService: any) { }
+  constructor(private localStorageService: LocalStorageService) { }
 
   transform(value: any, args?: any): any {
     switch (this.localStorageService.getTimeFormat()) {

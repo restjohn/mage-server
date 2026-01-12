@@ -26,11 +26,6 @@ import {
 import { DomSanitizer } from "@angular/platform-browser";
 import { first, Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-import {
-  FilterService,
-  MapService,
-  ObservationService,
-} from "../../../app/upgrade/ajs-upgraded-providers";
 import { ObservationEditFormPickerComponent } from "./observation-edit-form-picker.component";
 import * as moment from "moment";
 import { ObservationEditDiscardComponent } from "./observation-edit-discard/observation-edit-discard.component";
@@ -53,6 +48,9 @@ import { Observation, Event } from "src/app/filter/filter.types";
 import { AdminEventsService } from "../../admin/services/admin-events.service";
 import { LocalStorageService } from "src/app/http/local-storage.service";
 import { AdminUserService } from "../../admin/services/admin-user.service";
+import { MapService } from "src/app/map/map.service";
+import { FilterService } from "src/app/filter/filter.service";
+import { ObservationService } from "src/app/observation/observation.service";
 
 export type ObservationFormControl = UntypedFormControl & { definition: any };
 
@@ -140,8 +138,8 @@ export class ObservationEditComponent implements OnInit, OnChanges, OnDestroy {
     private snackBar: MatSnackBar,
     private attachmentService: AttachmentService,
     @Inject(DOCUMENT) private document: Document,
-    @Inject(MapService) private mapService: any,
-    @Inject(FilterService) private filterService: any,
+    private mapService: MapService,
+    private filterService: FilterService,
     private eventService: AdminEventsService,
     private adminUserService: AdminUserService,
     @Inject(ObservationService) private observationService: any,

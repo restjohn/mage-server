@@ -57,53 +57,15 @@ import { InputMaskModule } from '@ngneat/input-mask';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ColorPickerComponent } from './color-picker/color-picker.component';
 
-import { MapClipComponent } from './map/clip/clip.component';
 import { GeometryModule } from './geometry/geometry.module';
 import { MomentModule } from './moment/moment.module';
 import { BootstrapComponent } from './bootstrap/bootstrap.component';
-import { AttachmentComponent } from './observation/attachment/attachment.component';
-import { FilenamePipe } from './filename/filename.pipe';
-import { AttachUploadComponent } from './observation/attachment/attachment-upload/attachment-upload.component';
 import { UserAvatarComponent } from './user/user-avatar/user-avatar.component';
 import { TokenInterceptorService } from './http/token-interceptor.service';
 
 import {
-  mapServiceProvider,
-  eventResourceProvider,
-  eventServiceProvider,
-  geometryServiceProvider,
-  observationServiceProvider,
-  filterServiceProvider,
-  locationServiceProvider,
-  userServiceProvider,
-  settingsProvider,
-  teamProvider,
-  eventProvider,
-  authenticationConfigurationServiceProvider,
-  userPagingServiceProvider,
-  deviceServiceProvider,
-  devicePagingServiceProvider,
-  loginServiceProvider,
-  layerServiceProvider
-} from './upgrade/ajs-upgraded-providers';
-
-import {
   DMSValidatorDirective,
   MGRSValidatorDirective,
-  ObservationEditCheckboxComponent,
-  ObservationEditDateComponent,
-  ObservationEditSelectComponent,
-  ObservationEditEmailComponent,
-  ObservationEditGeometryComponent,
-  ObservationEditGeometryFormComponent,
-  ObservationEditGeometryMapComponent,
-  ObservationEditMultiselectComponent,
-  ObservationEditNumberComponent,
-  ObservationEditRadioComponent,
-  ObservationEditTextComponent,
-  ObservationEditTextareaComponent,
-  ObservationEditFormComponent,
-  ObservationEditComponent
 } from './observation/observation-edit/observation-edit';
 
 import { FeedItemComponent } from './feed/feed-item/feed-item.component';
@@ -121,10 +83,6 @@ import {
 } from './admin/admin-settings/admin-settings';
 import { DatetimePickerComponent } from './datetime-picker/datetime-picker.component';
 import { CommonModule } from '@angular/common';
-import { ObservationEditFormPickerComponent } from './observation/observation-edit/observation-edit-form-picker.component';
-import { ObservationEditDiscardComponent } from './observation/observation-edit/observation-edit-discard/observation-edit-discard.component';
-import { ObservationEditAttachmentComponent } from './observation/observation-edit/observation-edit-attachment/observation-edit-attachment.component';
-import { ObservationEditPasswordComponent } from './observation/observation-edit/observation-edit-password/observation-edit-password.component';
 import { ContactComponent } from './contact/contact.component';
 import { ContactDialogComponent } from './contact/contact-dialog.component';
 import { AdminAuthenticationOidcComponent } from './admin/admin-authentication/admin-authentication-oidc/admin-authentication-oidc.component';
@@ -259,23 +217,6 @@ import { AdminDevicessModule } from './admin/admin-devices/admin-devices.module'
     AdminDevicessModule,
   ],
   providers: [
-    mapServiceProvider,
-    userServiceProvider,
-    filterServiceProvider,
-    eventResourceProvider,
-    eventServiceProvider,
-    geometryServiceProvider,
-    observationServiceProvider,
-    locationServiceProvider,
-    settingsProvider,
-    teamProvider,
-    eventProvider,
-    authenticationConfigurationServiceProvider,
-    userPagingServiceProvider,
-    deviceServiceProvider,
-    devicePagingServiceProvider,
-    loginServiceProvider,
-    layerServiceProvider,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptorService,

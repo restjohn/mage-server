@@ -11,9 +11,9 @@ import { of } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
 import { FeedExpanded, ServiceType } from '@ngageoint/mage.web-core-lib/feed/feed.model';
 import { JsonSchemaModule } from '../../../../app/json-schema/json-schema.module';
-import { UserService } from '../../../../app/upgrade/ajs-upgraded-providers';
 import { AdminBreadcrumbModule } from '../../admin-breadcrumb/admin-breadcrumb.module';
 import { AdminServiceComponent } from './admin-service.component';
+import { AdminUserService } from '../../services/admin-user.service';
 
 class MockStateService {
   get params(): any {
@@ -66,7 +66,7 @@ describe('AdminServiceComponent', () => {
       }, {
         provide: MAT_DIALOG_DATA, useValue: {}
       }, {
-        provide: UserService,
+        provide: AdminUserService,
         useClass: MockUserService
       }, {
         provide: MatDialog,

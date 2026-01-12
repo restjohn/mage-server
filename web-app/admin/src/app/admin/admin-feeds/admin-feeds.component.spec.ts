@@ -3,7 +3,6 @@ import { ComponentFixture, inject, TestBed, waitForAsync } from '@angular/core/t
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { StateService } from '@uirouter/angular';
-import { UserService } from '../../../app/upgrade/ajs-upgraded-providers';
 import { AdminFeedsComponent } from './admin-feeds.component';
 import { AdminBreadcrumbModule } from '../admin-breadcrumb/admin-breadcrumb.module';
 import { MatCardModule } from '@angular/material/card'
@@ -14,6 +13,7 @@ import { MatInputModule } from '@angular/material/input'
 import { MatListModule } from '@angular/material/list'
 import { MatPaginatorModule } from '@angular/material/paginator'
 import { MatTabsModule } from '@angular/material/tabs'
+import { AdminUserService } from '../services/admin-user.service';
 
 class MockUserService {
   get myself(): any {
@@ -33,7 +33,7 @@ describe('AdminFeedsComponent', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: StateService, useValue: {} },
-        { provide: UserService, useClass: MockUserService },
+        { provide: AdminUserService, useClass: MockUserService },
         { provide: MatDialogRef, useValue: {} },
         { provide: MAT_DIALOG_DATA, useValue: {} }
       ],

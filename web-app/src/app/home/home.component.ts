@@ -5,7 +5,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { LocationService } from '../user/location/location.service';
 import { ActivatedRoute } from '@angular/router';
 import { User } from 'core-lib-src/user';
-import { Banners, SettingsService } from '../setttings/settings.service';
+import { Banners, SettingsService } from '../settings/settings.service';
 import * as _ from 'underscore';
 import { UserService } from '../user/user.service';
 import { MageEvent } from '@ngageoint/mage.web-core-lib/event';

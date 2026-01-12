@@ -4,9 +4,10 @@ import { of, Subject } from 'rxjs';
 
 import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
-import { DeviceService, UserService } from '../../../upgrade/ajs-upgraded-providers';
 
 import { DeviceDetailsComponent } from './device-details.component';
+import { AdminDeviceService } from '../../services/admin-device.service';
+import { AdminUserService } from '../../services/admin-user.service';
 
 describe('DeviceDetailsComponent', () => {
   let fixture: ComponentFixture<DeviceDetailsComponent>;
@@ -58,8 +59,8 @@ describe('DeviceDetailsComponent', () => {
       providers: [
         { provide: StateService, useValue: stateService },
         { provide: MatDialog, useValue: dialog },
-        { provide: DeviceService, useValue: deviceService },
-        { provide: UserService, useValue: userService }
+        { provide: AdminDeviceService, useValue: deviceService },
+        { provide: AdminUserService, useValue: userService }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();

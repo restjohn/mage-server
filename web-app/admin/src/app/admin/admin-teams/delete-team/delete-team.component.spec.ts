@@ -6,8 +6,8 @@ import { By } from '@angular/platform-browser';
 
 import { DeleteTeamComponent } from './delete-team.component';
 import { AdminTeamsService } from '../../services/admin-teams-service';
-import { UserService } from 'admin/src/app/upgrade/ajs-upgraded-providers';
 import { Team } from '../team';
+import { AdminUserService } from '../../services/admin-user.service';
 
 describe('DeleteTeamComponent', () => {
   let component: DeleteTeamComponent;
@@ -41,7 +41,7 @@ describe('DeleteTeamComponent', () => {
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { team: mockTeam } },
         { provide: AdminTeamsService, useValue: mockTeamsService },
-        { provide: UserService, useValue: mockUserService }
+        { provide: AdminUserService, useValue: mockUserService }
       ]
     }).compileComponents();
 

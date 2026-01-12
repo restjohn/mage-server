@@ -22,7 +22,7 @@ export class LayerPreviewComponent implements AfterViewInit, OnChanges {
 
     constructor(
         private http: HttpClient,
-        @Inject(LocalStorageService) private localStorageService: any
+        private localStorageService: LocalStorageService
     ) { }
 
     ngAfterViewInit(): void {

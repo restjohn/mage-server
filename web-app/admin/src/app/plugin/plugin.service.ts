@@ -117,7 +117,6 @@ export class PluginService {
     private injector: Injector,
     @Inject(SYSTEMJS)
     private system: SystemJS.Registry,
-    @Inject(LocalStorageService)
     private localStorageService: LocalStorageService) {
     const shareLib = (libId: string, lib: any) => registerSharedLibInContext(system, libId, lib)
     const providedLibs = {

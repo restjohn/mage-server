@@ -1,49 +1,39 @@
-import { Component, Inject, OnInit, EventEmitter, Output } from "@angular/core";
-import { Router } from "@angular/router";
-import * as _ from "underscore";
-import {
-  DeviceService,
-  DevicePagingService,
-  UserPagingService,
-} from "admin/src/app/upgrade/ajs-upgraded-providers";
-import { User } from "../admin-users/user";
-import {
-  Device,
-  DevicesResponse,
-  UsersResponse,
-} from "admin/src/@types/dashboard/admin-dashboard";
+import { Component, Inject, OnInit, EventEmitter, Output, OnDestroy } from "@angular/core";
 import { AdminBreadcrumb } from "../admin-breadcrumb/admin-breadcrumb.model";
 import { AdminUserService } from "../services/admin-user.service";
-import { takeUntil, Subject } from "rxjs";
+import { AdminDeviceService } from "../services/admin-device.service";
+import { DevicePagingService } from "../../services/device-paging.service";
+import { UserPagingService } from "../../services/user-paging.service";
+import { Subject, takeUntil } from "rxjs";
+import { User } from "../admin-users/user";
 
-/**
- * Admin dashboard component for managing users, devices, and logins.
- */
 @Component({
   selector: "admin-dashboard",
   templateUrl: "./admin-dashboard.html",
   styleUrls: ["./admin-dashboard.scss"],
 })
-export class AdminDashboardComponent implements OnInit {
+export class AdminDashboardComponent implements OnInit, OnDestroy {
   @Output() onUserActivated = new EventEmitter<any>();
   @Output() onDeviceEnabled = new EventEmitter<any>();
 
-  users: User[] = [];
-  userSearch: string = "";
-  userState: string = "inactive";
-  inactiveUsers: User[] = [];
-  stateAndData: UsersResponse;
+  userSearch = "";
+  userState = "inactive";
 
-  devices: Device[] = [];
   deviceSearch = "";
   deviceState = "unregistered";
-  unregisteredDevices: Device[] = [];
-  deviceStateAndData: DevicesResponse;
 
-  breadcrumbs: AdminBreadcrumb[] = [{
-    title: 'Dashboard',
-    iconClass: 'fa fa-dashboard'
-  }];
+  stateAndData!: ReturnType<UserPagingService["constructDefault"]>;
+  deviceStateAndData!: ReturnType<DevicePagingService["constructDefault"]>;
+
+  inactiveUsers: Array<ReturnType<UserPagingService["users"]>[number]> = [];
+  unregisteredDevices: Array<ReturnType<DevicePagingService["devices"]>[number]> = [];
+
+  breadcrumbs: AdminBreadcrumb[] = [
+    {
+      title: "Dashboard",
+      iconClass: "fa fa-dashboard",
+    },
+  ];
 
   private $state: any;
   private destroy$ = new Subject<void>();
@@ -51,41 +41,42 @@ export class AdminDashboardComponent implements OnInit {
   currentUser: User | null = null;
 
   constructor(
-    private router: Router,
     private userService: AdminUserService,
-    @Inject(DeviceService) private deviceService: any,
-    @Inject(DevicePagingService) private devicePagingService: any,
-    @Inject(UserPagingService) private userPagingService: any,
-    @Inject('$injector') private $injector: any,
+    private deviceService: AdminDeviceService,
+    private devicePagingService: DevicePagingService,
+    private userPagingService: UserPagingService,
+    @Inject("$injector") private $injector: any
   ) {
-    this.$state = this.$injector.get('$state');
+    this.$state = this.$injector.get("$state");
   }
 
-  /**
-   * Initialize the component, loading users, devices, and current user data.
-   */
   ngOnInit(): void {
     this.stateAndData = this.userPagingService.constructDefault();
     this.deviceStateAndData = this.devicePagingService.constructDefault();
 
-    // Subscribe to current user
     this.userService.myself$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
+      .subscribe((user) => {
         this.currentUser = user;
       });
 
-    this.devicePagingService.refresh(this.deviceStateAndData).then(() => {
-      this.unregisteredDevices = this.devicePagingService.devices(
-        this.deviceStateAndData[this.deviceState],
-      );
-    });
+    this.devicePagingService
+      .refresh(this.deviceStateAndData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.unregisteredDevices = this.devicePagingService.devices(
+          this.deviceStateAndData[this.deviceState]
+        );
+      });
 
-    this.userPagingService.refresh(this.stateAndData).then(() => {
-      this.inactiveUsers = this.userPagingService.users(
-        this.stateAndData[this.userState],
-      );
-    });
+    this.userPagingService
+      .refresh(this.stateAndData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.inactiveUsers = this.userPagingService.users(
+          this.stateAndData[this.userState]
+        );
+      });
   }
 
   ngOnDestroy(): void {
@@ -93,99 +84,93 @@ export class AdminDashboardComponent implements OnInit {
     this.destroy$.complete();
   }
 
-  count() {
+  count(): number {
     return this.userPagingService.count(this.stateAndData[this.userState]);
   }
 
-  hasNext() {
+  hasNext(): boolean {
     return this.userPagingService.hasNext(this.stateAndData[this.userState]);
   }
 
-  next() {
+  next(): void {
     this.userPagingService
       .next(this.stateAndData[this.userState])
-      .then((users) => {
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((users) => {
         this.inactiveUsers = users;
       });
   }
 
-  hasPrevious() {
+  hasPrevious(): boolean {
     return this.userPagingService.hasPrevious(
-      this.stateAndData[this.userState],
+      this.stateAndData[this.userState]
     );
   }
 
-  previous() {
+  previous(): void {
     this.userPagingService
       .previous(this.stateAndData[this.userState])
-      .then((users) => {
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((users) => {
         this.inactiveUsers = users;
       });
   }
 
-  deviceCount() {
+  deviceCount(): number {
     return this.devicePagingService.count(
-      this.deviceStateAndData[this.deviceState],
+      this.deviceStateAndData[this.deviceState]
     );
   }
 
-  hasNextDevice() {
+  hasNextDevice(): boolean {
     return this.devicePagingService.hasNext(
-      this.deviceStateAndData[this.deviceState],
+      this.deviceStateAndData[this.deviceState]
     );
   }
 
-  nextDevice() {
+  nextDevice(): void {
     this.devicePagingService
       .next(this.deviceStateAndData[this.deviceState])
-      .then((devices) => {
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((devices) => {
         this.unregisteredDevices = devices;
       });
   }
 
-  hasPreviousDevice() {
+  hasPreviousDevice(): boolean {
     return this.devicePagingService.hasPrevious(
-      this.deviceStateAndData[this.deviceState],
+      this.deviceStateAndData[this.deviceState]
     );
   }
 
-  previousDevice() {
+  previousDevice(): void {
     this.devicePagingService
       .previous(this.deviceStateAndData[this.deviceState])
-      .then((devices) => {
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((devices) => {
         this.unregisteredDevices = devices;
       });
   }
 
-  search() {
+  search(): void {
     this.userPagingService
       .search(this.stateAndData[this.userState], this.userSearch)
-      .then((users) => {
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((users) => {
         this.inactiveUsers = users;
       });
   }
 
-  searchDevices() {
+  searchDevices(): void {
     this.devicePagingService
       .search(this.deviceStateAndData[this.deviceState], this.deviceSearch)
-      .then((devices) => {
-        if (devices.length > 0) {
-          this.unregisteredDevices = devices;
-        } else {
-          this.devicePagingService
-            .search(
-              this.deviceStateAndData[this.deviceState],
-              this.deviceSearch,
-              this.deviceSearch,
-            )
-            .then((devices) => {
-              this.unregisteredDevices = devices;
-            });
-        }
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((devices) => {
+        this.unregisteredDevices = devices;
       });
   }
 
-  iconClass(device: Device): string {
+  iconClass(device: any): string {
     if (!device) return "";
     if (device.iconClass) return device.iconClass;
 
@@ -194,49 +179,58 @@ export class AdminDashboardComponent implements OnInit {
       return "fa fa-desktop admin-desktop-icon-xs";
     if (userAgent.includes("android"))
       return "fa fa-android admin-android-icon-xs";
-    if (userAgent.includes("ios")) return "fa fa-apple admin-apple-icon-xs";
+    if (userAgent.includes("ios"))
+      return "fa fa-apple admin-apple-icon-xs";
     return "fa fa-mobile admin-generic-icon-xs";
   }
 
-  gotoUser(user: User) {
-    this.$state.go('admin.user', { userId: user.id });
+  gotoUser(user: any): void {
+    this.$state.go("admin.user", { userId: user.id });
   }
 
-  gotoDevice(device: Device) {
-    this.$state.go('admin.device', { deviceId: device.id });
+  gotoDevice(device: any): void {
+    this.$state.go("admin.device", { deviceId: device.id });
   }
 
-  /**
-   * Check if the current user has a specific permission.
-   */
   hasPermission(permission: string): boolean {
     return this.currentUser?.role?.permissions?.includes(permission) || false;
   }
 
-  activateUser(event: MouseEvent, user: User) {
+  activateUser(event: MouseEvent, user: any): void {
     event.stopPropagation();
     user.active = true;
+
     this.userService.updateUser(user.id, user, () => {
-      this.userPagingService.refresh(this.stateAndData).then(() => {
-        this.inactiveUsers = this.userPagingService.users(
-          this.stateAndData[this.userState],
-        );
-      });
+      this.userPagingService
+        .refresh(this.stateAndData)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.inactiveUsers = this.userPagingService.users(
+            this.stateAndData[this.userState]
+          );
+        });
+
       this.onUserActivated.emit({ user });
     });
   }
 
-  registerDevice(event: MouseEvent, device: Device) {
+  registerDevice(event: MouseEvent, device: any): void {
     event.stopPropagation();
-    device.registered = true;
 
-    this.deviceService.updateDevice(device).then((updated: User) => {
-      this.devicePagingService.refresh(this.deviceStateAndData).then(() => {
-        this.unregisteredDevices = this.devicePagingService.devices(
-          this.deviceStateAndData[this.deviceState],
-        );
+    this.deviceService
+      .updateDevice(device.id, { registered: true })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((updatedDevice) => {
+        this.devicePagingService
+          .refresh(this.deviceStateAndData)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(() => {
+            this.unregisteredDevices = this.devicePagingService.devices(
+              this.deviceStateAndData[this.deviceState]
+            );
+          });
+
+        this.onDeviceEnabled.emit({ device: updatedDevice });
       });
-      this.onDeviceEnabled.emit({ user: updated });
-    });
   }
 }

@@ -1,42 +1,35 @@
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from "@angular/core/testing";
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { AdminDashboardComponent } from "./admin-dashboard";
-import { EventEmitter } from "@angular/core";
-import {
-  UserService,
-  DeviceService,
-  DevicePagingService,
-  EventService,
-  LayerService,
-  UserPagingService,
-} from "admin/src/app/upgrade/ajs-upgraded-providers";
-import { User } from "core-lib-src/user";
-import { Device } from "admin/src/@types/dashboard/admin-dashboard";
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatListModule } from '@angular/material/list';
-import { MatBadgeModule } from '@angular/material/badge';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatNativeDateModule } from '@angular/material/core';
-import { AdminBreadcrumbModule } from '../admin-breadcrumb/admin-breadcrumb.module';
-import { MatTableModule } from '@angular/material/table';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { StateService } from "@uirouter/angular";
+import { ComponentFixture, TestBed, fakeAsync, tick } from "@angular/core/testing";
+import { CUSTOM_ELEMENTS_SCHEMA, EventEmitter } from "@angular/core";
+import { of } from "rxjs";
 
-const TEST_USERS: User[] = [
+import { AdminDashboardComponent } from "./admin-dashboard";
+import { AdminBreadcrumbModule } from "../admin-breadcrumb/admin-breadcrumb.module";
+
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+
+import { MatToolbarModule } from "@angular/material/toolbar";
+import { MatIconModule } from "@angular/material/icon";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { MatButtonModule } from "@angular/material/button";
+import { MatCardModule } from "@angular/material/card";
+import { MatListModule } from "@angular/material/list";
+import { MatBadgeModule } from "@angular/material/badge";
+import { MatSelectModule } from "@angular/material/select";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { MatNativeDateModule } from "@angular/material/core";
+import { MatTableModule } from "@angular/material/table";
+
+import { StateService } from "@uirouter/angular";
+import { AdminUserService } from "../services/admin-user.service";
+import { AdminDeviceService } from "../services/admin-device.service";
+import { DevicePagingService } from "../../services/device-paging.service";
+import { UserPagingService } from "../../services/user-paging.service";
+
+const TEST_USERS: any[] = [
   {
     id: "1",
     username: "ranma77",
@@ -47,7 +40,11 @@ const TEST_USERS: User[] = [
     createdAt: new Date().toDateString(),
     lastUpdated: new Date().toDateString(),
     recentEventIds: [],
-    role: "martial artist",
+    role: {
+      id: "Test",
+      name: "martial artist",
+      permissions: [],
+    },
     email: "ranma@example.com",
     phones: [],
   },
@@ -61,7 +58,11 @@ const TEST_USERS: User[] = [
     createdAt: new Date().toDateString(),
     lastUpdated: new Date().toDateString(),
     recentEventIds: [],
-    role: "spirit detective",
+    role: {
+      id: "Test",
+      name: "spirit detective",
+      permissions: [],
+    },
     email: "yusuke@example.com",
     phones: [],
   },
@@ -75,20 +76,23 @@ const TEST_USERS: User[] = [
     createdAt: new Date().toDateString(),
     lastUpdated: new Date().toDateString(),
     recentEventIds: [],
-    role: "saiyan warrior",
+    role: {
+      id: "Test",
+      name: "saiyan warrior",
+      permissions: [],
+    },
     email: "goku@example.com",
     phones: [],
   },
 ];
 
-const TEST_DEVICES: Device[] = [
+const TEST_DEVICES: any[] = [
   {
     id: "d1",
     uid: "Ranma's Phone",
     registered: true,
     appVersion: "Web Client",
     userAgent: "",
-    userId: "1",
     iconClass: "",
   },
   {
@@ -97,7 +101,6 @@ const TEST_DEVICES: Device[] = [
     registered: true,
     appVersion: "mobile",
     userAgent: "iOS",
-    userId: "2",
     iconClass: "",
   },
   {
@@ -106,82 +109,79 @@ const TEST_DEVICES: Device[] = [
     registered: false,
     appVersion: "mobile",
     userAgent: "android",
-    userId: "3",
     iconClass: "",
   },
 ];
 
 const mockState = {
-  go: jasmine.createSpy('go'),
+  go: jasmine.createSpy("go"),
 };
 
 const mockInjector = {
   get: (token: string) => {
-    if (token === '$state') {
-      return mockState;
-    }
+    if (token === "$state") return mockState;
     return null;
   },
 };
 
-
-const mockUserService = {
-  myself: { role: { permissions: ["test.permission"] } },
+const mockUserService: Partial<AdminUserService> & any = {
+  myself$: of({
+    id: "me",
+    role: { permissions: ["test.permission"] },
+  }),
   updateUser: jasmine.createSpy("updateUser"),
 };
 
-const mockDeviceService = {
-  updateDevice: jasmine
-    .createSpy("updateDevice")
-    .and.returnValue(Promise.resolve(TEST_DEVICES[0])),
+const mockDeviceService: Partial<AdminDeviceService> & any = {
+  updateDevice: jasmine.createSpy("updateDevice").and.callFake((_id: string, patch: any) => {
+    const updated = { ...TEST_DEVICES[0], ...patch };
+    return of(updated);
+  }),
 };
 
-const mockUserPagingService = {
-  constructDefault: () => ({}),
-  refresh: jasmine.createSpy("refresh").and.returnValue(Promise.resolve()),
-  users: jasmine.createSpy("users").and.callFake((state) => TEST_USERS),
+const userStateAndData = {
+  inactive: {},
+};
+
+const deviceStateAndData = {
+  unregistered: {},
+};
+
+const mockUserPagingService: Partial<UserPagingService> & any = {
+  constructDefault: jasmine.createSpy("constructDefault").and.returnValue(userStateAndData),
+  refresh: jasmine.createSpy("refresh").and.returnValue(of([])),
+  users: jasmine.createSpy("users").and.callFake((_state: any) => TEST_USERS),
   count: jasmine.createSpy("count").and.returnValue(TEST_USERS.length),
   hasNext: jasmine.createSpy("hasNext").and.returnValue(true),
   hasPrevious: jasmine.createSpy("hasPrevious").and.returnValue(false),
-  next: jasmine
-    .createSpy("next")
-    .and.returnValue(Promise.resolve([TEST_USERS[1]])),
-  previous: jasmine
-    .createSpy("previous")
-    .and.returnValue(Promise.resolve([TEST_USERS[0]])),
-  search: jasmine.createSpy("search").and.callFake((state, term) => {
-    return Promise.resolve(
+  next: jasmine.createSpy("next").and.returnValue(of([TEST_USERS[1]])),
+  previous: jasmine.createSpy("previous").and.returnValue(of([TEST_USERS[0]])),
+  search: jasmine.createSpy("search").and.callFake((_state: any, term: string) => {
+    return of(
       TEST_USERS.filter((u) =>
-        u.displayName.toLowerCase().includes(term.toLowerCase()),
-      ),
+        (u.displayName || "").toLowerCase().includes((term || "").toLowerCase())
+      )
     );
   }),
 };
 
-const mockDevicePagingService = {
-  constructDefault: () => ({}),
-  refresh: jasmine.createSpy("refresh").and.returnValue(Promise.resolve()),
-  devices: jasmine.createSpy("devices").and.returnValue(TEST_DEVICES),
+const mockDevicePagingService: Partial<DevicePagingService> & any = {
+  constructDefault: jasmine.createSpy("constructDefault").and.returnValue(deviceStateAndData),
+  refresh: jasmine.createSpy("refresh").and.returnValue(of([])),
+  devices: jasmine.createSpy("devices").and.callFake((_state: any) => TEST_DEVICES),
   count: jasmine.createSpy("count").and.returnValue(TEST_DEVICES.length),
   hasNext: jasmine.createSpy("hasNext").and.returnValue(true),
   hasPrevious: jasmine.createSpy("hasPrevious").and.returnValue(false),
-  next: jasmine
-    .createSpy("next")
-    .and.returnValue(Promise.resolve([TEST_DEVICES[1]])),
-  previous: jasmine
-    .createSpy("previous")
-    .and.returnValue(Promise.resolve([TEST_DEVICES[0]])),
-  search: jasmine.createSpy("search").and.callFake((state, term) => {
-    return Promise.resolve(
+  next: jasmine.createSpy("next").and.returnValue(of([TEST_DEVICES[1]])),
+  previous: jasmine.createSpy("previous").and.returnValue(of([TEST_DEVICES[0]])),
+  search: jasmine.createSpy("search").and.callFake((_state: any, term: string) => {
+    return of(
       TEST_DEVICES.filter((d) =>
-        d.uid.toString().toLowerCase().includes(term.toLowerCase()),
-      ),
+        (d.uid || "").toString().toLowerCase().includes((term || "").toLowerCase())
+      )
     );
   }),
 };
-
-const mockEventService = {};
-const mockLayerService = {};
 
 describe("AdminDashboardComponent", () => {
   let component: AdminDashboardComponent;
@@ -207,15 +207,14 @@ describe("AdminDashboardComponent", () => {
         MatNativeDateModule,
         MatTableModule,
         AdminBreadcrumbModule,
-        BrowserAnimationsModule],
+        BrowserAnimationsModule,
+      ],
       providers: [
-        { provide: UserService, useValue: mockUserService },
-        { provide: DeviceService, useValue: mockDeviceService },
+        { provide: AdminUserService, useValue: mockUserService },
+        { provide: AdminDeviceService, useValue: mockDeviceService },
         { provide: DevicePagingService, useValue: mockDevicePagingService },
-        { provide: EventService, useValue: mockEventService },
-        { provide: LayerService, useValue: mockLayerService },
         { provide: UserPagingService, useValue: mockUserPagingService },
-        { provide: '$injector', useValue: mockInjector },
+        { provide: "$injector", useValue: mockInjector },
         { provide: StateService, useValue: mockState },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -230,7 +229,7 @@ describe("AdminDashboardComponent", () => {
     expect(component).toBeTruthy();
   });
 
-  it("should call services in ngOnInit", fakeAsync(() => {
+  it("should call paging refresh in ngOnInit and populate lists", fakeAsync(() => {
     tick();
     expect(mockUserPagingService.refresh).toHaveBeenCalled();
     expect(mockDevicePagingService.refresh).toHaveBeenCalled();
@@ -240,12 +239,10 @@ describe("AdminDashboardComponent", () => {
 
   it("should navigate to user and device", () => {
     component.gotoUser(TEST_USERS[0]);
-    expect(mockState.go).toHaveBeenCalledWith('admin.user', { userId: TEST_USERS[0].id });
-
+    expect(mockState.go).toHaveBeenCalledWith("admin.user", { userId: TEST_USERS[0].id });
 
     component.gotoDevice(TEST_DEVICES[0]);
-    expect(mockState.go).toHaveBeenCalledWith('admin.device', { deviceId: TEST_DEVICES[0].id });
-
+    expect(mockState.go).toHaveBeenCalledWith("admin.device", { deviceId: TEST_DEVICES[0].id });
   });
 
   it("should activate user and emit event", fakeAsync(() => {
@@ -253,7 +250,7 @@ describe("AdminDashboardComponent", () => {
     component.onUserActivated = new EventEmitter();
     spyOn(component.onUserActivated, "emit");
 
-    mockUserService.updateUser.and.callFake((id, user, cb) => cb());
+    mockUserService.updateUser.and.callFake((_id: string, _user: any, cb: Function) => cb());
 
     component.activateUser(new MouseEvent("click"), user);
     tick();
@@ -270,9 +267,9 @@ describe("AdminDashboardComponent", () => {
     component.registerDevice(new MouseEvent("click"), device);
     tick();
 
-    expect(device.registered).toBeTrue();
+    expect(mockDeviceService.updateDevice).toHaveBeenCalledWith(device.id, { registered: true });
     expect(component.onDeviceEnabled.emit).toHaveBeenCalledWith({
-      user: TEST_DEVICES[0],
+      device: jasmine.objectContaining({ id: "d1", registered: true }),
     });
   }));
 
@@ -322,12 +319,10 @@ describe("AdminDashboardComponent", () => {
   }));
 
   it("should set icon classes correctly", () => {
-    expect(component.iconClass(TEST_DEVICES[0])).toContain(
-      "desktop",
-    );
+    expect(component.iconClass(TEST_DEVICES[0])).toContain("desktop");
     expect(component.iconClass(TEST_DEVICES[2])).toContain("android");
     expect(component.iconClass(TEST_DEVICES[1])).toContain("apple");
     expect(component.iconClass({ ...TEST_DEVICES[1], userAgent: "mobile" })).toContain("mobile");
-    expect(component.iconClass(null)).toEqual("");
+    expect(component.iconClass(null as any)).toEqual("");
   });
 });

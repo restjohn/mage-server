@@ -118,7 +118,7 @@ export class LayerDetailsComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private http: HttpClient,
-    @Inject(LocalStorageService) private localStorageService: any,
+    private localStorageService: LocalStorageService,
     private adminUserService: AdminUserService
   ) { }
 

@@ -4,7 +4,11 @@ import { AdminSettingsComponent } from './admin-settings.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
-import { MatSnackBarModule, MatSnackBar, MatSnackBarDismiss } from '@angular/material/snack-bar';
+import {
+  MatSnackBarModule,
+  MatSnackBar,
+  MatSnackBarDismiss
+} from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -22,108 +26,141 @@ import { MatOptionModule, MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { FormsModule } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
-import { Settings, Team, Event, AuthenticationConfigurationService } from '../../../app/upgrade/ajs-upgraded-providers';
-import { Subject, Observable } from 'rxjs';
+
+import { Subject, Observable, BehaviorSubject, of } from 'rxjs';
 import { StateService, TransitionService } from '@uirouter/core';
+
 import { AdminUserService } from '../services/admin-user.service';
 import { LocalStorageService } from 'src/app/http/local-storage.service';
 
+import { SettingsService } from 'admin/src/app/services/settings.service';
+import { TeamService } from 'admin/src/app/services/team.service';
+import { EventService } from 'admin/src/app/services/event.service';
+import { AuthenticationConfigurationService } from '../services/authentication-configuration.service';
+
 class MockSnackbarRef {
-  private readonly afterDismissedObservable = new Subject<MatSnackBarDismiss>()
+  private readonly afterDismissedObservable = new Subject<MatSnackBarDismiss>();
 
   afterDismissed(): Observable<MatSnackBarDismiss> {
-    return this.afterDismissedObservable
+    return this.afterDismissedObservable;
   }
 
   dismiss(): void {
-    this.afterDismissedObservable.next({ dismissedByAction: false })
-    this.afterDismissedObservable.complete()
+    this.afterDismissedObservable.next({ dismissedByAction: false });
+    this.afterDismissedObservable.complete();
   }
 
   dismissWithAction(): void {
-    this.afterDismissedObservable.next({ dismissedByAction: true })
-    this.afterDismissedObservable.complete()
+    this.afterDismissedObservable.next({ dismissedByAction: true });
+    this.afterDismissedObservable.complete();
   }
 }
 
 class MockSnackbar {
-  private snackbarRef = new MockSnackbarRef()
+  private snackbarRef = new MockSnackbarRef();
 
   get _openedSnackBarRef(): any {
-    return this.snackbarRef
+    return this.snackbarRef;
   }
 
   open(): any {
-    return this.snackbarRef
+    return this.snackbarRef;
   }
 }
 
-class MockSettings {
-  query(): any {
-    return { $promise: Promise.resolve({}) };
+class MockSettingsService {
+  query(): Observable<any> {
+    return of({});
   }
 }
 
-class MockTeam {
-  query(): any {
-    return { $promise: Promise.resolve([]) };
+class MockTeamService {
+  query(): Observable<any[]> {
+    return of([]);
   }
 }
 
-class MockEvent {
-  query(): any {
-    return { $promise: Promise.resolve([]) };
+class MockEventService {
+  query(): Observable<any[]> {
+    return of([]);
   }
 }
 
 class MockAuthenticationConfigurationService {
-  getAllConfigurations(): Promise<any> {
-    return Promise.resolve({
-      data: []
-    });
+  getAllConfigurations(): Observable<any> {
+    return of({ data: [] });
   }
 }
 
-class MockStateService {
-
-}
+class MockStateService {}
 
 class MockTransitionService {
-  onExit(a: any, b: any, c: any): void {
-
-  }
-
+  onExit(_a: any, _b: any, _c: any): void {}
 }
 
 describe('AdminSettingsComponent', () => {
   let component: AdminSettingsComponent;
   let fixture: ComponentFixture<AdminSettingsComponent>;
 
-  beforeEach(waitForAsync(() => {
-    const mockLocalStorageService = { getToken: (): string => '1' };
-    const mockDialogRef = { close: (): void => { } };
-    const mockUserService = { myself: { role: { permissions: ['UPDATE_AUTH_CONFIG'] } } };
+  beforeEach(
+    waitForAsync(() => {
+      const mockLocalStorageService = { getToken: (): string => '1' };
+      const mockDialogRef = { close: (): void => {} };
 
-    TestBed.configureTestingModule({
-      imports: [NoopAnimationsModule, MatPaginatorModule, MatSortModule, MatSnackBarModule, MatTableModule, MatDialogModule,
-        MatProgressSpinnerModule, MatInputModule, MatFormFieldModule, MatIconModule, HttpClientTestingModule,
-        NoopAnimationsModule, MatCheckboxModule, MatListModule, MatCardModule, MatExpansionModule, MatRadioModule,
-        MatSelectModule, MatOptionModule, MatDatepickerModule, MatNativeDateModule, FormsModule, MatChipsModule],
-      providers: [
-        { provide: LocalStorageService, useValue: mockLocalStorageService },
-        { provide: Settings, useClass: MockSettings },
-        { provide: Team, useClass: MockTeam },
-        { provide: Event, useClass: MockEvent },
-        { provide: AuthenticationConfigurationService, useClass: MockAuthenticationConfigurationService },
-        { provide: MatDialogRef, useValue: mockDialogRef },
-        { provide: MatSnackBar, useClass: MockSnackbar },
-        { provide: AdminUserService, useValue: mockUserService },
-        { provide: StateService, useClass: MockStateService },
-        { provide: TransitionService, useClass: MockTransitionService }
-      ],
-      declarations: [AdminSettingsComponent]
-    }).compileComponents();
-  }));
+      const myself$ = new BehaviorSubject<any>({
+        role: { permissions: ['UPDATE_AUTH_CONFIG'] }
+      });
+
+      const mockUserService: any = {
+        myself: myself$.value,
+        myself$,
+        getMyself: jasmine.createSpy('getMyself').and.returnValue(of(myself$.value))
+      };
+
+      TestBed.configureTestingModule({
+        imports: [
+          NoopAnimationsModule,
+          MatPaginatorModule,
+          MatSortModule,
+          MatSnackBarModule,
+          MatTableModule,
+          MatDialogModule,
+          MatProgressSpinnerModule,
+          MatInputModule,
+          MatFormFieldModule,
+          MatIconModule,
+          HttpClientTestingModule,
+          MatCheckboxModule,
+          MatListModule,
+          MatCardModule,
+          MatExpansionModule,
+          MatRadioModule,
+          MatSelectModule,
+          MatOptionModule,
+          MatDatepickerModule,
+          MatNativeDateModule,
+          FormsModule,
+          MatChipsModule
+        ],
+        providers: [
+          { provide: LocalStorageService, useValue: mockLocalStorageService },
+          { provide: SettingsService, useClass: MockSettingsService },
+          { provide: TeamService, useClass: MockTeamService },
+          { provide: EventService, useClass: MockEventService },
+          {
+            provide: AuthenticationConfigurationService,
+            useClass: MockAuthenticationConfigurationService
+          },
+          { provide: MatDialogRef, useValue: mockDialogRef },
+          { provide: MatSnackBar, useClass: MockSnackbar },
+          { provide: AdminUserService, useValue: mockUserService },
+          { provide: StateService, useClass: MockStateService },
+          { provide: TransitionService, useClass: MockTransitionService }
+        ],
+        declarations: [AdminSettingsComponent]
+      }).compileComponents();
+    })
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(AdminSettingsComponent);

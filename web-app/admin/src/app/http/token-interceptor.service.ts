@@ -8,7 +8,7 @@ import { LocalStorageService } from 'src/app/http/local-storage.service';
 })
 export class TokenInterceptorService implements HttpInterceptor {
 
-  constructor(@Inject(LocalStorageService) private localStorageService: any) { }
+  constructor(private localStorageService: LocalStorageService) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.localStorageService.getToken();

@@ -10,7 +10,7 @@ import * as DMS from './geometry-dms'
 })
 export class GeometryPipe implements PipeTransform {
 
-  constructor(@Inject(LocalStorageService) private localStorageService: any) { }
+  constructor(private localStorageService: LocalStorageService) { }
 
   transform(value: any, format?: number): any {
     if (value === undefined) return

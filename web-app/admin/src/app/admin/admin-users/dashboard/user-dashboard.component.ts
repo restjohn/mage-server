@@ -6,9 +6,7 @@ import { from, lastValueFrom, EMPTY } from 'rxjs';
 import { mergeMap, tap, catchError, finalize } from 'rxjs/operators';
 
 import { StateService } from '@uirouter/angular';
-import {
-  UserPagingService
-} from 'admin/src/app/upgrade/ajs-upgraded-providers';
+import { UserPagingService } from 'admin/src/app/services/user-paging.service';
 import { LocalStorageService } from 'src/app/http/local-storage.service';
 import { User } from 'core-lib-src/user';
 import { CreateUserModalComponent } from '../create-user/create-user.component';

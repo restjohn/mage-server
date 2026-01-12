@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { UserSearchBoxComponent } from './user-search-box.component';
-import { UserPagingService } from 'admin/src/app/upgrade/ajs-upgraded-providers';
+import { UserPagingService } from 'admin/src/app/services/user-paging.service';
 
 describe('UserSearchBoxComponent', () => {
   let component: UserSearchBoxComponent;

@@ -1,10 +1,9 @@
 import _ from 'underscore'
-import { Component, OnInit, ElementRef, ViewChild, Inject } from '@angular/core'
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core'
 import { UntypedFormControl } from '@angular/forms'
 import { Observable } from 'rxjs'
 import { map, startWith, debounceTime, switchMap } from 'rxjs/operators'
 import { StateService } from '@uirouter/angular'
-import { Event } from '../../../upgrade/ajs-upgraded-providers'
 import { ServiceType, FeedTopic, Service, FeedExpanded, FeedService } from '@ngageoint/mage.web-core-lib/feed'
 import { MatDialog } from '@angular/material/dialog'
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete'
@@ -14,6 +13,7 @@ import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model'
 import { AdminFeedDeleteComponent } from './admin-feed-delete/admin-feed-delete.component'
 import { AdminEventsService } from '../../services/admin-events.service'
 import { AdminUserService } from '../../services/admin-user.service'
+import { EventService } from 'admin/src/app/services/event.service'
 
 @Component({
   selector: 'app-admin-feed',
@@ -81,9 +81,8 @@ export class AdminFeedComponent implements OnInit {
     private snackBar: MatSnackBar,
     private eventsService: AdminEventsService,
     private adminUserService: AdminUserService,
-    @Inject(Event) private eventResource: any
+    private eventService: EventService
   ) {
-    // initialize flags defensively; real values set in ngOnInit once myself is loaded
     this.hasFeedCreatePermission = false
     this.hasFeedEditPermission = false
     this.hasFeedDeletePermission = false
@@ -91,7 +90,6 @@ export class AdminFeedComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Load current user + permissions via the new Angular service
     this.adminUserService.getMyself().subscribe({
       next: (myself) => {
         this.myself = myself
@@ -102,7 +100,6 @@ export class AdminFeedComponent implements OnInit {
         this.hasFeedDeletePermission = perms.includes('FEEDS_CREATE_FEED')
         this.hasUpdateEventPermission = perms.includes('UPDATE_EVENT')
 
-        // continue with feed load after we have myself (so ACL filtering works)
         this.initFeed()
       },
       error: () => {
@@ -112,7 +109,6 @@ export class AdminFeedComponent implements OnInit {
         this.hasFeedDeletePermission = false
         this.hasUpdateEventPermission = false
 
-        // still load feed; ACL filtering will be conservative
         this.initFeed()
       }
     })
@@ -202,30 +198,46 @@ export class AdminFeedComponent implements OnInit {
   }
 
   addFeedToEvent($event: MatAutocompleteSelectedEvent): void {
-    this.eventResource.addFeed({ id: $event.option.id }, `"${this.feed.id}"`, event => {
-      this.searchControl.reset()
-      this.eventModel = null
-      this.addEvent = false
+    const eventId = String($event.option.id)
 
-      this.loadAllEvents()
+    this.eventService.addFeed(eventId, `"${this.feed.id}"`).subscribe({
+      next: (event: any) => {
+        this.searchControl.reset()
+        this.eventModel = null
+        this.addEvent = false
 
-      this.snackBar.open(`Feed added to event ${event.name}`, undefined, {
-        duration: 5 * 1000
-      })
+        this.loadAllEvents()
+
+        this.snackBar.open(`Feed added to event ${event?.name || ''}`, undefined, {
+          duration: 5 * 1000
+        })
+      },
+      error: () => {
+        this.snackBar.open(`Failed to add feed to event`, undefined, {
+          duration: 5 * 1000
+        })
+      }
     })
   }
 
   removeFeedFromEvent($event: MouseEvent, event: any): void {
     $event.stopPropagation()
 
-    this.eventResource.removeFeed({ id: event.id, feedId: this.feed.id }, removed => {
-      this.searchControl.reset()
+    this.eventService.removeFeed(String(event.id), String(this.feed.id)).subscribe({
+      next: () => {
+        this.searchControl.reset()
 
-      this.loadAllEvents()
+        this.loadAllEvents()
 
-      this.snackBar.open(`Feed removed from event ${event.name}`, undefined, {
-        duration: 5 * 1000
-      })
+        this.snackBar.open(`Feed removed from event ${event?.name || ''}`, undefined, {
+          duration: 5 * 1000
+        })
+      },
+      error: () => {
+        this.snackBar.open(`Failed to remove feed from event`, undefined, {
+          duration: 5 * 1000
+        })
+      }
     })
   }
 
