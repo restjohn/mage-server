@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, ApplicationRef, DoBootstrap } from '@angular/core';
+import { NgModule, ApplicationRef, DoBootstrap, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { UpgradeModule } from '@angular/upgrade/static';
 import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
@@ -83,8 +83,8 @@ import {
 } from './admin/admin-settings/admin-settings';
 import { DatetimePickerComponent } from './datetime-picker/datetime-picker.component';
 import { CommonModule } from '@angular/common';
-import { ContactComponent } from './contact/contact.component';
-import { ContactDialogComponent } from './contact/contact-dialog.component';
+import { ContactModule } from './contact/contact.module';
+import { BannerComponent } from './banner/banner.component';
 import { AdminAuthenticationOidcComponent } from './admin/admin-authentication/admin-authentication-oidc/admin-authentication-oidc.component';
 import { AuthenticationDeleteComponent } from './admin/admin-authentication/admin-authentication-delete/admin-authentication-delete.component';
 import { AdminAuthenticationLocalComponent } from './admin/admin-authentication/admin-authentication-local/admin-authentication-local.component';
@@ -109,6 +109,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { AdminUsersModule } from './admin/admin-users/admin-users.module';
 import { ObservationModule } from './observation/observation.module';
 import { AdminDevicessModule } from './admin/admin-devices/admin-devices.module';
+import { AdminNavigationComponent } from './navigation/admin-navigation.component';
+import { AuthenticationModule } from './authentication/authentication.module';
 
 @NgModule({
   declarations: [
@@ -118,6 +120,7 @@ import { AdminDevicessModule } from './admin/admin-devices/admin-devices.module'
     FeedItemComponent,
     BootstrapComponent,
     UserAvatarComponent,
+    BannerComponent,
     AdminSettingsComponent,
     PasswordPolicyComponent,
     AccountLockComponent,
@@ -128,8 +131,6 @@ import { AdminDevicessModule } from './admin/admin-devices/admin-devices.module'
     IconUploadComponent,
     ContactInfoComponent,
     DatetimePickerComponent,
-    ContactComponent,
-    ContactDialogComponent,
     AdminAuthenticationOidcComponent,
     AdminAuthenticationLocalComponent,
     AdminAuthenticationComponent,
@@ -139,7 +140,8 @@ import { AdminDevicessModule } from './admin/admin-devices/admin-devices.module'
     ButtonPreviewComponent,
     AdminAuthenticationSettingsComponent,
     AdminSettingsUnsavedComponent,
-    AdminMapComponent
+    AdminMapComponent,
+    AdminNavigationComponent
   ],
   imports: [
     CommonModule,
@@ -215,14 +217,27 @@ import { AdminDevicessModule } from './admin/admin-devices/admin-devices.module'
     InputMaskModule.forRoot(),
     AdminDashboardModule,
     AdminDevicessModule,
+    AuthenticationModule,
+    ContactModule
   ],
   providers: [
+    {
+      provide: '$rootScope',
+      useFactory: (i: any) => i.get('$rootScope'),
+      deps: ['$injector']
+    },
+    {
+      provide: '$scope',
+      useFactory: (i: any) => i.get('$rootScope').$new(),
+      deps: ['$injector']
+    },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptorService,
       multi: true
     }
-  ]
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppModule implements DoBootstrap {
   // eslint-disable-next-line @typescript-eslint/no-empty-function

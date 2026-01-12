@@ -1,0 +1,30 @@
+.text-center {
+    text-align: center;
+}
+
+.third-party-button {
+    width: 100%;
+}
+
+.third-party-button-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.third-party-logo {
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.third-party-logo img {
+    height: 24px;
+    width: auto;
+}
+
+.third-party-button-text {
+    flex: 1;
+    text-align: center;
+}

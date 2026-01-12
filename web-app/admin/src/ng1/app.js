@@ -1,7 +1,5 @@
 import _ from 'underscore';
 import angular from 'angular';
-import fileUpload from './file-upload/file.upload.component';
-import fileBrowser from './file-upload/file.browser.component';
 import uiRouter from '@uirouter/angularjs';
 import {
   downgradeComponent,
@@ -17,6 +15,7 @@ import { UserAvatarComponent } from '../app/user/user-avatar/user-avatar.compone
 import { UserReadService } from '@ngageoint/mage.web-core-lib/user';
 
 import { ContactComponent } from '../app/contact/contact.component';
+import { BannerComponent } from '../app/banner/banner.component';
 
 import { AdminSettingsComponent } from '../app/admin/admin-settings/admin-settings.component';
 import { AdminAuthenticationComponent } from '../app/admin/admin-authentication/admin-authentication.component';
@@ -39,6 +38,15 @@ import { LayerDashboardComponent } from '../app/admin/admin-layers/dashboard/lay
 import { LayerDetailsComponent } from '../app/admin/admin-layers/layer-details/layer-details.component';
 import { DeviceDashboardComponent } from '../app/admin/admin-devices/dashboard/devices-dashboard.component';
 import { DeviceDetailsComponent } from '../app/admin/admin-devices/device-details/device-details.component';
+import { AdminNavigationComponent } from '../app/navigation/admin-navigation.component';
+
+import { LocalSigninComponent } from '../app/authentication/local-signin/local-signin.component';
+import { IdpSigninComponent } from '../app/authentication/idp-signin/idp-signin.component';
+import { LdapSigninComponent } from '../app/authentication/ldap-signin/ldap-signin.component';
+import { LocalSignupComponent } from '../app/authentication/local-signup/local-signup.component';
+import { SigninComponent } from '../app/authentication/signin/signin.component';
+import { AuthorizeComponent } from '../app/authentication/authorize/authorize.component';
+import { AuthenticationComponent } from '../app/authentication/authentication/authentication.component';
 
 require('angular-minicolors');
 require('select2');
@@ -100,6 +108,7 @@ app
     downgradeComponent({ component: AuthenticationCreateComponent })
   )
   .directive('contact', downgradeComponent({ component: ContactComponent }))
+  .directive('banner', downgradeComponent({ component: BannerComponent }))
   .directive(
     'adminEventFormPreview',
     downgradeComponent({ component: AdminEventFormPreviewComponent })
@@ -151,17 +160,38 @@ app
   .directive(
     'adminDevice',
     downgradeComponent({ component: DeviceDetailsComponent })
-  );
-
-app
-  .component('navbar', require('./navbar/navbar.component'))
-  .component('dateTime', require('./datetime/datetime.component'))
-  .component('fileUpload', fileUpload)
-  .component('fileBrowser', fileBrowser)
-  .controller('NavController', require('./mage/mage-nav.controller'))
+  )
   .directive(
-    'fileUploadGrid',
-    require('./file-upload/file-upload-grid.directive')
+    'adminNavigation',
+    downgradeComponent({ component: AdminNavigationComponent })
+  )
+  .directive(
+    'localSignin',
+    downgradeComponent({ component: LocalSigninComponent })
+  )
+  .directive(
+    'idpSignin',
+    downgradeComponent({ component: IdpSigninComponent })
+  )
+  .directive(
+    'ldapSignin',
+    downgradeComponent({ component: LdapSigninComponent })
+  )
+  .directive(
+    'localSignup',
+    downgradeComponent({ component: LocalSignupComponent })
+  )
+  .directive(
+    'signin',
+    downgradeComponent({ component: SigninComponent })
+  )
+  .directive(
+    'authorize',
+    downgradeComponent({ component: AuthorizeComponent })
+  )
+  .directive(
+    'authentication',
+    downgradeComponent({ component: AuthenticationComponent })
   )
   .animation('.slide-down', function () {
     return {
@@ -175,13 +205,9 @@ app
   })
   .config(config)
   .run(run);
-require('./mage');
-require('./authentication'); // for modal in admin pages if token expires
+// TODO (MIGRATE): Replace AngularJS factories with Angular providers and register them in `AppModule`.
 require('./factories');
-require('./filters');
 require('./admin');
-require('./user');
-require('./material-components');
 
 config.$inject = [
   '$httpProvider',
@@ -203,6 +229,8 @@ function config(
 
   $animateProvider.classNameFilter(/ng-animatable/);
 
+  // TODO (MIGRATE): Port this AngularJS route resolve logic to an Angular Route Guard or Resolver.
+  // - Implement an `AdminGuard` that checks the migrated `UserService`'s permissions and opens login panel.
   function resolveAdmin() {
     return {
       user: [
@@ -221,8 +249,8 @@ function config(
             // Important when doing this the admin page also has to be permission based
             // and only show what each user can see.
             // Possible that each role should have an 'admin' permission to abstract this
-            myself.role.name === 'ADMIN_ROLE' ||
-              myself.role.name === 'EVENT_MANAGER_ROLE'
+            myself.role && (myself.role.name === 'ADMIN_ROLE' ||
+              myself.role.name === 'EVENT_MANAGER_ROLE')
               ? deferred.resolve(myself)
               : deferred.reject();
           });
@@ -443,8 +471,8 @@ function config(
   });
 }
 
-run.$inject = ['$rootScope', '$uibModal', '$state', 'Api', 'UserService'];
-function run($rootScope, $uibModal, $state, Api, UserService) {
+run.$inject = ['$rootScope', '$uibModal', '$state', 'Api', 'UserService', 'authService'];
+function run($rootScope, $uibModal, $state, Api, UserService, authService) {
   $rootScope.$on('event:auth-loginRequired', function (e, response) {
     const stateExceptions = ['landing'];
     const requestExceptions = ['/api/users/myself/password'];
@@ -456,13 +484,27 @@ function run($rootScope, $uibModal, $state, Api, UserService) {
       $rootScope.loginDialogPresented = true;
       Api.get(function (api) {
         let successful = false;
+        const signinModalTemplate = `
+          <form class="form" method="post" autocomplete="off">
+            <div class="modal-header">
+              <h3 class="modal-title">Log in to continue to MAGE</h3>
+            </div>
+            <div class="modal-body">
+              <authentication 
+                [api]="api" 
+                [hide-signup]="hideSignup" 
+                (on-success)="onSuccess()" 
+                (on-failure)="logout()">
+              </authentication>
+            </div>
+          </form>
+        `;
         const options = {
-          template: require('./authentication/signin-modal.html'),
+          template: signinModalTemplate,
           controller: [
             '$scope',
             '$uibModalInstance',
-            'authService',
-            function ($scope, $uibModalInstance, authService) {
+            function ($scope, $uibModalInstance) {
               $uibModalInstance.scope = $scope;
               $scope.api = api;
               $scope.hideSignup = true;

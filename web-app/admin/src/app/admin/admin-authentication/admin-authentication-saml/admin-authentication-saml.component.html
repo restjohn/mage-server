@@ -3,7 +3,7 @@
   <mat-form-field appearance="outline">
     <mat-label>Entry Point</mat-label>
     <input matInput type="text" [readonly]="!editable" [(ngModel)]="strategy.settings.entryPoint"
-      (click)="setDirty(true)">
+      (ngModelChange)="setDirty(true)">
     <mat-hint align="end">
       Location of the IdP. This can be the location of the single sign-on identity provider.
     </mat-hint>
@@ -12,12 +12,13 @@
   <mat-form-field appearance="outline">
     <mat-label>Issuer</mat-label>
     <input matInput type="text" [readonly]="!editable" [(ngModel)]="strategy.settings.issuer"
-      (click)="setDirty(true)">
+      (ngModelChange)="setDirty(true)">
   </mat-form-field>
 
   <mat-form-field appearance="outline">
     <mat-label>Redirect Host</mat-label>
-    <input matInput type="text" [readonly]="!editable" [(ngModel)]="strategy.settings.redirectHost" (click)="setDirty(true)">
+    <input matInput type="text" [readonly]="!editable" [(ngModel)]="strategy.settings.redirectHost"
+      (ngModelChange)="setDirty(true)">
   </mat-form-field>
 
   <div class="mat-subheading-2">Security</div>
@@ -26,7 +27,8 @@
 
   <mat-form-field appearance="outline">
     <mat-label>IdP Public Signing Certificate</mat-label>
-    <textarea matInput [readonly]="!editable" [(ngModel)]="strategy.settings.cert" (click)="setDirty(true)"></textarea>
+    <textarea matInput [readonly]="!editable" [(ngModel)]="strategy.settings.cert"
+      (ngModelChange)="setDirty(true)"></textarea>
     <mat-hint align="end">
       The public signing certificate used to validate the signatures of the incoming SAML Responses.
     </mat-hint>
@@ -35,7 +37,7 @@
   <mat-form-field appearance="outline">
     <mat-label>Private Key</mat-label>
     <textarea matInput [readonly]="!editable" [(ngModel)]="strategy.settings.privateKey"
-      (click)="setDirty(true)"></textarea>
+      (ngModelChange)="setDirty(true)"></textarea>
     <mat-hint align="end">
       Private key used to sign requests. Supports well formatted PEM or single-line.
     </mat-hint>
@@ -44,7 +46,7 @@
   <mat-form-field appearance="outline">
     <mat-label>Decryption Private Key</mat-label>
     <textarea matInput [readonly]="!editable" [(ngModel)]="strategy.settings.decryptionPvk"
-      (click)="setDirty(true)"></textarea>
+      (ngModelChange)="setDirty(true)"></textarea>
     <mat-hint align="end">
       Private key that will be used to attempt to decrypt any encrypted assertions that are received. Supports well
       formatted PEM or single-line.
@@ -72,7 +74,7 @@
   <mat-form-field appearance="outline">
     <mat-label>IdP Issuer</mat-label>
     <input matInput type="text" [readonly]="!editable" [(ngModel)]="strategy.settings.idpIssuer"
-      (click)="setDirty(true)">
+      (ngModelChange)="setDirty(true)">
     <mat-hint align="end">
       The IdP issuer will be validated for incoming Logout Requests/Responses.
     </mat-hint>
@@ -92,8 +94,8 @@
 
   <mat-form-field appearance="outline">
     <mat-label>Request ID Expiration Period</mat-label>
-    <input matInput type="number" [readonly]="!editable"
-      [(ngModel)]="strategy.settings.requestIdExpirationPeriodMs" (click)="setDirty(true)">
+    <input matInput type="number" [readonly]="!editable" [(ngModel)]="strategy.settings.requestIdExpirationPeriodMs"
+      (ngModelChange)="setDirty(true)">
     <div class="suffix-spacing" matSuffix>Milliseconds</div>
     <mat-hint align="end">
       Defines the expiration time when a Request ID generated for a SAML request will not be valid if seen in a SAML
@@ -106,7 +108,7 @@
   <mat-form-field appearance="outline">
     <mat-label>Logout URL</mat-label>
     <input matInput type="url" [readonly]="!editable" [(ngModel)]="strategy.settings.logoutUrl"
-      (click)="setDirty(true)">
+      (ngModelChange)="setDirty(true)">
     <mat-hint align="end">
       Base address to call with logout requests. Default is Entry Point.
     </mat-hint>
@@ -117,7 +119,7 @@
   <mat-form-field appearance="outline">
     <mat-label>Audience</mat-label>
     <input matInput type="text" [readonly]="!editable" [(ngModel)]="strategy.settings.audience"
-      (click)="setDirty(true)">
+      (ngModelChange)="setDirty(true)">
     <mat-hint align="end">
       Expected response Audience.
     </mat-hint>
@@ -126,7 +128,7 @@
   <mat-form-field appearance="outline">
     <mat-label>Identifier Format</mat-label>
     <input matInput type="text" [readonly]="!editable" [(ngModel)]="strategy.settings.identifierFormat"
-      (click)="setDirty(true)">
+      (ngModelChange)="setDirty(true)">
     <mat-hint align="end">
       Name identifier format to request from identity provider.
     </mat-hint>
@@ -135,7 +137,7 @@
   <mat-form-field appearance="outline">
     <mat-label>Clock Skew</mat-label>
     <input matInput type="number" [readonly]="!editable" [(ngModel)]="strategy.settings.acceptedClockSkewMs"
-      (click)="setDirty(true)">
+      (ngModelChange)="setDirty(true)">
     <div class="suffix-spacing" matSuffix>Milliseconds</div>
     <mat-hint align="end">
       Time in milliseconds of skew that is acceptable between client and server when checking NotBefore and NotOnOrAfter
@@ -147,7 +149,7 @@
   <mat-form-field appearance="outline">
     <mat-label>Attribute Consuming Service Index</mat-label>
     <input matInput type="text" [readonly]="!editable" [(ngModel)]="strategy.settings.attributeConsumingServiceIndex"
-      (click)="setDirty(true)">
+      (ngModelChange)="setDirty(true)">
     <mat-hint align="end">
       Instructs the IDP which attribute set to attach to the response.
     </mat-hint>
@@ -167,7 +169,7 @@
   <mat-form-field appearance="outline">
     <mat-label>Authhentication Context</mat-label>
     <input matInput type="text" [readonly]="!editable" [(ngModel)]="strategy.settings.authnContext"
-      (click)="setDirty(true)">
+      (ngModelChange)="setDirty(true)">
     <mat-hint align="end">
       Name identifier format to request auth context.
     </mat-hint>
@@ -196,7 +198,7 @@
   <mat-form-field appearance="outline">
     <mat-label>Authentication Request Binding</mat-label>
     <input matInput type="text" [readonly]="!editable" [(ngModel)]="strategy.settings.authnRequestBinding"
-      (click)="setDirty(true)">
+      (ngModelChange)="setDirty(true)">
     <mat-hint align="end">
       If set to HTTP-POST, will request authentication from IDP via HTTP POST binding, otherwise defaults to HTTP
       Redirect.
@@ -218,7 +220,7 @@
   <mat-form-field appearance="outline">
     <mat-label>Provider Name</mat-label>
     <input matInput type="text" [readonly]="!editable" [(ngModel)]="strategy.settings.providerName"
-      (click)="setDirty(true)">
+      (ngModelChange)="setDirty(true)">
     <mat-hint align="end">
       Human-readable name of the requester for use by the presenter's user agent or the identity provider.
     </mat-hint>
@@ -236,7 +238,7 @@
       <mat-form-field appearance="outline">
         <mat-label>Profile ID Property</mat-label>
         <input matInput type="text" [readonly]="!editable" [(ngModel)]="strategy.settings.profile.id"
-          (click)="setDirty(true)">
+          (ngModelChange)="setDirty(true)">
         <mat-hint align="end">
           The id property that is returned in the user profile. Defaults to 'uid'.
         </mat-hint>
@@ -244,7 +246,7 @@
       <mat-form-field appearance="outline">
         <mat-label>Display Name Property</mat-label>
         <input matInput type="text" [readonly]="!editable" [(ngModel)]="strategy.settings.profile.displayName"
-          (click)="setDirty(true)">
+          (ngModelChange)="setDirty(true)">
         <mat-hint align="end">
           The display name property that is returned in the user profile. Defaults to 'email'.
         </mat-hint>
@@ -252,7 +254,7 @@
       <mat-form-field appearance="outline">
         <mat-label>Email Name Property</mat-label>
         <input matInput type="text" [readonly]="!editable" [(ngModel)]="strategy.settings.profile.email"
-          (click)="setDirty(true)">
+          (ngModelChange)="setDirty(true)">
         <mat-hint align="end">
           The email property that is returned in the user profile. Defaults to 'email'.
         </mat-hint>
