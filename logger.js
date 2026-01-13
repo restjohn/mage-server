@@ -4,9 +4,11 @@ const { createLogger, format, transports } = require('winston');
 const log = createLogger({
   level: 'info', // default log level
   format: format.combine(
-    format.timestamp(),
+    format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    format.errors({ stack: true }), // capture stack traces for errors
+    format.splat(), // support printf-style formatting
     format.printf(({ timestamp, level, message, ...meta }) => {
-      let metaString = Object.keys(meta).length ? JSON.stringify(meta) : '';
+      const metaString = Object.keys(meta).length ? JSON.stringify(meta) : '';
       return `${timestamp} [${level.toUpperCase()}] ${message} ${metaString}`;
     })
   ),
