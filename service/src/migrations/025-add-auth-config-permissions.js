@@ -1,6 +1,6 @@
 "use strict";
 
-const log = require('../../../mage-server/logger');
+const log = require('../logger'); 
 
 exports.id = 'add-auth-config-permissions';
 

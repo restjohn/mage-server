@@ -1,6 +1,6 @@
 'use strict';
 
-const log = require('../../../mage-server/logger')
+const log = require('../logger')
   , AsyncLock = require('async-lock')
   , access = require('../access')
   , Authentication = require('../models/authentication')

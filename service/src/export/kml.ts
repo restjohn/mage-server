@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 'use strict';
 
-const log = require('../../../mage-server/logger')
+const log = require('../logger'); 
 import async from 'async'
 import archiver from 'archiver'
 import stream from 'stream'
