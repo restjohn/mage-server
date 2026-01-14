@@ -36,7 +36,7 @@ import { LocalStorageService } from 'src/app/http/local-storage.service';
 import { SettingsService } from 'admin/src/app/services/settings.service';
 import { TeamService } from 'admin/src/app/services/team.service';
 import { EventService } from 'admin/src/app/services/event.service';
-import { AuthenticationConfigurationService } from '../services/authentication-configuration.service';
+import { AuthenticationConfigurationService } from '../services/admin-authentication-configuration.service';
 
 class MockSnackbarRef {
   private readonly afterDismissedObservable = new Subject<MatSnackBarDismiss>();

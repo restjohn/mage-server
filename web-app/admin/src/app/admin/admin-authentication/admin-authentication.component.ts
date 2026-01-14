@@ -18,7 +18,7 @@ import { AdminSettingsUnsavedComponent } from '../admin-settings/admin-settings-
 import { lastValueFrom, Subject, takeUntil } from 'rxjs';
 import { AdminUserService } from '../services/admin-user.service';
 import { LocalStorageService } from 'src/app/http/local-storage.service';
-import { AuthenticationConfigurationService } from '../services/authentication-configuration.service';
+import { AuthenticationConfigurationService } from '../services/admin-authentication-configuration.service';
 import { AdminTeamsService } from '../services/admin-teams-service';
 import { AdminEventsService } from '../services/admin-events.service';
 

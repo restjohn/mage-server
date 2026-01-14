@@ -23,8 +23,8 @@ export class SigninModalComponent {
   ) {
     this.api = data.api;
   }
-
-  onSuccess(): void {
+  
+  onAuthFlowSuccess(): void {
     const token = this.localStorageService.getToken();
 
     if (token) {

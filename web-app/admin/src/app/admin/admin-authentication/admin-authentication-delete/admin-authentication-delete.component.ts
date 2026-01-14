@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, Inject } from '@angular/core'
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog'
 import { Strategy } from '../../admin-authentication/admin-settings.model'
-import { AuthenticationConfigurationService } from '../../services/authentication-configuration.service'
+import { AuthenticationConfigurationService } from '../../services/admin-authentication-configuration.service'
 
 @Component({
   selector: 'admin-authentication-delete',

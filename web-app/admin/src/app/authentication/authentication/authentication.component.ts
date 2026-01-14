@@ -71,22 +71,19 @@ export class AuthenticationComponent implements OnInit {
 
   authorized(): void {
     const disclaimer = this.api?.disclaimer || { show: false };
-
+  
     if (!disclaimer.show) {
-      // Token-aware authService will pull from LocalStorageService
-      this.authService.loginConfirmed();
-      this.userService.acceptDisclaimer();
       this.onSuccess.emit();
       return;
     }
-
+  
     this.action = 'disclaimer';
-  }
+  }  
 
   acceptDisclaimer(): void {
     this.userService.acceptDisclaimer();
     this.onSuccess.emit();
-  }
+  }  
 
   onSignin(event: SigninEvent): void {
     this.user = event.user;

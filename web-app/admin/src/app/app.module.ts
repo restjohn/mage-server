@@ -63,10 +63,11 @@ import { MomentModule } from './moment/moment.module';
 import { BootstrapComponent } from './bootstrap/bootstrap.component';
 import { UserAvatarComponent } from './user/user-avatar/user-avatar.component';
 import { TokenInterceptorService } from './http/token-interceptor.service';
+import { AuthBufferInterceptor } from './services/auth-buffer.interceptor';
 
 import {
   DMSValidatorDirective,
-  MGRSValidatorDirective,
+  MGRSValidatorDirective
 } from './observation/observation-edit/observation-edit';
 
 import { FeedItemComponent } from './feed/feed-item/feed-item.component';
@@ -111,8 +112,6 @@ import { AdminDevicesModule } from './admin/admin-devices/admin-devices.module';
 import { AdminNavigationComponent } from './navigation/admin-navigation.component';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { AppRoutingModule } from './routing.module';
-import { AuthBufferInterceptor } from './services/auth-buffer.interceptor';
-
 
 @NgModule({
   declarations: [
@@ -143,7 +142,7 @@ import { AuthBufferInterceptor } from './services/auth-buffer.interceptor';
     AdminAuthenticationSettingsComponent,
     AdminSettingsUnsavedComponent,
     AdminMapComponent,
-    AdminNavigationComponent,
+    AdminNavigationComponent
   ],
   imports: [
     CommonModule,
@@ -217,17 +216,9 @@ import { AuthBufferInterceptor } from './services/auth-buffer.interceptor';
     AppRoutingModule
   ],
   providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthBufferInterceptor,
-      multi: true
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: TokenInterceptorService,
-      multi: true
-    }
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptorService, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthBufferInterceptor, multi: true }
   ],
-  bootstrap: [BootstrapComponent],
+  bootstrap: [BootstrapComponent]
 })
 export class AppModule {}
