@@ -195,10 +195,10 @@
               }
             ],
             "styles": [
-              "admin/src/ng1/vendor/bootstrap/css/bootstrap.min.css",
+              "admin/src/vendor/bootstrap/css/bootstrap.min.css",
               "node_modules/swagger-ui/dist/swagger-ui.css",
               "node_modules/@ngageoint/md-date-time-picker/dist/css/mdDateTimePicker.css",
-              "admin/src/ng1/vendor/material-design-icons/icons.css",
+              "admin/src/vendor/material-design-icons/icons.css",
               "admin/src/styles.scss"
             ],
             "stylePreprocessorOptions": {

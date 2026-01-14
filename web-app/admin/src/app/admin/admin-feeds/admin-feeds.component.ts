@@ -1,13 +1,13 @@
 import _ from 'underscore'
 import { Component, OnInit } from '@angular/core'
 import { Feed, Service, FeedService } from '@ngageoint/mage.web-core-lib/feed'
-import { StateService } from '@uirouter/angular'
 import { MatDialog } from '@angular/material/dialog'
 import { forkJoin } from 'rxjs'
 import { AdminFeedDeleteComponent } from './admin-feed/admin-feed-delete/admin-feed-delete.component'
 import { AdminServiceDeleteComponent } from './admin-service/admin-service-delete/admin-service-delete.component'
 import { AdminBreadcrumb } from '../admin-breadcrumb/admin-breadcrumb.model'
 import { AdminUserService } from '../services/admin-user.service'
+import { UiStateService } from '../services/ui-state.service'
 
 @Component({
   selector: 'admin-feeds',
@@ -40,7 +40,7 @@ export class AdminFeedsComponent implements OnInit {
 
   constructor(
     private feedService: FeedService,
-    private stateService: StateService,
+    private stateService: UiStateService,
     public dialog: MatDialog,
     private adminUserService: AdminUserService
   ) {}

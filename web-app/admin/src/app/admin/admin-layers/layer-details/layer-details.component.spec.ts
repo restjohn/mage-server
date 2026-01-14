@@ -3,13 +3,13 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { StateService } from '@uirouter/angular';
 import { LayerDetailsComponent } from './layer-details.component';
 import { LayersService } from '../layers.service';
 import { AdminEventsService } from '../../services/admin-events.service';
 import { of, Observable } from 'rxjs';
 import { LocalStorageService } from 'src/app/http/local-storage.service';
 import { AdminUserService } from '../../services/admin-user.service';
+import { UiStateService } from '../../services/ui-state.service';
 
 describe('LayerDetailsComponent', () => {
   let component: LayerDetailsComponent;
@@ -62,7 +62,7 @@ describe('LayerDetailsComponent', () => {
         NoopAnimationsModule
       ],
       providers: [
-        { provide: StateService, useValue: mockStateService },
+        { provide: UiStateService, useValue: mockStateService },
         { provide: LayersService, useValue: mockLayersService },
         { provide: AdminEventsService, useValue: mockEventsService },
         { provide: LocalStorageService, useValue: mockLocalStorageService },

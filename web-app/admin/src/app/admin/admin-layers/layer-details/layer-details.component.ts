@@ -1,5 +1,4 @@
 import { Component, OnInit, Inject, ViewChild, ElementRef } from '@angular/core';
-import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageEvent } from '@angular/material/paginator';
@@ -21,6 +20,7 @@ import { DeleteLayerComponent } from '../delete-layer/delete-layer.component';
 import { Event } from 'src/app/filter/filter.types';
 import { Observable } from 'rxjs';
 import { ImageryLayerConfig } from '../imagery-layer-settings/imagery-layer-settings.component';
+import { UiStateService } from '../../services/ui-state.service';
 
 interface UrlLayer {
   table: string;
@@ -112,7 +112,7 @@ export class LayerDetailsComponent implements OnInit {
   @ViewChild('previewMapContainer') previewMapContainer: ElementRef;
 
   constructor(
-    private stateService: StateService,
+    private stateService: UiStateService,
     private layersService: LayersService,
     private eventsService: AdminEventsService,
     private dialog: MatDialog,

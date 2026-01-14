@@ -23,7 +23,9 @@ import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatNativeDateModule } from "@angular/material/core";
 import { MatTableModule } from "@angular/material/table";
 
-import { StateService } from "@uirouter/angular";
+import { Router } from "@angular/router";
+import { RouterTestingModule } from "@angular/router/testing";
+
 import { AdminUserService } from "../services/admin-user.service";
 import { AdminDeviceService } from "../services/admin-device.service";
 import { DevicePagingService } from "../../services/device-paging.service";
@@ -113,17 +115,6 @@ const TEST_DEVICES: any[] = [
   },
 ];
 
-const mockState = {
-  go: jasmine.createSpy("go"),
-};
-
-const mockInjector = {
-  get: (token: string) => {
-    if (token === "$state") return mockState;
-    return null;
-  },
-};
-
 const mockUserService: Partial<AdminUserService> & any = {
   myself$: of({
     id: "me",
@@ -186,6 +177,7 @@ const mockDevicePagingService: Partial<DevicePagingService> & any = {
 describe("AdminDashboardComponent", () => {
   let component: AdminDashboardComponent;
   let fixture: ComponentFixture<AdminDashboardComponent>;
+  let router: Router;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -193,6 +185,7 @@ describe("AdminDashboardComponent", () => {
       imports: [
         CommonModule,
         FormsModule,
+        RouterTestingModule, // ✅ add
         MatToolbarModule,
         MatIconModule,
         MatFormFieldModule,
@@ -214,14 +207,16 @@ describe("AdminDashboardComponent", () => {
         { provide: AdminDeviceService, useValue: mockDeviceService },
         { provide: DevicePagingService, useValue: mockDevicePagingService },
         { provide: UserPagingService, useValue: mockUserPagingService },
-        { provide: "$injector", useValue: mockInjector },
-        { provide: StateService, useValue: mockState },
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminDashboardComponent);
     component = fixture.componentInstance;
+
+    router = TestBed.inject(Router);
+    spyOn(router, "navigate").and.returnValue(Promise.resolve(true)); // ✅ spy
+
     fixture.detectChanges();
   });
 
@@ -239,10 +234,10 @@ describe("AdminDashboardComponent", () => {
 
   it("should navigate to user and device", () => {
     component.gotoUser(TEST_USERS[0]);
-    expect(mockState.go).toHaveBeenCalledWith("admin.user", { userId: TEST_USERS[0].id });
+    expect(router.navigate).toHaveBeenCalledWith(["/admin/users", TEST_USERS[0].id]);
 
     component.gotoDevice(TEST_DEVICES[0]);
-    expect(mockState.go).toHaveBeenCalledWith("admin.device", { deviceId: TEST_DEVICES[0].id });
+    expect(router.navigate).toHaveBeenCalledWith(["/admin/devices", TEST_DEVICES[0].id]);
   });
 
   it("should activate user and emit event", fakeAsync(() => {

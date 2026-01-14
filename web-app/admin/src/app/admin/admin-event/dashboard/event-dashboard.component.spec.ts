@@ -16,9 +16,9 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { EventDashboardComponent } from './event-dashboard.component';
 import { AdminEventsService } from '../../services/admin-events.service';
-import { StateService } from '@uirouter/angular';
 import { AdminUserService } from '../../services/admin-user.service';
 import { LocalStorageService } from 'src/app/http/local-storage.service';
+import { UiStateService } from '../../services/ui-state.service';
 
 const mockEventsResponse = {
   totalCount: 2,
@@ -64,7 +64,7 @@ describe('EventDashboardComponent', () => {
   let eventServiceSpy: jasmine.SpyObj<AdminEventsService>;
   let userServiceSpy: any;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
-  let stateSpy: jasmine.SpyObj<StateService>;
+  let stateSpy: jasmine.SpyObj<UiStateService>;
   let localStorageSpy: jasmine.SpyObj<LocalStorageService>;
 
   beforeEach(async () => {
@@ -91,7 +91,7 @@ describe('EventDashboardComponent', () => {
         { provide: AdminEventsService, useValue: eventServiceSpy },
         { provide: AdminUserService, useValue: userServiceSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        { provide: StateService, useValue: stateSpy },
+        { provide: UiStateService, useValue: stateSpy },
         { provide: LocalStorageService, useValue: localStorageSpy }
       ]
     }).compileComponents();

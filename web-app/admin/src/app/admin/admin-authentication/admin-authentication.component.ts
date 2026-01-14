@@ -1,7 +1,6 @@
 import {
   Component,
   OnInit,
-  Inject,
   EventEmitter,
   Output,
   Input,
@@ -13,10 +12,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AdminBreadcrumb } from '../admin-breadcrumb/admin-breadcrumb.model';
 import { Strategy } from '../admin-authentication/admin-settings.model';
 import { MatDialog } from '@angular/material/dialog';
-import { StateService } from '@uirouter/angular';
+import { UiStateService } from '../services/ui-state.service';
 import { AuthenticationDeleteComponent } from './admin-authentication-delete/admin-authentication-delete.component';
 import { AdminSettingsUnsavedComponent } from '../admin-settings/admin-settings-unsaved/admin-settings-unsaved.component';
-import { TransitionService } from '@uirouter/core';
 import { lastValueFrom, Subject, takeUntil } from 'rxjs';
 import { AdminUserService } from '../services/admin-user.service';
 import { LocalStorageService } from 'src/app/http/local-storage.service';
@@ -24,13 +22,21 @@ import { AuthenticationConfigurationService } from '../services/authentication-c
 import { AdminTeamsService } from '../services/admin-teams-service';
 import { AdminEventsService } from '../services/admin-events.service';
 
+/**
+ * Implement this interface on components that want to block navigation
+ * when there are unsaved changes.
+ */
+export interface CanComponentDeactivate {
+  canDeactivate: () => boolean | Promise<boolean>;
+}
+
 @Component({
   selector: 'admin-authentication',
   templateUrl: 'admin-authentication.component.html',
   styleUrls: ['./admin-authentication.component.scss']
 })
 export class AdminAuthenticationComponent
-  implements OnInit, OnChanges, OnDestroy
+  implements OnInit, OnChanges, OnDestroy, CanComponentDeactivate
 {
   @Output() saveComplete = new EventEmitter<boolean>();
   @Output() deleteComplete = new EventEmitter<boolean>();
@@ -57,9 +63,8 @@ export class AdminAuthenticationComponent
 
   constructor(
     private dialog: MatDialog,
-    private stateService: StateService,
+    private stateService: UiStateService,
     private readonly snackBar: MatSnackBar,
-    private readonly transitionService: TransitionService,
     private teamsService: AdminTeamsService,
     private eventsService: AdminEventsService,
     public localStorageService: LocalStorageService,
@@ -74,8 +79,6 @@ export class AdminAuthenticationComponent
         this.hasAuthConfigEditPermission =
           user?.role?.permissions?.includes('UPDATE_AUTH_CONFIG') || false;
       });
-
-    this.transitionService.onExit({}, this.onUnsavedChanges, { bind: this });
 
     this.loadInitialData().catch((err) => {
       console.log(err);
@@ -265,6 +268,10 @@ export class AdminAuthenticationComponent
   onAuthenticationToggled(strategy: Strategy): void {
     (strategy as any).isDirty = true;
     this.isDirty = true;
+  }
+
+  canDeactivate(): boolean | Promise<boolean> {
+    return this.onUnsavedChanges();
   }
 
   async onUnsavedChanges(): Promise<boolean> {

@@ -69,7 +69,7 @@ import * as mageCoreUser from '@ngageoint/mage.web-core-lib/user'
 import { Inject, Injectable, Injector, NgModuleRef, createNgModule } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { SystemJS, SYSTEMJS } from './systemjs.service'
-import { PluginHooks } from '@ngageoint/mage.web-core-lib/plugin'
+import { PluginHooks } from 'core-lib-src/plugin'
 import { LocalStorageService } from 'src/app/http/local-storage.service'
 
 function registerSharedLibInContext(system: SystemJS.Context, libId: string, lib: any): void {

@@ -1,7 +1,6 @@
 import { Component, OnInit, Inject, HostListener } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { StateService } from '@uirouter/angular';
 import {
   AdminDeviceService,
   DevicesResponse,
@@ -12,6 +11,7 @@ import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
 import { CreateDeviceDialogComponent } from '../create-device/create-device.component';
 import { AdminUserService } from '../../services/admin-user.service';
 import { takeUntil, Subject } from 'rxjs';
+import { UiStateService } from '../../services/ui-state.service';
 
 @Component({
   selector: 'admin-devices',
@@ -48,7 +48,7 @@ export class DeviceDashboardComponent implements OnInit {
 
   constructor(
     private modal: MatDialog,
-    private stateService: StateService,
+    private stateService: UiStateService,
     private deviceService: AdminDeviceService,
     private userService: AdminUserService
   ) {}

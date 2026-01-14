@@ -13,7 +13,6 @@ import { MatInputModule } from '@angular/material/input'
 import { MatListModule } from '@angular/material/list'
 import { MatSelectModule } from '@angular/material/select'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { StateService } from '@uirouter/angular';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { BehaviorSubject, of } from 'rxjs'
 import { AdminBreadcrumbModule } from '../../../../../app/admin/admin-breadcrumb/admin-breadcrumb.module';
@@ -32,6 +31,7 @@ import { AdminFeedEditTopicComponent } from './admin-feed-edit-topic/admin-feed-
 import { AdminFeedEditComponent } from './admin-feed-edit.component';
 import { FeedEditState, freshEditState } from './feed-edit.model'
 import { FeedEditService } from './feed-edit.service'
+import { UiStateService } from '../../../services/ui-state.service';
 
 class MockStateService {
   get params(): any {
@@ -67,7 +67,7 @@ describe('FeedEditComponent', () => {
     TestBed.configureTestingModule({
       providers: [
         {
-          provide: StateService,
+          provide: UiStateService,
           useClass: MockStateService
         },
         {

@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy, Inject, ViewChild } from '@angular/core';
-import { StateService } from '@uirouter/angular';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
@@ -16,6 +15,7 @@ import { AdminTeamsService } from '../../services/admin-teams-service';
 import { SearchModalComponent, SearchModalData, SearchModalResult, SearchModalColumn } from '../../../core/search-modal/search-modal.component';
 import { DeleteEventComponent } from '../delete-event/delete-event.component';
 import { CreateFormDialogComponent } from '../create-form/create-form.component';
+import { UiStateService } from '../../services/ui-state.service';
 
 interface ExtendedEvent extends MageEvent {
   complete?: boolean;
@@ -109,7 +109,7 @@ export class EventDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private eventsService: AdminEventsService,
     private teamsService: AdminTeamsService,
-    private stateService: StateService,
+    private stateService: UiStateService,
     private dialog: MatDialog
   ) { }
 

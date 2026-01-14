@@ -2,10 +2,9 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { from, lastValueFrom, EMPTY } from 'rxjs';
-import { mergeMap, tap, catchError, finalize } from 'rxjs/operators';
+import { from, lastValueFrom, EMPTY, async, Subject } from 'rxjs';
+import { mergeMap, tap, catchError, finalize, takeUntil } from 'rxjs/operators';
 
-import { StateService } from '@uirouter/angular';
 import { UserPagingService } from 'admin/src/app/services/user-paging.service';
 import { LocalStorageService } from 'src/app/http/local-storage.service';
 import { User } from 'core-lib-src/user';
@@ -70,6 +69,10 @@ export class UserDashboardComponent implements OnInit {
 
   userStatusFilter: 'all' | 'active' | 'inactive' | 'disabled' = 'all';
 
+  private destroy$ = new Subject<void>();
+
+  loadingUsers = false;
+
   /**
    * Constructs the UserDashboardComponent with necessary services.
    * @param dialog Angular Material dialog service
@@ -84,10 +87,9 @@ export class UserDashboardComponent implements OnInit {
     private dialog: MatDialog,
     private router: Router,
     private localStorageService: LocalStorageService,
-    private stateService: StateService,
     private teamService: AdminTeamsService,
     private userService: AdminUserService,
-    @Inject(UserPagingService) private userPagingService
+    private userPagingService: UserPagingService
   ) {
     this.token = this.localStorageService.getToken();
     this.stateAndData = this.userPagingService.constructDefault();
@@ -121,7 +123,7 @@ export class UserDashboardComponent implements OnInit {
    * Initializes permission flags for the current user.
    */
   private initPermissions(): void {
-    this.userService.myself$.subscribe(user => {
+    this.userService.myself$.subscribe((user) => {
       const permissions = user?.role?.permissions ?? [];
       this.hasUserCreatePermission = permissions.includes('CREATE_USER');
     });
@@ -175,19 +177,21 @@ export class UserDashboardComponent implements OnInit {
   /**
    * Refreshes the paginated list of users.
    */
-  refreshUsers(): Promise<void> {
+  refreshUsers(onDone?: () => void): void {
     const state = this.stateAndData['all'];
-
     state.pageSize = this.pageSize;
     state.pageIndex = this.pageIndex;
-
     state.userFilter = this.getFilter();
 
-    return this.userPagingService.refresh(this.stateAndData).then(() => {
-      const users = this.userPagingService.users(state);
-      this.dataSource = users;
-      this.totalUsers = state.pageInfo.totalCount || 0;
-    });
+    this.userPagingService
+      .refresh(this.stateAndData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        const users = this.userPagingService.users(state);
+        this.dataSource = users;
+        this.totalUsers = state.pageInfo?.totalCount || 0;
+        onDone?.();
+      });
   }
 
   /**
@@ -212,16 +216,26 @@ export class UserDashboardComponent implements OnInit {
    * Executes a search query on the user list.
    */
   search(): void {
-    this.stateAndData['all'].userFilter.active = this.getFilter();
-
+    const state = this.stateAndData['all'];
+    state.userFilter = this.getFilter();
+    this.error = null;
+  
     this.userPagingService
-      .search(this.stateAndData['all'], this.userSearch)
-      .then((users) => {
+      .search(state, this.userSearch)
+      .pipe(
+        takeUntil(this.destroy$),
+        catchError((err) => {
+          console.error(err);
+          this.error = 'Search failed.';
+          return EMPTY;
+        })
+      )
+      .subscribe((users) => {
         this.dataSource = users;
-        this.totalUsers =
-          this.stateAndData['all'].pageInfo.totalCount || users.length;
+        this.totalUsers = state.pageInfo?.totalCount || users.length;
       });
   }
+  
 
   /**
    * Resets the search and pagination state.
@@ -244,26 +258,12 @@ export class UserDashboardComponent implements OnInit {
   }
 
   /**
-   * Navigates to the user creation page.
-   */
-  newUser(): void {
-    this.router.navigate(['/admin/create-user']);
-  }
-
-  /**
-   * Navigates to the bulk user import page.
-   */
-  bulkImport(): void {
-    this.router.navigate(['/admin/bulk-user']);
-  }
-
-  /**
    * Navigates to a specific user's detail page.
    * @param user The user to navigate to
    */
   gotoUser(user: User): void {
-    this.stateService.go('admin.user', { userId: user.id });
-  }
+    this.router.navigate(['/admin', 'users', user.id]);
+  }  
 
   /**
    * Opens a modal to create a new user.
@@ -274,23 +274,23 @@ export class UserDashboardComponent implements OnInit {
       disableClose: true,
       data: { roles: this.roles }
     });
-  
-    dialogRef.afterClosed().subscribe(newUser => {
+
+    dialogRef.afterClosed().subscribe((newUser) => {
       if (!newUser?.confirmed) {
         return;
       }
-  
+
       this.userService.createUser(newUser.user).subscribe({
         next: () => {
           this.refreshUsers();
         },
-        error: err => {
+        error: (err) => {
           console.error(err);
           this.refreshUsers();
         }
       });
     });
-  }  
+  }
 
   /**
    * Opens a modal for bulk user import.
@@ -329,7 +329,7 @@ export class UserDashboardComponent implements OnInit {
             }
           })
           .finally(() => {
-            this.refreshUsers().then(() => {
+            this.refreshUsers(() => {
               this.isFinalizing = false;
               if (this.bulkErrors.length === 0) {
                 this.isFinished = true;
@@ -357,35 +357,35 @@ export class UserDashboardComponent implements OnInit {
    */
   async bulkCreateUsers(users: User[]): Promise<User[]> {
     const usersAdded: User[] = [];
-  
+
     this.bulkErrors = [];
     this.bulkProgress.total = users.length;
     this.bulkProgress.completed = 0;
     this.bulkProgress.failed = 0;
-  
+
     const CONCURRENCY = 100;
-  
+
     await lastValueFrom(
       from(users).pipe(
         mergeMap(
-          userData =>
+          (userData) =>
             this.userService.createUser(userData).pipe(
-              tap(createdUser => {
+              tap((createdUser) => {
                 usersAdded.push(createdUser);
               }),
-              catchError(err => {
+              catchError((err) => {
                 this.bulkProgress.failed++;
-  
+
                 this.bulkErrors.push({
                   user: userData,
                   error: err?.error || err?.message || 'Unknown error'
                 });
-  
+
                 console.error(
                   `Failed to create user ${userData.username}`,
                   err
                 );
-  
+
                 return EMPTY; // continue stream
               }),
               finalize(() => {
@@ -396,7 +396,7 @@ export class UserDashboardComponent implements OnInit {
         )
       )
     );
-  
+
     this.refreshUsers();
     return usersAdded;
   }

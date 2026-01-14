@@ -1,10 +1,12 @@
-import { Component, Inject, OnInit, EventEmitter, Output, OnDestroy } from "@angular/core";
+import { Component, EventEmitter, Output, OnDestroy, OnInit } from "@angular/core";
+import { Subject, takeUntil } from "rxjs";
+
 import { AdminBreadcrumb } from "../admin-breadcrumb/admin-breadcrumb.model";
 import { AdminUserService } from "../services/admin-user.service";
 import { AdminDeviceService } from "../services/admin-device.service";
+import { UiStateService } from "../services/ui-state.service";
 import { DevicePagingService } from "../../services/device-paging.service";
 import { UserPagingService } from "../../services/user-paging.service";
-import { Subject, takeUntil } from "rxjs";
 import { User } from "../admin-users/user";
 
 @Component({
@@ -35,7 +37,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     },
   ];
 
-  private $state: any;
   private destroy$ = new Subject<void>();
 
   currentUser: User | null = null;
@@ -45,10 +46,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private deviceService: AdminDeviceService,
     private devicePagingService: DevicePagingService,
     private userPagingService: UserPagingService,
-    @Inject("$injector") private $injector: any
-  ) {
-    this.$state = this.$injector.get("$state");
-  }
+    private state: UiStateService
+  ) {}
 
   ngOnInit(): void {
     this.stateAndData = this.userPagingService.constructDefault();
@@ -102,9 +101,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   hasPrevious(): boolean {
-    return this.userPagingService.hasPrevious(
-      this.stateAndData[this.userState]
-    );
+    return this.userPagingService.hasPrevious(this.stateAndData[this.userState]);
   }
 
   previous(): void {
@@ -185,11 +182,11 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   gotoUser(user: any): void {
-    this.$state.go("admin.user", { userId: user.id });
+    this.state.go("admin.user", { userId: user.id });
   }
 
   gotoDevice(device: any): void {
-    this.$state.go("admin.device", { deviceId: device.id });
+    this.state.go("admin.device", { deviceId: device.id });
   }
 
   hasPermission(permission: string): boolean {

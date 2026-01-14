@@ -3,8 +3,7 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core'
 import { UntypedFormControl } from '@angular/forms'
 import { Observable } from 'rxjs'
 import { map, startWith, debounceTime, switchMap } from 'rxjs/operators'
-import { StateService } from '@uirouter/angular'
-import { ServiceType, FeedTopic, Service, FeedExpanded, FeedService } from '@ngageoint/mage.web-core-lib/feed'
+import { ServiceType, FeedTopic, Service, FeedExpanded, FeedService } from 'core-lib-src/feed'
 import { MatDialog } from '@angular/material/dialog'
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete'
 import { MatSnackBar } from '@angular/material/snack-bar'
@@ -14,6 +13,7 @@ import { AdminFeedDeleteComponent } from './admin-feed-delete/admin-feed-delete.
 import { AdminEventsService } from '../../services/admin-events.service'
 import { AdminUserService } from '../../services/admin-user.service'
 import { EventService } from 'admin/src/app/services/event.service'
+import { UiStateService } from '../../services/ui-state.service'
 
 @Component({
   selector: 'app-admin-feed',
@@ -76,7 +76,7 @@ export class AdminFeedComponent implements OnInit {
 
   constructor(
     private feedService: FeedService,
-    private stateService: StateService,
+    private stateService: UiStateService,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private eventsService: AdminEventsService,

@@ -14,15 +14,13 @@ import { DevicePagingService } from '../services/device-paging.service';
 
 import { AdminUserService } from '../admin/services/admin-user.service';
 import { AdminDeviceService } from '../admin/services/admin-device.service';
+import { UiStateService } from '../admin/services/ui-state.service';
 
 describe('LoginsComponent', () => {
   let component: LoginsComponent;
   let fixture: ComponentFixture<LoginsComponent>;
 
-  const mockState = { go: jasmine.createSpy('go') };
-  const mockInjector = {
-    get: (token: string) => (token === '$state' ? mockState : null)
-  };
+  const mockState = jasmine.createSpyObj<UiStateService>('StateService', ['go']);
 
   const mockLoginService = {
     query: jasmine
@@ -59,7 +57,7 @@ describe('LoginsComponent', () => {
       imports: [FormsModule],
       declarations: [LoginsComponent],
       providers: [
-        { provide: '$injector', useValue: mockInjector },
+        { provide: UiStateService, useValue: mockState },
         { provide: LoginService, useValue: mockLoginService },
         { provide: UserPagingService, useValue: mockUserPaging },
         { provide: DevicePagingService, useValue: mockDevicePaging },
@@ -109,9 +107,7 @@ describe('LoginsComponent', () => {
   }));
 
   it('initUserSourceIfNeeded should call paging when users list empty and no userId', fakeAsync(() => {
-    mockUserPaging.users.and.returnValue([
-      { displayName: 'Paged User' } as any
-    ]);
+    mockUserPaging.users.and.returnValue([{ displayName: 'Paged User' } as any]);
 
     createComponent({ users: [] } as any);
     tick();
@@ -140,9 +136,7 @@ describe('LoginsComponent', () => {
     expect(mockDevicePaging.constructDefault).toHaveBeenCalled();
     expect(mockDevicePaging.refresh).toHaveBeenCalled();
     expect(component.loginDeviceSearchResults.length).toBe(1);
-    expect((component.loginDeviceSearchResults[0] as any).uid).toBe(
-      'Paged Device'
-    );
+    expect((component.loginDeviceSearchResults[0] as any).uid).toBe('Paged Device');
   }));
 
   it('hasNext should be false for invalid next links and true for valid link', fakeAsync(() => {
@@ -155,11 +149,7 @@ describe('LoginsComponent', () => {
     component.loginPage = { logins: [], next: '   ', prev: null } as any;
     expect(component.hasNext).toBe(false);
 
-    component.loginPage = {
-      logins: [],
-      next: 'http://next',
-      prev: null
-    } as any;
+    component.loginPage = { logins: [], next: 'http://next', prev: null } as any;
     expect(component.hasNext).toBe(true);
   }));
 
@@ -201,18 +191,10 @@ describe('LoginsComponent', () => {
     createComponent();
     tick();
 
-    component.loginPage = {
-      logins: [{ id: 'old' }],
-      next: 'http://next',
-      prev: null
-    } as any;
+    component.loginPage = { logins: [{ id: 'old' }], next: 'http://next', prev: null } as any;
 
     mockLoginService.query.and.returnValue(
-      of({
-        logins: [{ id: 'new' }],
-        next: 'http://next2',
-        prev: 'http://prev2'
-      })
+      of({ logins: [{ id: 'new' }], next: 'http://next2', prev: 'http://prev2' })
     );
 
     component.pageLogin('http://next');
@@ -227,18 +209,10 @@ describe('LoginsComponent', () => {
     createComponent();
     tick();
 
-    component.loginPage = {
-      logins: [{ id: 'old' }],
-      next: 'http://next',
-      prev: null
-    } as any;
+    component.loginPage = { logins: [{ id: 'old' }], next: 'http://next', prev: null } as any;
 
     mockLoginService.query.and.returnValue(
-      of({
-        logins: [],
-        next: 'http://still-next',
-        prev: 'http://prev'
-      })
+      of({ logins: [], next: 'http://still-next', prev: 'http://prev' })
     );
 
     component.pageLogin('http://next');
@@ -275,9 +249,7 @@ describe('LoginsComponent', () => {
     component.login.startDate = new Date('2025-12-01T00:00:00.000Z');
     component.login.endDate = end;
 
-    mockLoginService.query.and.returnValue(
-      of({ logins: [], next: null, prev: null })
-    );
+    mockLoginService.query.and.returnValue(of({ logins: [], next: null, prev: null }));
 
     component.filterLogins();
     tick();
@@ -310,25 +282,18 @@ describe('LoginsComponent', () => {
 
     (component as any).userStateAndData = { all: {} } as any;
 
-    mockUserPaging.search.and.returnValue(
-      of([{ displayName: 'U1' } as any, { displayName: 'U2' } as any])
-    );
+    mockUserPaging.search.and.returnValue(of([{ displayName: 'U1' } as any, { displayName: 'U2' } as any]));
 
     component.searchLoginsAgainstUsers('abc');
     tick();
 
-    expect(mockUserPaging.search).toHaveBeenCalledWith(
-      (component as any).userStateAndData.all,
-      'abc'
-    );
+    expect(mockUserPaging.search).toHaveBeenCalledWith((component as any).userStateAndData.all, 'abc');
     expect(component.loginSearchResults.length).toBe(2);
   }));
 
   it('searchLoginsAgainstUsers should set first 10 users when searchString empty or ".*" (local list branch)', fakeAsync(() => {
     createComponent({
-      users: Array.from({ length: 12 }).map(
-        (_, i) => ({ displayName: `User${i}` } as any)
-      )
+      users: Array.from({ length: 12 }).map((_, i) => ({ displayName: `User${i}` } as any))
     } as any);
     tick();
 
@@ -349,9 +314,7 @@ describe('LoginsComponent', () => {
 
     (component as any).deviceStateAndData = { all: {} } as any;
 
-    mockDevicePaging.search.and.returnValue(
-      of([{ uid: 'A' }, { uid: 'B' }] as any)
-    );
+    mockDevicePaging.search.and.returnValue(of([{ uid: 'A' }, { uid: 'B' }] as any));
     component.onDeviceSearchChange('term');
     tick();
 
@@ -431,7 +394,7 @@ describe('LoginsComponent', () => {
     expect(component.filterLogins).toHaveBeenCalled();
   }));
 
-  it('gotoUser and gotoDevice should call $state.go with correct params', fakeAsync(() => {
+  it('gotoUser and gotoDevice should call state.go with correct params', fakeAsync(() => {
     createComponent();
     tick();
 
@@ -439,20 +402,16 @@ describe('LoginsComponent', () => {
     component.gotoDevice({ id: 'd99' } as any);
 
     expect(mockState.go).toHaveBeenCalledWith('admin.user', { userId: 'u99' });
-    expect(mockState.go).toHaveBeenCalledWith('admin.device', {
-      deviceId: 'd99'
-    });
+    expect(mockState.go).toHaveBeenCalledWith('admin.device', { deviceId: 'd99' });
   }));
 
   it('iconClass should handle null device and device.iconClass override', fakeAsync(() => {
     createComponent();
     tick();
 
-    expect(component.iconClass(null as any)).toContain('fa-mobile');
+    expect(component.iconClass(null as any)).toBe('');
 
-    expect(component.iconClass({ iconClass: 'custom-class' } as any)).toBe(
-      'custom-class'
-    );
+    expect(component.iconClass({ iconClass: 'custom-class' } as any)).toBe('custom-class');
   }));
 
   it('displayUser/displayDevice should return empty string when missing fields', fakeAsync(() => {

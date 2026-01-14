@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { PageEvent } from '@angular/material/paginator';
-import { StateService } from '@uirouter/angular';
 import { of, throwError } from 'rxjs';
 
 import { TeamDetailsComponent } from './team-details.component';
@@ -14,11 +13,12 @@ import { Event } from 'src/app/filter/filter.types';
 import { DeleteTeamComponent } from '../delete-team/delete-team.component';
 import { SearchModalComponent } from '../../../core/search-modal/search-modal.component';
 import { AdminUserService } from '../../services/admin-user.service';
+import { UiStateService } from '../../services/ui-state.service';
 
 describe('TeamDetailsComponent', () => {
   let component: TeamDetailsComponent;
   let fixture: ComponentFixture<TeamDetailsComponent>;
-  let mockStateService: jasmine.SpyObj<StateService>;
+  let mockStateService: jasmine.SpyObj<UiStateService>;
   let mockDialog: jasmine.SpyObj<MatDialog>;
   let mockUserService: jasmine.SpyObj<any>;
   let mockTeamsService: jasmine.SpyObj<AdminTeamsService>;
@@ -82,7 +82,7 @@ describe('TeamDetailsComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [TeamDetailsComponent],
       providers: [
-        { provide: StateService, useValue: mockStateService },
+        { provide: UiStateService, useValue: mockStateService },
         { provide: MatDialog, useValue: mockDialog },
         { provide: AdminUserService, useValue: mockUserService },
         { provide: AdminTeamsService, useValue: mockTeamsService },

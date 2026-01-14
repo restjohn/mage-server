@@ -65,6 +65,14 @@ const authentication = AuthenticationInitializer.initialize(app, passport, provi
 // TODO: don't pass authentication to other routes, but enforce authentication ahead of adding route modules
 require('./routes')(app, { authentication });
 
+const adminDist = path.join(__dirname, '..', '..', 'web-app', 'dist', 'admin');
+
+app.use('/admin', express.static(adminDist));
+
+app.get('/admin/*', (req, res) => {
+  res.sendFile(path.join(adminDist, 'index.html'));
+});
+
 // Express requires a 4 parameter function callback, do not remove unused next parameter
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use(function(err, req, res, next) {

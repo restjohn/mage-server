@@ -18,7 +18,7 @@ import { LayerService } from "../layer/layer.service";
 import { LocationService } from "../user/location/location.service";
 import { LocalStorageService } from "../http/local-storage.service";
 import * as _ from "lodash";
-import * as moment from "moment";
+import moment from 'moment';
 import { FeedService } from "@ngageoint/mage.web-core-lib/feed";
 import { User } from "@ngageoint/mage.web-core-lib/user";
 import { MemberPage, filterChanges } from "./event.types";

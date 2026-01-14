@@ -27,7 +27,7 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { first, Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 import { ObservationEditFormPickerComponent } from "./observation-edit-form-picker.component";
-import * as moment from "moment";
+import moment from 'moment';
 import { ObservationEditDiscardComponent } from "./observation-edit-discard/observation-edit-discard.component";
 import {
   MatSnackBar,

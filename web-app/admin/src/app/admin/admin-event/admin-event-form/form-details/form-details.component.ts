@@ -2,7 +2,6 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { StateService } from '@uirouter/angular';
 import { firstValueFrom } from 'rxjs';
 
 import { AdminEventsService } from '../../../services/admin-events.service';
@@ -30,6 +29,7 @@ import {
   prepareFormPayload,
   isUserFieldType
 } from '../../helpers/form-field-utils';
+import { UiStateService } from '../../../services/ui-state.service';
 
 interface FormData {
   id?: number;
@@ -131,7 +131,7 @@ export class FormDetailsComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private localStorageService: LocalStorageService,
-    private stateService: StateService
+    private stateService: UiStateService
   ) {}
 
   ngOnInit(): void {

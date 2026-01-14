@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
-import { StateService } from '@uirouter/angular';
 import { of, throwError } from 'rxjs';
 
 import { LayerDashboardComponent } from './layer-dashboard.component';
 import { LayersService, Layer } from '../layers.service';
 import { PageEvent } from '@angular/material/paginator';
 import { AdminUserService } from '../../services/admin-user.service';
+import { UiStateService } from '../../services/ui-state.service';
 
 describe('LayerDashboardComponent', () => {
   let component: LayerDashboardComponent;
   let fixture: ComponentFixture<LayerDashboardComponent>;
   let mockLayersService: jasmine.SpyObj<LayersService>;
   let mockDialog: jasmine.SpyObj<MatDialog>;
-  let mockStateService: jasmine.SpyObj<StateService>;
+  let mockStateService: jasmine.SpyObj<UiStateService>;
   let mockUserService: any;
 
   const mockLayers: Layer[] = [
@@ -61,7 +61,7 @@ describe('LayerDashboardComponent', () => {
       providers: [
         { provide: LayersService, useValue: mockLayersService },
         { provide: MatDialog, useValue: mockDialog },
-        { provide: StateService, useValue: mockStateService },
+        { provide: UiStateService, useValue: mockStateService },
         { provide: AdminUserService, useValue: mockUserService }
       ]
     })

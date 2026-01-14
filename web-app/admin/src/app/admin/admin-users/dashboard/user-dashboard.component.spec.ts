@@ -6,11 +6,10 @@ import {
   tick
 } from '@angular/core/testing';
 import { UserDashboardComponent } from './user-dashboard.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { UserPagingService } from 'admin/src/app/services/user-paging.service';
 import { AdminTeamsService } from '../../services/admin-teams-service';
-import { StateService } from '@uirouter/angular';
 import { of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -22,6 +21,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { LocalStorageService } from 'src/app/http/local-storage.service';
+import { AdminUserService } from '../../services/admin-user.service';
+import { UiStateService } from '../../services/ui-state.service';
 
 describe('UserDashboardComponent', () => {
   let component: UserDashboardComponent;
@@ -72,14 +73,13 @@ describe('UserDashboardComponent', () => {
     }
   ];
 
-  let dialogSpy: any;
-  let routerSpy: any;
-  let localStorageSpy: any;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let localStorageSpy: jasmine.SpyObj<LocalStorageService>;
   let userServiceSpy: any;
   let pagingServiceSpy: any;
   let teamsServiceSpy: any;
-  let stateServiceSpy: any;
-  let injectorSpy: any;
+  let stateServiceSpy: jasmine.SpyObj<UiStateService>;
 
   beforeEach(async () => {
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
@@ -102,7 +102,9 @@ describe('UserDashboardComponent', () => {
     pagingServiceSpy = {
       constructDefault: jasmine
         .createSpy()
-        .and.returnValue({ all: { pageInfo: { totalCount: 2 } } }),
+        .and.returnValue({
+          all: { pageInfo: { totalCount: 2 }, userFilter: {} }
+        }),
       refresh: jasmine.createSpy().and.callFake(() => Promise.resolve()),
       users: jasmine.createSpy().and.returnValue(testUsers),
       search: jasmine.createSpy().and.returnValue(Promise.resolve(testUsers))
@@ -113,11 +115,9 @@ describe('UserDashboardComponent', () => {
       addUserToTeam: jasmine.createSpy().and.returnValue(of({}))
     };
 
-    stateServiceSpy = jasmine.createSpyObj('StateService', ['go']);
-
-    injectorSpy = {
-      get: (token: any) => (token === '$state' ? stateServiceSpy : null)
-    };
+    stateServiceSpy = jasmine.createSpyObj<UiStateService>('StateService', [
+      'go'
+    ]);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -136,11 +136,10 @@ describe('UserDashboardComponent', () => {
         { provide: MatDialog, useValue: dialogSpy },
         { provide: Router, useValue: routerSpy },
         { provide: LocalStorageService, useValue: localStorageSpy },
-        { provide: AdminTeamsService, useValue: userServiceSpy },
+        { provide: AdminUserService, useValue: userServiceSpy },
         { provide: UserPagingService, useValue: pagingServiceSpy },
         { provide: AdminTeamsService, useValue: teamsServiceSpy },
-        { provide: StateService, useValue: stateServiceSpy },
-        { provide: '$injector', useValue: injectorSpy }
+        { provide: UiStateService, useValue: stateServiceSpy }
       ]
     }).compileComponents();
 
@@ -212,7 +211,7 @@ describe('UserDashboardComponent', () => {
   it('should open create user modal and call service', fakeAsync(() => {
     dialogSpy.open.and.returnValue({
       afterClosed: () => of({ confirmed: true, user: {} })
-    });
+    } as Partial<MatDialogRef<any>> as MatDialogRef<any>);
 
     component.createUser();
     tick();

@@ -3,11 +3,11 @@ import { FormDetailsComponent } from './form-details.component';
 import { AdminEventsService } from '../../../services/admin-events.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { StateService } from '@uirouter/angular';
 import { of, throwError } from 'rxjs';
 import { Event as MageEvent } from 'src/app/filter/filter.types';
 import { LocalStorageService } from 'src/app/http/local-storage.service';
 import { AdminUserService } from '../../../services/admin-user.service';
+import { UiStateService } from '../../../services/ui-state.service';
 
 describe('FormDetailsComponent', () => {
   let component: FormDetailsComponent;
@@ -73,7 +73,7 @@ describe('FormDetailsComponent', () => {
         { provide: MatSnackBar, useValue: mockSnackBar },
         { provide: LocalStorageService, useValue: mockLocalStorageService },
         { provide: AdminUserService, useValue: mockUserService },
-        { provide: StateService, useValue: mockStateService }
+        { provide: UiStateService, useValue: mockStateService }
       ]
     })
       .compileComponents();

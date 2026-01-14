@@ -1,15 +1,12 @@
-import { Component, OnInit, Inject, Input, OnDestroy } from '@angular/core';
-import * as moment from 'moment';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+import moment from 'moment';
 import { Subject, Observable, from, of, isObservable } from 'rxjs';
 import { takeUntil, catchError } from 'rxjs/operators';
 
 import { User } from '../admin/admin-users/user';
 import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
-import {
-  Login,
-  LoginFilter,
-  LoginPage,
-} from 'admin/src/@types/dashboard/admin-dashboard';
+import { Login, LoginFilter, LoginPage } from 'admin/src/@types/dashboard/admin-dashboard';
 
 import { AdminDeviceService } from '../admin/services/admin-device.service';
 import { AdminUserService } from '../admin/services/admin-user.service';
@@ -61,18 +58,14 @@ export class LoginsComponent implements OnInit, OnDestroy {
   private deviceStateAndData: any = null;
   private deviceState: string = 'all';
 
-  private $state: any;
-
   constructor(
     private adminUserService: AdminUserService,
     private deviceService: AdminDeviceService,
     private loginService: LoginService,
     private userPagingService: UserPagingService,
     private devicePagingService: DevicePagingService,
-    @Inject('$injector') private $injector: any
-  ) {
-    this.$state = this.$injector.get('$state');
-  }
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     if (this.userId) {
@@ -132,10 +125,7 @@ export class LoginsComponent implements OnInit, OnDestroy {
     this.userStateAndData = this.userPagingService.constructDefault();
 
     this.to$<any>(this.userPagingService.refresh(this.userStateAndData))
-      .pipe(
-        takeUntil(this.destroy$),
-        catchError(() => of(null))
-      )
+      .pipe(takeUntil(this.destroy$), catchError(() => of(null)))
       .subscribe(() => {
         const initial = this.userPagingService.users(
           this.userStateAndData[this.userState]
@@ -153,10 +143,7 @@ export class LoginsComponent implements OnInit, OnDestroy {
     this.deviceStateAndData = this.devicePagingService.constructDefault();
 
     this.to$<any>(this.devicePagingService.refresh(this.deviceStateAndData))
-      .pipe(
-        takeUntil(this.destroy$),
-        catchError(() => of(null))
-      )
+      .pipe(takeUntil(this.destroy$), catchError(() => of(null)))
       .subscribe(() => {
         const initial = this.devicePagingService.devices(
           this.deviceStateAndData[this.deviceState]
@@ -171,10 +158,7 @@ export class LoginsComponent implements OnInit, OnDestroy {
 
   loadInitialLogins(): void {
     this.queryLogins$({ filter: this.filter, limit: this.loginResultsLimit })
-      .pipe(
-        takeUntil(this.destroy$),
-        catchError(() => of(null))
-      )
+      .pipe(takeUntil(this.destroy$), catchError(() => of(null)))
       .subscribe((loginPage: any) => {
         if (!loginPage) return;
         this.normalizePageLinks(loginPage);
@@ -187,10 +171,7 @@ export class LoginsComponent implements OnInit, OnDestroy {
     if (!this.isValidPageLink(url)) return;
 
     this.queryLogins$({ url, filter: this.filter, limit: this.loginResultsLimit })
-      .pipe(
-        takeUntil(this.destroy$),
-        catchError(() => of(null))
-      )
+      .pipe(takeUntil(this.destroy$), catchError(() => of(null)))
       .subscribe((nextPage: any) => {
         if (!nextPage) return;
 
@@ -241,10 +222,7 @@ export class LoginsComponent implements OnInit, OnDestroy {
     }
 
     this.queryLogins$({ filter: this.filter, limit: this.loginResultsLimit })
-      .pipe(
-        takeUntil(this.destroy$),
-        catchError(() => of(null))
-      )
+      .pipe(takeUntil(this.destroy$), catchError(() => of(null)))
       .subscribe((loginPage: any) => {
         if (!loginPage) return;
         this.normalizePageLinks(loginPage);
@@ -293,10 +271,7 @@ export class LoginsComponent implements OnInit, OnDestroy {
           null
         )
       )
-        .pipe(
-          takeUntil(this.destroy$),
-          catchError(() => of([] as Device[]))
-        )
+        .pipe(takeUntil(this.destroy$), catchError(() => of([] as Device[])))
         .subscribe((devices: Device[]) => {
           this.loginDeviceSearchResults = devices || [];
         });
@@ -340,10 +315,7 @@ export class LoginsComponent implements OnInit, OnDestroy {
       this.to$<User[]>(
         this.userPagingService.search(this.userStateAndData[this.userState], term)
       )
-        .pipe(
-          takeUntil(this.destroy$),
-          catchError(() => of([] as User[]))
-        )
+        .pipe(takeUntil(this.destroy$), catchError(() => of([] as User[])))
         .subscribe((users: User[]) => {
           this.loginSearchResults = (users || []).slice(0, 10);
         });
@@ -357,8 +329,8 @@ export class LoginsComponent implements OnInit, OnDestroy {
     }
 
     const lower = searchString.toLowerCase();
-    const filteredUsers = (this.users || []).filter(
-      (u) => (u.displayName || '').toLowerCase().includes(lower)
+    const filteredUsers = (this.users || []).filter((u) =>
+      (u.displayName || '').toLowerCase().includes(lower)
     );
 
     this.loginSearchResults = filteredUsers.slice(0, 10);
@@ -423,11 +395,15 @@ export class LoginsComponent implements OnInit, OnDestroy {
   }
 
   gotoUser(user: User): void {
-    this.$state.go('admin.user', { userId: (user as any).id });
+    const id = (user as any)?.id;
+    if (!id) return;
+    this.router.navigate(['/admin/users', id]);
   }
 
   gotoDevice(device: Device): void {
-    this.$state.go('admin.device', { deviceId: (device as any).id });
+    const id = (device as any)?.id;
+    if (!id) return;
+    this.router.navigate(['/admin/devices', id]);
   }
 
   fromNow(timestamp: string | Date): string {

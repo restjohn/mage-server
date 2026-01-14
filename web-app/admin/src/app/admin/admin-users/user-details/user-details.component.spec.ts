@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { StateService } from '@uirouter/angular';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 
 import { UserDetailsComponent } from './user-details.component';
@@ -12,6 +11,7 @@ import { AdminUserService } from '../../services/admin-user.service';
 import { LocalStorageService } from 'src/app/http/local-storage.service';
 import { LoginService } from 'admin/src/app/services/login.service';
 import { DevicePagingService } from 'admin/src/app/services/device-paging.service';
+import { UiStateService } from '../../services/ui-state.service';
 
 describe('UserDetailsComponent', () => {
   let component: UserDetailsComponent;
@@ -111,7 +111,7 @@ describe('UserDetailsComponent', () => {
       imports: [FormsModule],
       declarations: [UserDetailsComponent],
       providers: [
-        { provide: StateService, useValue: mockStateService },
+        { provide: UiStateService, useValue: mockStateService },
         { provide: MatDialog, useValue: mockDialog },
         { provide: AdminUserService, useValue: mockUserService },
         { provide: LoginService, useValue: mockLoginService },

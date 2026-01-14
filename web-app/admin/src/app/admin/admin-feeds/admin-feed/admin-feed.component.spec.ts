@@ -14,14 +14,14 @@ import { MatListModule } from '@angular/material/list';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { StateService } from '@uirouter/angular';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { AdminBreadcrumbModule } from '../../admin-breadcrumb/admin-breadcrumb.module';
 import { AdminFeedComponent } from './admin-feed.component';
 import { AdminUserService } from '../../services/admin-user.service';
 import { EventService } from 'admin/src/app/services/event.service';
-import { FeedService } from '@ngageoint/mage.web-core-lib/feed';
+import { FeedService } from 'core-lib-src/feed';
 import { of } from 'rxjs';
+import { UiStateService } from '../../services/ui-state.service';
 
 class MockUserService {
   getMyself() {
@@ -74,7 +74,7 @@ describe('AdminFeedComponent', () => {
     waitForAsync(() => {
       TestBed.configureTestingModule({
         providers: [
-          { provide: StateService, useClass: MockStateService },
+          { provide: UiStateService, useClass: MockStateService },
           { provide: MatDialogRef, useValue: {} },
           { provide: MAT_DIALOG_DATA, useValue: {} },
           { provide: AdminUserService, useClass: MockUserService },

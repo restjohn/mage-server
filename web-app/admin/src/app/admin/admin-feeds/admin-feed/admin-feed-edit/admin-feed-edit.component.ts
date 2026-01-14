@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { StateService } from '@uirouter/angular';
 import * as _ from 'underscore';
 import { Service } from '@ngageoint/mage.web-core-lib/feed';
 import { AdminBreadcrumb } from '../../../admin-breadcrumb/admin-breadcrumb.model';
 import { FeedEditState, FeedMetaData } from './feed-edit.model'
 import { FeedEditService } from './feed-edit.service'
+import { UiStateService } from '../../../services/ui-state.service';
 
 @Component({
   selector: 'app-feed-edit',
@@ -36,7 +36,7 @@ export class AdminFeedEditComponent implements OnInit {
 
   constructor(
     private feedEdit: FeedEditService,
-    private stateService: StateService
+    private stateService: UiStateService
   ) {
     if (this.stateService.params.feedId) {
       this.breadcrumbs = this.breadcrumbs.concat([

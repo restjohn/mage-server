@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { StateService } from '@uirouter/angular';
 import { forkJoin } from 'rxjs';
 import {
   Feed,
@@ -13,6 +12,7 @@ import {
 import { AdminUserService } from '../../services/admin-user.service';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { AdminServiceDeleteComponent } from './admin-service-delete/admin-service-delete.component';
+import { UiStateService } from '../../services/ui-state.service';
 
 @Component({
   selector: 'app-admin-service',
@@ -50,7 +50,7 @@ export class AdminServiceComponent implements OnInit {
 
   constructor(
     private feedService: FeedService,
-    private stateService: StateService,
+    private stateService: UiStateService,
     public dialog: MatDialog,
     private adminUserService: AdminUserService
   ) {}

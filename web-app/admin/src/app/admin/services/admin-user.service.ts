@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpRequest, HttpEvent } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpParams,
+  HttpRequest,
+  HttpEvent
+} from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
@@ -9,7 +14,6 @@ import { LocalStorageService } from 'src/app/http/local-storage.service';
   providedIn: 'root'
 })
 export class AdminUserService {
-
   private myselfSubject = new BehaviorSubject<any | null>(null);
   private isAdminSubject = new BehaviorSubject<boolean>(false);
 
@@ -27,11 +31,9 @@ export class AdminUserService {
   }
 
   signupVerify(data: any, token: string): Observable<any> {
-    return this.http.post(
-      '/api/users/signups/verifications',
-      data,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    return this.http.post('/api/users/signups/verifications', data, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
   }
 
   signin(data: any): Observable<any> {
@@ -47,19 +49,19 @@ export class AdminUserService {
   authorize(token: string, uid: string, newUser = false): Observable<any> {
     const body = this.toFormParams({ uid, appVersion: 'Web Client' });
 
-    return this.http.post<any>(
-      '/auth/token?createDevice=false',
-      body,
-      { headers: { Authorization: `Bearer ${token}` } }
-    ).pipe(
-      tap(res => {
-        if (res?.device?.registered) {
-          this.setUser(res.user);
-          this.localStorage.setToken(res.token);
-        }
-      }),
-      map(res => res?.device?.registered ? res : null)
-    );
+    return this.http
+      .post<any>('/auth/token?createDevice=false', body, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .pipe(
+        tap((res) => {
+          if (res?.device?.registered) {
+            this.setUser(res.user);
+            this.localStorage.setToken(res.token);
+          }
+        }),
+        map((res) => (res?.device?.registered ? res : null))
+      );
   }
 
   logout(): Observable<void> {
@@ -73,7 +75,7 @@ export class AdminUserService {
 
   getMyself(): Observable<any> {
     return this.http.get<any>('/api/users/myself').pipe(
-      tap(user => this.setUser(user)),
+      tap((user) => this.setUser(user)),
       catchError(() => of({}))
     );
   }
@@ -87,12 +89,15 @@ export class AdminUserService {
   }
 
   updateMyPassword(auth: any): Observable<void> {
-    return this.http.put<void>('/api/users/myself/password', auth).pipe(
-      tap(() => this.clearUser())
-    );
+    return this.http
+      .put<void>('/api/users/myself/password', auth)
+      .pipe(tap(() => this.clearUser()));
   }
 
-  updateMyself(user: any, progress?: (e: HttpEvent<any>) => void): Observable<any> {
+  updateMyself(
+    user: any,
+    progress?: (e: HttpEvent<any>) => void
+  ): Observable<any> {
     return this.saveUser('/api/users/myself', 'PUT', user, progress);
   }
 
@@ -112,18 +117,27 @@ export class AdminUserService {
         term: options.term ?? '',
         total: options.includeTotalCount !== false ? 'true' : 'false',
         ...(typeof options.active === 'boolean' && { active: options.active }),
-        ...(typeof options.enabled === 'boolean' && { enabled: options.enabled })
+        ...(typeof options.enabled === 'boolean' && {
+          enabled: options.enabled
+        })
       }
     });
 
     return this.http.get('/api/next-users/search', { params });
   }
 
-  createUser(user: any, progress?: (e: HttpEvent<any>) => void): Observable<any> {
+  createUser(
+    user: any,
+    progress?: (e: HttpEvent<any>) => void
+  ): Observable<any> {
     return this.saveUser('/api/users', 'POST', user, progress);
   }
 
-  updateUser(id: string, user: any, progress?: (e: HttpEvent<any>) => void): Observable<any> {
+  updateUser(
+    id: string,
+    user: any,
+    progress?: (e: HttpEvent<any>) => void
+  ): Observable<any> {
     return this.saveUser(`/api/users/${id}`, 'PUT', user, progress);
   }
 
@@ -172,7 +186,7 @@ export class AdminUserService {
     progress?: (e: HttpEvent<any>) => void
   ): Observable<any> {
     const formData = new FormData();
-    Object.keys(user).forEach(k => {
+    Object.keys(user).forEach((k) => {
       if (user[k] !== null && user[k] !== undefined) {
         formData.append(k, user[k]);
       }
@@ -183,14 +197,14 @@ export class AdminUserService {
     });
 
     return this.http.request(req).pipe(
-      tap(event => progress?.(event)),
-      map(event => (event as any).body ?? event)
+      tap((event) => progress?.(event)),
+      map((event) => (event as any).body ?? event)
     );
   }
 
   private toFormParams(data: any): HttpParams {
     let params = new HttpParams();
-    Object.keys(data).forEach(k => {
+    Object.keys(data).forEach((k) => {
       params = params.set(k, data[k]);
     });
     return params;

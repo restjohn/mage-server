@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { DeleteDeviceComponent } from '../delete-device/delete-device.component';
@@ -7,6 +6,7 @@ import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
 import { User } from '../../admin-users/user';
 import { AdminUserService } from '../../services/admin-user.service';
 import { AdminDeviceService } from '../../services/admin-device.service';
+import { UiStateService } from '../../services/ui-state.service';
 
 @Component({
   selector: 'mage-device-details',
@@ -41,7 +41,7 @@ export class DeviceDetailsComponent implements OnInit {
   } = {};
 
   constructor(
-    public stateService: StateService,
+    public stateService: UiStateService,
     private dialog: MatDialog,
     private deviceService: AdminDeviceService,
     private adminUserService: AdminUserService

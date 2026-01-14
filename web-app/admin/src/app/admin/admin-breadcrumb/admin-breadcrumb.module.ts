@@ -13,6 +13,13 @@ import { MatIconModule } from '@angular/material/icon';
   ],
   exports: [
     AdminBreadcrumbComponent
+  ],
+  providers: [
+    {
+      provide: '$state',
+      useFactory: (i: any) => i.get('$state'),
+      deps: ['$injector']
+    }     
   ]
 })
 export class AdminBreadcrumbModule { }

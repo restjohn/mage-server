@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform, Inject } from '@angular/core';
 import { LocalStorageService } from 'src/app/http/local-storage.service';
-import * as moment from 'moment';
+import moment from 'moment';
 
 @Pipe({
   name: 'moment',

@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import { catchError, EMPTY, finalize, map, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { NgForm } from '@angular/forms';
-import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
 import { DeleteUserComponent } from '../delete-user/delete-user.component';
 import { AdminTeamsService } from '../../services/admin-teams-service';
@@ -17,7 +16,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { AdminUserService } from '../../services/admin-user.service';
 import { LocalStorageService } from 'src/app/http/local-storage.service';
 import { User } from '../user';
-import * as moment from 'moment';
+import moment from 'moment';
 import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
 import * as zxcvbnCommonPackage from '@zxcvbn-ts/language-common';
 import * as zxcvbnEnPackage from '@zxcvbn-ts/language-en';
@@ -26,6 +25,7 @@ import { LoginService } from 'admin/src/app/services/login.service';
 import { DevicePagingService } from 'admin/src/app/services/device-paging.service';
 import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
 import { TeamService } from 'admin/src/app/services/team.service';
+import { UiStateService } from '../../services/ui-state.service';
 
 interface Login {
   id: string;
@@ -160,7 +160,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   ];
 
   constructor(
-    public stateService: StateService,
+    public stateService: UiStateService,
     private dialog: MatDialog,
     private userService: AdminUserService,
     private loginService: LoginService,

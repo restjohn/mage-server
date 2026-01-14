@@ -1,0 +1,13 @@
+<div class="container-fluid">
+    <div class="row" *ngIf="plugins.length === 0">
+      <div class="col-md-12">No plugins available.</div>
+    </div>
+  
+    <div *ngFor="let plugin of plugins; trackBy: trackById" class="row">
+      <div class="col-md-12">
+        <div>Plugin {{ plugin.title }}</div>
+        <a href="javascript:void(0)" (click)="open(plugin.id)">Show Plugin</a>
+      </div>
+    </div>
+  </div>
+  

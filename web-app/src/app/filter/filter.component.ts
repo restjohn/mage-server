@@ -7,7 +7,7 @@ import { Observable, firstValueFrom, map, startWith, debounceTime, switchMap, of
 import { COMMA, ENTER } from "@angular/cdk/keycodes";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { LocalStorageService } from "../http/local-storage.service";
-import * as moment from "moment";
+import moment from 'moment';
 import { User } from "@ngageoint/mage.web-core-lib/user";
 import {
   Form,

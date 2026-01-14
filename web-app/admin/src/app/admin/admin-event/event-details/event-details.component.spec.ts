@@ -4,11 +4,11 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSelectChange } from '@angular/material/select';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of, throwError } from 'rxjs';
-import { StateService } from '@uirouter/angular';
 
 import { EventDetailsComponent } from './event-details.component';
 import { AdminEventsService } from '../../services/admin-events.service';
 import { AdminTeamsService } from '../../services/admin-teams-service';
+import { UiStateService } from '../../services/ui-state.service';
 
 describe('EventDetailsComponent', () => {
   let component: EventDetailsComponent;
@@ -16,7 +16,7 @@ describe('EventDetailsComponent', () => {
   let eventsService: jasmine.SpyObj<AdminEventsService>;
   let teamsService: jasmine.SpyObj<AdminTeamsService>;
   let dialog: jasmine.SpyObj<MatDialog>;
-  let stateService: jasmine.SpyObj<StateService>;
+  let stateService: jasmine.SpyObj<UiStateService>;
 
   beforeEach(async () => {
     const eventsServiceSpy = jasmine.createSpyObj('EventsService', [
@@ -51,7 +51,7 @@ describe('EventDetailsComponent', () => {
         { provide: AdminEventsService, useValue: eventsServiceSpy },
         { provide: AdminTeamsService, useValue: teamsServiceSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        { provide: StateService, useValue: stateServiceSpy }
+        { provide: UiStateService, useValue: stateServiceSpy }
       ]
     })
       .compileComponents();
@@ -59,7 +59,7 @@ describe('EventDetailsComponent', () => {
     eventsService = TestBed.inject(AdminEventsService) as jasmine.SpyObj<AdminEventsService>;
     teamsService = TestBed.inject(AdminTeamsService) as jasmine.SpyObj<AdminTeamsService>;
     dialog = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
-    stateService = TestBed.inject(StateService) as jasmine.SpyObj<StateService>;
+    stateService = TestBed.inject(UiStateService) as jasmine.SpyObj<UiStateService>;
 
     eventsService.getEventById.and.returnValue(of({
       id: 1,

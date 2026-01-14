@@ -1,12 +1,12 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { StateService } from '@uirouter/angular';
 
 import { LayersService, Layer } from '../layers.service';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { CreateLayerDialogComponent } from '../create-layer/create-layer.component';
 import { AdminUserService } from '../../services/admin-user.service';
+import { UiStateService } from '../../services/ui-state.service';
 
 @Component({
   selector: 'mage-layer-dashboard',
@@ -39,7 +39,7 @@ export class LayerDashboardComponent implements OnInit {
 
   constructor(
     private modal: MatDialog,
-    private stateService: StateService,
+    private stateService: UiStateService,
     private layersService: LayersService,
     private adminUserService: AdminUserService
   ) {}

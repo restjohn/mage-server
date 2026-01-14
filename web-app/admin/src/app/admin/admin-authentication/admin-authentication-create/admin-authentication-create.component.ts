@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core'
 import { TypeChoice } from './admin-create.model';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { CdkStepper, STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
-import { StateService } from '@uirouter/core';
+import { UiStateService } from '../../services/ui-state.service';
 import { AuthenticationConfigurationService } from '../../services/authentication-configuration.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Strategy } from '../../admin-authentication/admin-settings.model';
@@ -51,7 +51,7 @@ export class AuthenticationCreateComponent implements OnInit {
    }
 
    constructor(
-      private readonly stateService: StateService,
+      private readonly stateService: UiStateService,
       private readonly snackBar: MatSnackBar,
       @Inject(AuthenticationConfigurationService)
       private readonly authenticationConfigurationService: any) {

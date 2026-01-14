@@ -1,7 +1,6 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { StateService } from '@uirouter/angular';
 
 import { AdminUserService } from '../../services/admin-user.service';
 import {
@@ -13,6 +12,7 @@ import {
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { Event } from 'src/app/filter/filter.types';
 import { CreateEventDialogComponent } from '../create-event/create-event.component';
+import { UiStateService } from '../../services/ui-state.service';
 
 @Component({
   selector: 'admin-events',
@@ -46,7 +46,7 @@ export class EventDashboardComponent implements OnInit {
 
   constructor(
     private modal: MatDialog,
-    private stateService: StateService,
+    private stateService: UiStateService,
     private eventService: AdminEventsService,
     private adminUserService: AdminUserService
   ) {}

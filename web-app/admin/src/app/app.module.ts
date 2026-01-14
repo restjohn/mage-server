@@ -1,8 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, ApplicationRef, DoBootstrap, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule } from '@angular/core';
 
-import { UpgradeModule } from '@angular/upgrade/static';
-import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -49,12 +47,15 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatStepperModule } from '@angular/material/stepper';
+import { MatMenuModule } from '@angular/material/menu';
 
 import { MatDatetimepickerModule } from '@mat-datetimepicker/core';
 import { MatMomentDatetimeModule } from '@mat-datetimepicker/moment';
 import { InputMaskModule } from '@ngneat/input-mask';
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+
 import { ColorPickerComponent } from './color-picker/color-picker.component';
 
 import { GeometryModule } from './geometry/geometry.module';
@@ -71,8 +72,8 @@ import {
 import { FeedItemComponent } from './feed/feed-item/feed-item.component';
 import { FeedItemSummaryModule } from './feed/feed-item/feed-item-summary/feed-item-summary.module';
 import { AdminFeedsModule } from './admin/admin-feeds/admin-feeds.module';
-import { StaticIconModule } from '@ngageoint/mage.web-core-lib/static-icon';
-import { MageCommonModule } from '@ngageoint/mage.web-core-lib/common';
+import { StaticIconModule } from 'core-lib-src/static-icon';
+import { MageCommonModule } from 'core-lib-src/common';
 import { AdminModule } from './admin/admin.module';
 import { AdminSettingsComponent } from './admin/admin-settings/admin-settings.component';
 import { AdminBreadcrumbModule } from './admin/admin-breadcrumb/admin-breadcrumb.module';
@@ -82,7 +83,6 @@ import {
   SecurityDisclaimerComponent
 } from './admin/admin-settings/admin-settings';
 import { DatetimePickerComponent } from './datetime-picker/datetime-picker.component';
-import { CommonModule } from '@angular/common';
 import { ContactModule } from './contact/contact.module';
 import { BannerComponent } from './banner/banner.component';
 import { AdminAuthenticationOidcComponent } from './admin/admin-authentication/admin-authentication-oidc/admin-authentication-oidc.component';
@@ -105,12 +105,14 @@ import { AdminTeamsModule } from './admin/admin-teams/admin-teams.module';
 import { AdminEventsModule } from './admin/admin-event/admin-events.module';
 import { AdminLayersModule } from './admin/admin-layers/admin-layers.module';
 import { AdminDashboardModule } from './admin/admin-dashboard/admin-dashboard.module';
-import { MatMenuModule } from '@angular/material/menu';
 import { AdminUsersModule } from './admin/admin-users/admin-users.module';
 import { ObservationModule } from './observation/observation.module';
-import { AdminDevicessModule } from './admin/admin-devices/admin-devices.module';
+import { AdminDevicesModule } from './admin/admin-devices/admin-devices.module';
 import { AdminNavigationComponent } from './navigation/admin-navigation.component';
 import { AuthenticationModule } from './authentication/authentication.module';
+import { AppRoutingModule } from './routing.module';
+import { AuthBufferInterceptor } from './services/auth-buffer.interceptor';
+
 
 @NgModule({
   declarations: [
@@ -141,14 +143,12 @@ import { AuthenticationModule } from './authentication/authentication.module';
     AdminAuthenticationSettingsComponent,
     AdminSettingsUnsavedComponent,
     AdminMapComponent,
-    AdminNavigationComponent
+    AdminNavigationComponent,
   ],
   imports: [
     CommonModule,
     BrowserModule,
     HttpClientModule,
-    UpgradeModule,
-    UIRouterUpgradeModule.forRoot(),
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
@@ -196,11 +196,6 @@ import { AuthenticationModule } from './authentication/authentication.module';
     HueModule,
     AlphaModule,
     CheckboardModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatSortModule,
-    MatSnackBarModule,
-    MatDatepickerModule,
     NgxMatSelectSearchModule,
     AdminModule,
     AdminTeamsModule,
@@ -216,20 +211,16 @@ import { AuthenticationModule } from './authentication/authentication.module';
     MatStepperModule,
     InputMaskModule.forRoot(),
     AdminDashboardModule,
-    AdminDevicessModule,
+    AdminDevicesModule,
     AuthenticationModule,
-    ContactModule
+    ContactModule,
+    AppRoutingModule
   ],
   providers: [
     {
-      provide: '$rootScope',
-      useFactory: (i: any) => i.get('$rootScope'),
-      deps: ['$injector']
-    },
-    {
-      provide: '$scope',
-      useFactory: (i: any) => i.get('$rootScope').$new(),
-      deps: ['$injector']
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthBufferInterceptor,
+      multi: true
     },
     {
       provide: HTTP_INTERCEPTORS,
@@ -237,9 +228,6 @@ import { AuthenticationModule } from './authentication/authentication.module';
       multi: true
     }
   ],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  bootstrap: [BootstrapComponent],
 })
-export class AppModule implements DoBootstrap {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public ngDoBootstrap(appRef: ApplicationRef): void { }
-}
+export class AppModule {}

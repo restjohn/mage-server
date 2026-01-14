@@ -79,4 +79,4 @@ import { LoginsModule } from '../../logins/logins.module';
         AdminDeviceService
     ]
 })
-export class AdminDevicessModule { }
+export class AdminDevicesModule { }

@@ -1,7 +1,7 @@
 import { Component, Inject, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core'
 import { UntypedFormGroup, NgModel } from '@angular/forms'
 import { LocalStorageService } from 'src/app/http/local-storage.service'
-import * as moment from 'moment'
+import moment from 'moment';
 
 interface DateField {
   title: string,

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -21,6 +20,7 @@ import {
   SearchModalColumn
 } from '../../../core/search-modal/search-modal.component';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
+import { UiStateService } from '../../services/ui-state.service';
 
 /**
  * Component for displaying and managing team details in the admin interface.
@@ -124,7 +124,7 @@ export class TeamDetailsComponent implements OnInit {
   }
 
   constructor(
-    private stateService: StateService,
+    private stateService: UiStateService,
     private dialog: MatDialog,
     private adminUserService: AdminUserService,
     private teamService: AdminTeamsService,

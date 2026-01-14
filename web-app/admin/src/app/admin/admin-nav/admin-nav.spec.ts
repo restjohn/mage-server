@@ -1,15 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AdminNavComponent } from './admin-nav';
 import { AdminUserService } from '../services/admin-user.service';
+import { UiStateService } from '../services/ui-state.service';
 
 describe('AdminNavComponent', () => {
   let component: AdminNavComponent;
   let fixture: ComponentFixture<AdminNavComponent>;
   let mockUserService: any;
-  let mockState: any;
+  let mockState: jasmine.SpyObj<UiStateService>;
 
   beforeEach(() => {
-    mockState = { go: jasmine.createSpy('go') };
+    mockState = jasmine.createSpyObj<UiStateService>('StateService', ['go']);
+
     mockUserService = {
       myself: { role: { permissions: ['UPDATE_SETTINGS', 'VIEW_USERS'] } }
     };
@@ -18,7 +20,7 @@ describe('AdminNavComponent', () => {
       declarations: [AdminNavComponent],
       providers: [
         { provide: AdminUserService, useValue: mockUserService },
-        { provide: '$injector', useValue: { get: () => mockState } }
+        { provide: UiStateService, useValue: mockState },
       ]
     });
 
@@ -56,15 +58,15 @@ describe('AdminNavComponent', () => {
     component.pluginTabs = [];
     component.stateName = 'admin.dashboard';
 
-    component.ngOnChanges({});
+    component.ngOnChanges({} as any);
 
-    const dashboard = component.navItems.find(i => i.state === 'admin.dashboard');
-    const users = component.navItems.find(i => i.state === 'admin.users');
-    const devices = component.navItems.find(i => i.state === 'admin.devices');
+    const dashboard = component.navItems.find(i => i.route === 'admin.dashboard');
+    const users = component.navItems.find(i => i.route === 'admin.users');
+    const devices = component.navItems.find(i => i.route === 'admin.devices');
 
-    expect(dashboard.count).toBe(3);
-    expect(users.count).toBe(2);
-    expect(devices.count).toBe(1);
+    expect(dashboard?.count).toBe(3);
+    expect(users?.count).toBe(2);
+    expect(devices?.count).toBe(1);
   });
 
   it('should return true if state matches a plugin', () => {
@@ -103,13 +105,14 @@ describe('AdminNavComponent', () => {
     component.pluginTabs = [{ id: '1', state: 'admin.pluginA', title: 'Plugin A' }];
     component.stateName = 'admin.pluginA';
 
-    component.ngOnChanges({});
+    component.ngOnChanges({} as any);
     expect(component.pluginActiveChange.emit).toHaveBeenCalledWith(true);
   });
 
   it('should navigate when route is different', () => {
     component.stateName = 'admin.dashboard';
     component.onClick('admin.users');
+
     expect(mockState.go).toHaveBeenCalledWith('admin.users');
     expect(component.drawerOpen).toBeFalse();
   });
@@ -118,6 +121,7 @@ describe('AdminNavComponent', () => {
     mockState.go.calls.reset();
     component.stateName = 'admin.users';
     component.onClick('admin.users');
+
     expect(mockState.go).not.toHaveBeenCalled();
   });
 });

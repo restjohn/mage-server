@@ -2,12 +2,12 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { of, Subject } from 'rxjs';
 
-import { StateService } from '@uirouter/angular';
 import { MatDialog } from '@angular/material/dialog';
 
 import { DeviceDetailsComponent } from './device-details.component';
 import { AdminDeviceService } from '../../services/admin-device.service';
 import { AdminUserService } from '../../services/admin-user.service';
+import { UiStateService } from '../../services/ui-state.service';
 
 describe('DeviceDetailsComponent', () => {
   let fixture: ComponentFixture<DeviceDetailsComponent>;
@@ -57,7 +57,7 @@ describe('DeviceDetailsComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [DeviceDetailsComponent],
       providers: [
-        { provide: StateService, useValue: stateService },
+        { provide: UiStateService, useValue: stateService },
         { provide: MatDialog, useValue: dialog },
         { provide: AdminDeviceService, useValue: deviceService },
         { provide: AdminUserService, useValue: userService }

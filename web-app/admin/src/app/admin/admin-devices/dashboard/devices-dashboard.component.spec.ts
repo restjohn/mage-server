@@ -16,10 +16,10 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DeviceDashboardComponent } from './devices-dashboard.component';
 import { DevicesResponse, AdminDeviceService } from '../../services/admin-device.service';
-import { StateService } from '@uirouter/angular';
 import { LocalStorageService } from 'src/app/http/local-storage.service';
 import { AdminUserService } from '../../services/admin-user.service';
 import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
+import { UiStateService } from '../../services/ui-state.service';
 
 const mockDevices: Device[] = [
   {
@@ -57,7 +57,7 @@ describe('DeviceDashboardComponent', () => {
   let deviceServiceSpy: jasmine.SpyObj<AdminDeviceService>;
   let userServiceSpy: any;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
-  let stateSpy: jasmine.SpyObj<StateService>;
+  let stateSpy: jasmine.SpyObj<UiStateService>;
   let localStorageSpy: jasmine.SpyObj<LocalStorageService>;
 
   beforeEach(async () => {
@@ -84,7 +84,7 @@ describe('DeviceDashboardComponent', () => {
         { provide: AdminDeviceService, useValue: deviceServiceSpy },
         { provide: AdminUserService, useValue: userServiceSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        { provide: StateService, useValue: stateSpy },
+        { provide: UiStateService, useValue: stateSpy },
         { provide: LocalStorageService, useValue: localStorageSpy }
       ]
     }).compileComponents();
