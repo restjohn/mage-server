@@ -28,6 +28,9 @@
       ],
       "core-lib-src/*": [
         "projects/core-lib/*/public-api.ts"
+      ],
+      "mage-web-app/*": [
+        "src/app/*"
       ]
     }
   },

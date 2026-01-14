@@ -1,0 +1,39 @@
+.signin-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.wand-container {
+    text-align: center;
+}
+
+.mage-wand {
+    max-width: 120px;
+    height: auto;
+}
+
+.bottom-gap {
+    margin-bottom: 16px;
+}
+
+.or-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin: 36px 0;
+}
+
+.or-hr {
+    flex: 1;
+    height: 2px;
+    background-color: rgba(0, 0, 0, .15);
+    border-radius: 1px;
+    border: none;
+}
+
+#or {
+    opacity: 0.6;
+    color: #666;
+}

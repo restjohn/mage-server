@@ -2,7 +2,7 @@
   position: relative;
 }
 
-::ng-deep app-admin-side-nav > admin-breadcrumb {
+::ng-deep app-admin-side-nav>admin-breadcrumb {
   display: block;
   position: fixed;
   width: 100%;
@@ -16,6 +16,7 @@
   left: 5px;
   z-index: 10000;
   display: flex;
+
   @media (max-width: 599px) {
     top: 66px !important;
   }
@@ -50,9 +51,11 @@
       padding: 2px;
       user-select: none;
     }
+
     &:active {
       transform: translateY(1px);
     }
+
     i {
       font-size: 1.3rem;
     }
@@ -64,6 +67,7 @@
     background: rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(1px);
     margin-top: 120px;
+
     @media (max-width: 599px) {
       margin-top: 110px;
     }
@@ -143,6 +147,7 @@
           display: block;
         }
       }
+
       .text {
         font-size: 1rem;
         font-weight: 500;
@@ -161,6 +166,7 @@
       }
     }
   }
+
   @media (max-width: 599px) {
     .drawer {
       position: fixed;
@@ -192,14 +198,17 @@
 
       .nav-row {
         padding: 1rem 1.1rem;
+
         .icon {
           font-size: 1.6rem;
           width: 2rem;
         }
+
         .icon.plugin .plugin-icon {
           width: 1.6rem;
           height: 1.6rem;
         }
+
         .text {
           font-size: 1.1rem;
         }
