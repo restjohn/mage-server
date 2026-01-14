@@ -25,8 +25,9 @@ export class AuthenticationConfigurationService {
   }
 
   updateConfiguration(config: any): Observable<any> {
+    const id = config?._id ?? config?.id;
     return this.http.put(
-      `${this.baseUrl}/${encodeURIComponent(config._id)}`,
+      `${this.baseUrl}/${encodeURIComponent(String(id))}`,
       config,
       { headers: this.jsonHeaders }
     );

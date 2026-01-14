@@ -3,7 +3,7 @@ import { TypeChoice } from './admin-create.model';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { CdkStepper, STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { UiStateService } from '../../services/ui-state.service';
-import { AuthenticationConfigurationService } from '../../services/authentication-configuration.service';
+import { AuthenticationConfigurationService } from '../../services/admin-authentication-configuration.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Strategy } from '../../admin-authentication/admin-settings.model';
 
