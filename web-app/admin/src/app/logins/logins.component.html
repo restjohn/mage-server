@@ -135,11 +135,15 @@
         </td>
         <td>
           <span class="login-device" *ngIf="login.device">
-            <a href="javascript:void(0);" (click)="gotoDevice(login.device)">
+            <a
+              class="pointer"
+              [routerLink]="['../devices', login.device.id]"
+            >
               <i class="fa" [ngClass]="iconClass(login.device)"></i>
               {{ login.device.uid }}
             </a>
           </span>
+
           <span class="login-device unknown" *ngIf="!login.device">
             <i class="fa fa-question-circle"></i>
             Unknown Device

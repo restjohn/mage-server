@@ -5,7 +5,19 @@ import {
   ElementRef,
   ViewChild
 } from '@angular/core';
-import { catchError, EMPTY, finalize, map, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import {
+  catchError,
+  EMPTY,
+  finalize,
+  map,
+  Observable,
+  of,
+  Subject,
+  switchMap,
+  take,
+  takeUntil
+} from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { DeleteUserComponent } from '../delete-user/delete-user.component';
@@ -14,18 +26,17 @@ import { AdminEventsService } from '../../services/admin-events.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { PageEvent } from '@angular/material/paginator';
 import { AdminUserService } from '../../services/admin-user.service';
-import { LocalStorageService } from 'src/app/http/local-storage.service';
+import { LocalStorageService } from '../../../../../../../web-app/src/app/http/local-storage.service';
 import { User } from '../user';
 import moment from 'moment';
 import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
 import * as zxcvbnCommonPackage from '@zxcvbn-ts/language-common';
 import * as zxcvbnEnPackage from '@zxcvbn-ts/language-en';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
-import { LoginService } from 'admin/src/app/services/login.service';
-import { DevicePagingService } from 'admin/src/app/services/device-paging.service';
-import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
-import { TeamService } from 'admin/src/app/services/team.service';
-import { UiStateService } from '../../services/ui-state.service';
+import { LoginService } from '../../../services/login.service';
+import { DevicePagingService } from '../../../services/device-paging.service';
+import { Device } from '../../../../@types/dashboard/devices-dashboard';
+import { TeamService } from '../../../../app/services/team.service';
 
 interface Login {
   id: string;
@@ -50,9 +61,6 @@ interface IconMetadata {
   color?: string;
 }
 
-const CURRENT_TEAMS_KEY = 'all';
-const CANDIDATE_TEAMS_KEY = 'all.search';
-
 @Component({
   selector: 'mage-user-details',
   templateUrl: './user-details.component.html',
@@ -62,7 +70,7 @@ const CANDIDATE_TEAMS_KEY = 'all.search';
  * Admin component for viewing and managing a user's details, teams, events, devices, logins, and credentials.
  */
 export class UserDetailsComponent implements OnInit, OnDestroy {
-  user: User;
+  user?: User;
   userTeams: any[] = [];
   userEvents: any[] = [];
   team: any = {};
@@ -78,18 +86,20 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   login = {
     startDateOpened: false,
     endDateOpened: false,
-    startDate: null,
-    endDate: null
+    startDate: null as any,
+    endDate: null as any
   };
 
   firstLogin: Login | null = null;
   showPrevious = false;
   showNext = true;
+
   deviceStateAndData: any;
   deviceState = 'all';
   loginSearchResults: Device[] = [];
   isSearchingDevices = false;
   device: Device | null = null;
+
   userTeamSearch = '';
   userEventSearch = '';
   userTeamStateAndData: any;
@@ -97,15 +107,20 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   nonUserTeam: any = null;
   nonUserTeamSearchResults: any[] = [];
   isSearching = false;
-  loginPage: LoginPage;
+
+  loginPage?: LoginPage;
   loginResultsLimit = 10;
-  endDate: Date;
+  endDate?: Date;
+
   devices: Device[] = [];
   editTeam = false;
   editEvent = false;
+
   isEditingUser = false;
   editUser: EditableUser | null = null;
+
   roles: any[] = [];
+
   passwordStrengthScore = 0;
   passwordStrengthMap = {
     0: { type: 'danger', text: 'Weak' },
@@ -114,14 +129,18 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     3: { type: 'primary', text: 'Strong' },
     4: { type: 'success', text: 'Excellent' }
   };
+
   saving = false;
   error: string | null = null;
+
   canEditRole = false;
   canUpdatePassword = false;
+
   passwordStrengthType: string | null = null;
   passwordStrength: string | null = null;
   passwordStatus: { status: 'success' | 'danger' | null; msg: string | null } =
     { status: null, msg: null };
+
   changePassword = false;
   newPassword = '';
   newPasswordConfirm = '';
@@ -129,8 +148,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   iconPreviewUrl: string | null = null;
   avatarPreviewUrl: string | null = null;
+
   removeIconSelected = false;
   iconMetadata: IconMetadata = { type: 'none' };
+
   @ViewChild('mapIconCanvas') mapIconCanvasRef?: ElementRef<HTMLCanvasElement>;
 
   teamsDataSource = new MatTableDataSource<any>();
@@ -155,12 +176,13 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     {
       title: 'Users',
       iconClass: 'fa fa-user',
-      state: { name: 'admin.users' }
+      route: ['../']
     }
   ];
 
   constructor(
-    public stateService: UiStateService,
+    private route: ActivatedRoute,
+    private router: Router,
     private dialog: MatDialog,
     private userService: AdminUserService,
     private loginService: LoginService,
@@ -173,12 +195,42 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.deviceStateAndData = this.devicePagingService.constructDefault();
   }
 
-  /**
-   * Initialize component state, load user, roles, teams, events, devices, and login activity.
-   */
   ngOnInit(): void {
-    const userId = this.stateService.params.userId;
-    if (!userId) return;
+    this.route.paramMap
+      .pipe(
+        map((pm) => pm.get('userId')),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((userId) => {
+        if (!userId) {
+          this.error = 'Missing userId route param';
+          return;
+        }
+        this.initForUser(userId);
+      });
+
+    try {
+      zxcvbnOptions.setOptions({
+        dictionary: {
+          ...zxcvbnCommonPackage.dictionary,
+          ...zxcvbnEnPackage.dictionary
+        },
+        graphs: zxcvbnCommonPackage.adjacencyGraphs,
+        translations: zxcvbnEnPackage.translations
+      });
+    } catch {}
+  }
+
+  private initForUser(userId: string): void {
+    this.error = null;
+
+    this.user = undefined;
+    this.userTeams = [];
+    this.userEvents = [];
+    this.loadingTeams = true;
+    this.loadingEvents = true;
+
+    this.breadcrumbs = [{ title: 'Users', iconClass: 'fa fa-user' }];
 
     this.filter = {
       user: { id: userId }
@@ -196,9 +248,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((myself) => {
         this.currentUser = myself;
-
         const permissions = myself?.role?.permissions ?? [];
-
         this.hasUserEditPermission = permissions.includes('UPDATE_USER');
         this.hasUserDeletePermission = permissions.includes('DELETE_USER');
         this.canEditRole = permissions.includes('UPDATE_USER_ROLE');
@@ -210,45 +260,49 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((roles) => {
         this.roles = roles;
-        this.setSelectedRoleFromUser();
       });
 
     this.userService
       .getUser(userId)
       .pipe(takeUntil(this.destroy$))
-      .subscribe((user) => {
-        this.user = user;
+      .subscribe({
+        next: (user) => {
+          this.user = user;
 
-        this.isSelf = !!this.currentUser && this.currentUser.id === user.id;
+          this.isSelf = !!this.currentUser && this.currentUser.id === user.id;
 
-        const anyUser: any = user;
-        if (anyUser.icon?.type === 'create') {
-          this.iconMetadata = {
-            type: 'create',
-            text: anyUser.icon.text,
-            color: anyUser.icon.color
-          };
-        } else if (user.iconUrl) {
-          this.iconMetadata = { type: 'upload' };
-        } else {
-          this.iconMetadata = { type: 'none' };
+          const anyUser: any = user;
+          if (anyUser.icon?.type === 'create') {
+            this.iconMetadata = {
+              type: 'create',
+              text: anyUser.icon.text,
+              color: anyUser.icon.color
+            };
+          } else if (user.iconUrl) {
+            this.iconMetadata = { type: 'upload' };
+          } else {
+            this.iconMetadata = { type: 'none' };
+          }
+
+          this.loadUserTeams();
+          this.loadUserEvents();
+          this.setupActionButtons();
+
+          this.breadcrumbs = [
+            { title: 'Users', iconClass: 'fa fa-user', route: ['../'] },
+            { title: user.displayName || 'Unknown User' }
+          ];
+        },
+        error: (err) => {
+          this.error = err?.error?.message || 'Failed to load user';
         }
-
-        this.loadUserTeams();
-        this.loadUserEvents();
-        this.setupActionButtons();
-        this.setSelectedRoleFromUser();
-
-        this.breadcrumbs.push({ title: user.displayName || 'Unknown User' });
       });
 
     this.loginService
       .query({ filter: this.filter, limit: this.loginResultsLimit })
       .then((loginPage: LoginPage) => {
         this.loginPage = loginPage;
-        if (loginPage.logins.length) {
-          this.firstLogin = loginPage.logins[0];
-        }
+        this.firstLogin = loginPage.logins?.length ? loginPage.logins[0] : null;
       });
 
     delete this.deviceStateAndData['registered'];
@@ -262,22 +316,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
           this.deviceStateAndData[this.deviceState]
         );
       });
-
-    try {
-      zxcvbnOptions.setOptions({
-        dictionary: {
-          ...zxcvbnCommonPackage.dictionary,
-          ...zxcvbnEnPackage.dictionary
-        },
-        graphs: zxcvbnCommonPackage.adjacencyGraphs,
-        translations: zxcvbnEnPackage.translations
-      });
-    } catch {}
   }
 
-  /**
-   * Load teams that include the current user using pagination and optional search.
-   */
   private loadUserTeams(): void {
     if (!this.user?.id) return;
 
@@ -305,6 +345,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
             this.userTeams = [];
             this.totalUserTeams = 0;
           }
+
           this.teamsDataSource.data = this.userTeams;
           this.loadingTeams = false;
         },
@@ -317,9 +358,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Load events the current user can access using pagination and optional search.
-   */
   private loadUserEvents(): void {
     if (!this.user?.id) return;
 
@@ -331,7 +369,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         page_size: this.userEventsPageSize
       })
       .subscribe({
-        next: (results) => {
+        next: (results: any) => {
           this.userEvents = results.items || [];
           this.totalUserEvents = results.totalCount || this.userEvents.length;
           this.eventsDataSource.data = this.userEvents;
@@ -346,9 +384,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Create or update action buttons based on edit state and permissions.
-   */
   setupActionButtons(): void {
     this.teamActionButtons = [];
 
@@ -361,118 +396,76 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Toggle edit mode for teams table.
-   */
   toggleEditTeams(): void {
     this.editTeam = !this.editTeam;
     this.setupActionButtons();
   }
 
-  /**
-   * Toggle edit mode for events table.
-   */
   toggleEditEvents(): void {
     this.editEvent = !this.editEvent;
     this.setupActionButtons();
   }
 
-  /**
-   * Handle pagination changes for the user's teams.
-   * @param event - Angular Material page change event
-   */
   onUserTeamsPageChange(event: PageEvent): void {
     this.userTeamsPageSize = event.pageSize;
     this.userTeamsPageIndex = event.pageIndex;
     this.loadUserTeams();
   }
 
-  /**
-   * Handle pagination changes for the user's events.
-   * @param event - Angular Material page change event
-   */
   onUserEventsPageChange(event: PageEvent): void {
     this.userEventsPageSize = event.pageSize;
     this.userEventsPageIndex = event.pageIndex;
     this.loadUserEvents();
   }
 
-  /**
-   * Search the user's teams by name and reset pagination.
-   * @param searchTerm - Text to filter team names
-   */
   searchUserTeam(searchTerm?: string): void {
     this.userTeamSearch = searchTerm || '';
     this.userTeamsPageIndex = 0;
     this.loadUserTeams();
   }
 
-  /**
-   * Search events the user can access and reset pagination.
-   * @param searchTerm - Text to filter event names
-   */
   searchUserEvent(searchTerm?: string): void {
     this.userEventSearch = searchTerm || '';
     this.userEventsPageIndex = 0;
     this.loadUserEvents();
   }
 
-  /**
-   * Search for teams not containing the user (placeholder stub).
-   * @param searchString - Search text
-   * @returns Promise resolving to a list of matching teams
-   */
-  searchNonUserTeams(searchString: string): Promise<any[]> {
+  searchNonUserTeams(_searchString: string): Promise<any[]> {
     this.isSearching = true;
 
     this.nonUserTeamSearchResults = [];
     if (this.nonUserTeamSearchResults.length === 0) {
-      const noTeam = {
-        name: 'No Results Found'
-      };
-      this.nonUserTeamSearchResults.push(noTeam);
+      this.nonUserTeamSearchResults.push({ name: 'No Results Found' });
     }
 
     this.isSearching = false;
     return Promise.resolve(this.nonUserTeamSearchResults);
   }
 
-  /**
-   * Determine a device icon class from the device's user agent or app version.
-   * @param device - Device information
-   * @returns FontAwesome class string
-   */
   iconClass(device: Device): string {
     if (!device) return '';
 
-    if (device.iconClass) return device.iconClass;
+    if ((device as any).iconClass) return (device as any).iconClass;
 
     const userAgent = device.userAgent || '';
 
     if (device.appVersion === 'Web Client') {
-      device.iconClass = 'fa-desktop admin-desktop-icon-xs';
-    } else if (userAgent.toLowerCase().indexOf('android') !== -1) {
-      device.iconClass = 'fa-android admin-android-icon-xs';
-    } else if (userAgent.toLowerCase().indexOf('ios') !== -1) {
-      device.iconClass = 'fa-apple admin-apple-icon-xs';
+      (device as any).iconClass = 'fa-desktop admin-desktop-icon-xs';
+    } else if (userAgent.toLowerCase().includes('android')) {
+      (device as any).iconClass = 'fa-android admin-android-icon-xs';
+    } else if (userAgent.toLowerCase().includes('ios')) {
+      (device as any).iconClass = 'fa-apple admin-apple-icon-xs';
     } else {
-      device.iconClass = 'fa-mobile admin-generic-icon-xs';
+      (device as any).iconClass = 'fa-mobile admin-generic-icon-xs';
     }
 
-    return device.iconClass;
+    return (device as any).iconClass;
   }
 
-  /**
-   * Navigate to the edit user state for a given user.
-   * @param user - User to edit
-   */
   editUserNavigate(user: User): void {
-    this.stateService.go('admin.editUser', { userId: user.id });
+    this.router.navigate(['/admin/users', user.id]);
   }
 
-  /**
-   * Toggle user edit mode.
-   */
   toggleEditUser(): void {
     if (this.isEditingUser) {
       this.cancelEdit();
@@ -481,16 +474,16 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Begin editing the current user's profile and icon metadata.
-   */
   startEdit(): void {
+    if (!this.user) return;
+
     this.isEditingUser = true;
     this.editUser = { ...this.user } as EditableUser;
 
     this.iconPreviewUrl = null;
     this.avatarPreviewUrl = null;
     this.removeIconSelected = false;
+
     if (!this.iconMetadata) this.iconMetadata = { type: 'none' };
     if (this.iconMetadata.type === 'create') {
       if (!this.iconMetadata.text) this.setIconInitials(this.user.displayName);
@@ -500,13 +493,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     }
 
     this.setSelectedRoleFromUser();
-
     this.error = null;
   }
 
-  /**
-   * Cancel editing and reset temporary state.
-   */
   cancelEdit(): void {
     this.isEditingUser = false;
     this.editUser = null;
@@ -517,10 +506,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.removeIconSelected = false;
   }
 
-  /**
-   * Get the current editable phone number from either the edit buffer or legacy fields.
-   * @returns The phone number string or empty string
-   */
   getPhoneNumber(): string {
     return (
       this.editUser?.phones?.[0]?.number ||
@@ -530,10 +515,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     );
   }
 
-  /**
-   * Update the editable phone number, initializing array structures as needed.
-   * @param value - Phone number text
-   */
   updatePhoneNumber(value: string): void {
     if (!this.editUser) return;
 
@@ -548,9 +529,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     (this.editUser.phones as any)[0].number = value;
   }
 
-  /**
-   * Set the selected role in the edit model based on the user's existing role.
-   */
   private setSelectedRoleFromUser(): void {
     if (!this.canEditRole || !this.user || !this.roles?.length) return;
     if (!this.editUser) return;
@@ -570,10 +548,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Handle changes to the map icon type (none/create/upload) and sync UI state.
-   */
   iconTypeChanged(): void {
+    if (!this.user) return;
+
     if (this.iconMetadata.type === 'create') {
       this.setIconInitials(this.user.displayName);
       if (!this.iconMetadata.color)
@@ -586,35 +563,21 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.removeIconSelected = false;
     } else {
       this.iconPreviewUrl = null;
-      if (this.editUser) {
-        (this.editUser as any).icon = null;
-      }
+      if (this.editUser) (this.editUser as any).icon = null;
       this.removeIconSelected = true;
     }
   }
 
-  /**
-   * Update the generated icon initials text.
-   * @param value - Initials text (up to 2 characters)
-   */
   onCreateTextChanged(value: string): void {
     this.iconMetadata.text = (value || '').toUpperCase().slice(0, 2);
     this.updateMapIconCanvas();
   }
 
-  /**
-   * Update the generated icon color.
-   * @param value - Hex color value
-   */
   onCreateColorChanged(value: string): void {
     this.iconMetadata.color = value;
     this.updateMapIconCanvas();
   }
 
-  /**
-   * Initialize icon initials from a name if not already set.
-   * @param name - Display name
-   */
   private setIconInitials(name: string): void {
     if (this.iconMetadata.text) return;
     const initials = (name || '').match(/\b\w/g) || [];
@@ -623,17 +586,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     ).toUpperCase();
   }
 
-  /**
-   * Generate a random hex color string.
-   * @returns Hex color
-   */
   private randomColor(): string {
     return '#' + Math.floor(Math.random() * 16777215).toString(16);
   }
 
-  /**
-   * Redraw the map icon canvas based on current create metadata.
-   */
   private updateMapIconCanvas(): void {
     const canvas = this.mapIconCanvasRef?.nativeElement;
     if (!canvas || this.iconMetadata.type !== 'create') return;
@@ -642,12 +598,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.drawMarker(canvas, color, text);
   }
 
-  /**
-   * Draw a pin-shaped marker with text onto a canvas.
-   * @param canvas - Target canvas
-   * @param color - Marker color
-   * @param text - Initials text
-   */
   private drawMarker(
     canvas: HTMLCanvasElement,
     color: string,
@@ -655,6 +605,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   ): void {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
     const size = Math.min(canvas.width || 75, canvas.height || 75);
     canvas.width = size;
     canvas.height = size;
@@ -703,29 +654,21 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     ctx.fillText(text || '', centerX, circleY);
   }
 
-  /**
-   * Convert a canvas to a PNG blob.
-   * @param canvas - Source canvas
-   * @returns PNG Blob or undefined if conversion fails
-   */
   private canvasToPng(canvas: HTMLCanvasElement): Blob | undefined {
     const icon = canvas.toDataURL('image/png');
     if (!icon) return undefined;
+
     const byteString = atob(icon.split(',')[1]);
     const ab = new ArrayBuffer(byteString.length);
     const ia = new Uint8Array(ab);
+
     for (let i = 0; i < byteString.length; i++) {
       ia[i] = byteString.charCodeAt(i);
     }
+
     return new Blob([ab], { type: 'image/png' });
   }
 
-  /**
-   * Convert a hex color to an rgba() string.
-   * @param hex - Hex color string
-   * @param opacity - Alpha value (0-1)
-   * @returns rgba color string
-   */
   private hexToRgb(hex: string, opacity: number): string {
     hex = (hex || '#000000').replace('#', '');
     const r = parseInt(hex.substring(0, 2), 16);
@@ -734,12 +677,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     return `rgba(${r},${g},${b},${opacity})`;
   }
 
-  /**
-   * Handle uploaded icon file selection and preview it.
-   * @param event - File input change event
-   */
   onIconChanged(event: Event): void {
     if (!this.editUser) return;
+
     const input = event.target as HTMLInputElement;
     const file = input.files && input.files[0];
     if (!file) {
@@ -747,7 +687,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.editUser.icon = file as any;
+    (this.editUser as any).icon = file;
     this.removeIconSelected = false;
     this.iconMetadata.type = 'upload';
 
@@ -758,12 +698,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     reader.readAsDataURL(file);
   }
 
-  /**
-   * Handle uploaded avatar file selection and preview it.
-   * @param event - File input change event
-   */
   onAvatarChanged(event: Event): void {
     if (!this.editUser) return;
+
     const input = event.target as HTMLInputElement;
     const file = input.files && input.files[0];
     if (!file) {
@@ -781,9 +718,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     reader.readAsDataURL(file);
   }
 
-  /**
-   * Mark the icon for removal and clear previews.
-   */
   removeIcon(): void {
     if (!this.editUser) return;
     this.removeIconSelected = true;
@@ -792,9 +726,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     (this.editUser as any).icon = null;
   }
 
-  /**
-   * Persist edits to the user, including role, phone, and icon changes.
-   */
   saveUser(): void {
     if (!this.editUser) return;
 
@@ -861,9 +792,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Add the current user to the selected non-member team.
-   */
   addUserToTeam(): void {
     if (!this.nonUserTeam?.id || !this.user?.id) return;
 
@@ -879,12 +807,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Remove the user from a team.
-   * @param $event - Click event to stop propagation
-   * @param team - Team to remove
-   */
   removeUserFromTeam($event: MouseEvent, team: any): void {
+    if (!this.user?.id) return;
+
     $event.stopPropagation();
     const wasLastItemOnPage = (this.userTeams?.length || 0) <= 1;
 
@@ -905,31 +830,16 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Navigate to an event in the admin area.
-   * @param userEvent - Target event
-   */
-  gotoEvent(userEvent: any): void {
-    this.stateService.go('admin.event', { eventId: userEvent.id });
-  }
-
-  /**
-   * Delete a user and navigate back to the users list.
-   * @param user - User to delete
-   */
   deleteUser(user: User): void {
     this.userService
       .deleteUser(user.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => this.stateService.go('admin.users'),
+        next: () => this.router.navigate(['/admin/users']),
         error: (err) => console.error('Failed to delete user:', err)
       });
   }
 
-  /**
-   * Open a confirmation dialog before deleting the user.
-   */
   confirmDeleteUser(user: User): void {
     const dialogRef = this.dialog.open(DeleteUserComponent, {
       data: { user }
@@ -942,10 +852,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Activate a user account.
-   * @param user - User to activate
-   */
   activateUser(user: User): void {
     user.active = true;
     this.userService
@@ -954,10 +860,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  /**
-   * Enable a user account.
-   * @param user - User to enable
-   */
   enableUser(user: User): void {
     user.enabled = true;
     this.userService
@@ -966,10 +868,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  /**
-   * Disable a user account.
-   * @param user - User to disable
-   */
   disableUser(user: User): void {
     user.enabled = false;
     this.userService
@@ -978,27 +876,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  /**
-   * Navigate to a team in the admin area.
-   * @param team - Target team
-   */
-  gotoTeam(team: any): void {
-    this.stateService.go('admin.team', { teamId: team.id });
-  }
-
-  /**
-   * Navigate to the details page for a device.
-   * @param device - Device to view
-   */
-  gotoDevice(device: Device): void {
-    if (!device) return;
-    this.stateService.go('admin.device', { deviceId: device.id });
-  }
-
-  /**
-   * Page through login records using a provided URL from the API.
-   * @param url - Next/previous page URL
-   */
   pageLogin(url: string): void {
     this.loginService
       .query({ url: url, filter: this.filter, limit: this.loginResultsLimit })
@@ -1011,30 +888,29 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Search for devices associated with login activity.
-   * @param searchString - Regex or plain text search
-   * @returns Promise resolving to matching devices
-   */
   searchLogins(searchString: string): Observable<Device[]> {
     this.isSearchingDevices = true;
-  
+
     if (searchString == null) {
       searchString = '.*';
     }
-  
+
     return this.devicePagingService
       .search(this.deviceStateAndData[this.deviceState], searchString)
       .pipe(
         map((devices: Device[]) => {
           this.loginSearchResults = devices || [];
           if (this.loginSearchResults.length === 0) {
-            this.loginSearchResults = [{ userAgent: 'No Results Found' } as Device];
+            this.loginSearchResults = [
+              { userAgent: 'No Results Found' } as Device
+            ];
           }
           return this.loginSearchResults;
         }),
         catchError(() => {
-          this.loginSearchResults = [{ userAgent: 'No Results Found' } as Device];
+          this.loginSearchResults = [
+            { userAgent: 'No Results Found' } as Device
+          ];
           return of(this.loginSearchResults);
         }),
         finalize(() => {
@@ -1043,12 +919,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       );
   }
 
-  /**
-   * Apply login filters (device/date) and refresh results.
-   */
   filterLogins(): void {
     this.filter.device = this.device;
     this.filter.startDate = this.login.startDate;
+
     if (this.login.endDate) {
       this.endDate = moment(this.login.endDate).endOf('day').toDate();
     }
@@ -1062,98 +936,57 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Open the date picker for login start date.
-   * @param event - Mouse event to prevent default behavior
-   */
   openLoginStart(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-
     this.login.startDateOpened = true;
   }
 
-  /**
-   * Open the date picker for login end date.
-   * @param event - Mouse event to prevent default behavior
-   */
   openLoginEnd(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-
     this.login.endDateOpened = true;
   }
 
-  /**
-   * Update the login results limit and refetch.
-   */
   loginResultsLimitChanged(): void {
     this.filterLogins();
   }
 
-  /**
-   * Trigger login filtering when date range changes.
-   */
   dateFilterChanged(): void {
     this.filterLogins();
   }
 
-  /**
-   * Convert a timestamp to a human-friendly relative time.
-   * @param timestamp - ISO timestamp
-   * @returns Relative time string
-   */
   fromNow(timestamp: string): string {
     return moment(timestamp).fromNow();
   }
 
-  /**
-   * Format a timestamp for display.
-   * @param timestamp - ISO timestamp
-   * @returns Formatted date string
-   */
   formatDate(timestamp: string): string {
     return moment(timestamp).format('MMM D YYYY hh:mm:ss A');
   }
 
-  /**
-   * Get the authenticated URL for the user's icon (appends access token and cache-buster).
-   * @returns Authenticated URL or null if none
-   */
   get userIconImgUrl(): string | null {
     if (!this.user?.iconUrl) return null;
     return this.makeAuthenticatedUrl(this.user.iconUrl);
   }
 
-  /**
-   * Get the authenticated URL for the user's avatar (appends access token and cache-buster).
-   * @returns Authenticated URL or null if none
-   */
   get userAvatarImgUrl(): string | null {
     if (!this.user?.avatarUrl) return null;
     return this.makeAuthenticatedUrl(this.user.avatarUrl as any);
   }
 
-  /**
-   * Append an access token (and optional cache buster) to a URL.
-   * @param url - Base URL
-   * @returns Authenticated URL
-   */
   private makeAuthenticatedUrl(url: string): string {
     if (!url) return '';
     const token = this.localStorageService?.getToken?.();
     if (!token) return url;
+
     const sep = url.includes('?') ? '&' : '?';
     const dc = (this.user as any)?.lastUpdated
       ? `&_dc=${(this.user as any).lastUpdated}`
       : '';
+
     return `${url}${sep}access_token=${token}${dc}`;
   }
 
-  /**
-   * Update password strength indicators for the provided password.
-   * @param password - Candidate password
-   */
   passwordChanged(password: string): void {
     if (password && password.length > 0) {
       const score = zxcvbn(
@@ -1162,11 +995,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
           Boolean
         ) as string[]
       ).score;
+
       this.passwordStrengthScore = score + 1;
-      this.passwordStrengthType =
-        this.passwordStrengthMap[score as 0 | 1 | 2 | 3 | 4].type;
-      this.passwordStrength =
-        this.passwordStrengthMap[score as 0 | 1 | 2 | 3 | 4].text;
+      this.passwordStrengthType = (this.passwordStrengthMap as any)[score].type;
+      this.passwordStrength = (this.passwordStrengthMap as any)[score].text;
     } else {
       this.passwordStrengthScore = 0;
       this.passwordStrengthType = null;
@@ -1174,10 +1006,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Update the user's password after simple validation.
-   * @param form - Optional template-driven form for validation and reset
-   */
   updatePassword(form?: NgForm): void {
     if (!this.user?.id) return;
     this.passwordStatus = { status: null, msg: null };
@@ -1225,6 +1053,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         status: 'success',
         msg: 'Password successfully updated.'
       };
+
       if (form) form.resetForm();
       this.changePassword = false;
       this.cancelEdit();
@@ -1248,9 +1077,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /**
-   * Cancel password change and clear related UI state.
-   */
   cancelPasswordChange(): void {
     this.changePassword = false;
     this.newPassword = '';

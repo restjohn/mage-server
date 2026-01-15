@@ -5,8 +5,8 @@ import { Subject, Observable, from, of, isObservable } from 'rxjs';
 import { takeUntil, catchError } from 'rxjs/operators';
 
 import { User } from '../admin/admin-users/user';
-import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
-import { Login, LoginFilter, LoginPage } from 'admin/src/@types/dashboard/admin-dashboard';
+import { Device } from '../../@types/dashboard/devices-dashboard';
+import { Login, LoginFilter, LoginPage } from '../../@types/dashboard/admin-dashboard';
 
 import { AdminDeviceService } from '../admin/services/admin-device.service';
 import { AdminUserService } from '../admin/services/admin-user.service';
@@ -392,18 +392,6 @@ export class LoginsComponent implements OnInit, OnDestroy {
     if (userAgent.includes('android')) return 'fa fa-android admin-android-icon-xs';
     if (userAgent.includes('ios')) return 'fa fa-apple admin-apple-icon-xs';
     return 'fa fa-mobile admin-generic-icon-xs';
-  }
-
-  gotoUser(user: User): void {
-    const id = (user as any)?.id;
-    if (!id) return;
-    this.router.navigate(['/admin/users', id]);
-  }
-
-  gotoDevice(device: Device): void {
-    const id = (device as any)?.id;
-    if (!id) return;
-    this.router.navigate(['/admin/devices', id]);
   }
 
   fromNow(timestamp: string | Date): string {

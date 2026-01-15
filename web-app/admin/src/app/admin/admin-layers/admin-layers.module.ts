@@ -24,6 +24,7 @@ import { LayerDetailsComponent } from './layer-details/layer-details.component';
 import { DeleteLayerComponent } from './delete-layer/delete-layer.component';
 import { LayerPreviewComponent } from './layer-preview/layer-preview.component';
 import { ImageryLayerSettingsComponent } from './imagery-layer-settings/imagery-layer-settings.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
     declarations: [
@@ -53,7 +54,8 @@ import { ImageryLayerSettingsComponent } from './imagery-layer-settings/imagery-
         MatSnackBarModule,
         MatInputModule,
         CoreModule,
-        AdminBreadcrumbModule
+        AdminBreadcrumbModule,
+        RouterModule
     ],
     providers: [
         LayersService

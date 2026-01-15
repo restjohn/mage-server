@@ -110,7 +110,6 @@ export class AdminTeamsService {
             params = params.set('page_size', String(options.page_size));
         }
 
-        // Always request total count for pagination
         params = params.set('total', 'true');
 
         return this.http.get<membersResponse>(`/api/teams/${options.id}/members`, { params });
@@ -144,7 +143,6 @@ export class AdminTeamsService {
             params = params.set('page_size', String(options.page_size));
         }
 
-        // Always request total count for pagination
         params = params.set('total', 'true');
 
         return this.http.get<membersResponse>(`/api/teams/${options.id}/nonMembers`, { params });

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
-import { User } from 'core-lib-src/user';
-import { UserPagingService } from 'admin/src/app/services/user-paging.service';
+import { User } from '../user';
+import { UserPagingService } from '../../../services/user-paging.service';
 
 @Component({
   selector: 'user-search-box',

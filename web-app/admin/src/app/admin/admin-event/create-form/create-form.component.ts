@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AdminEventsService } from '../../services/admin-events.service';
-import { Event } from 'src/app/filter/filter.types';
+import { Event } from '../../../../../../src/app/filter/filter.types';
 import { Field } from '../helpers/observation-feed-helper';
 import { deriveUserFieldNames, prepareFormPayload } from '../helpers/form-field-utils';
 

@@ -1,177 +1,222 @@
-import { Component, Inject, OnInit } from '@angular/core'
+import { Component, Inject, OnInit } from '@angular/core';
 import { TypeChoice } from './admin-create.model';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { CdkStepper, STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
-import { UiStateService } from '../../services/ui-state.service';
 import { AuthenticationConfigurationService } from '../../services/admin-authentication-configuration.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Strategy } from '../../admin-authentication/admin-settings.model';
+import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
-   selector: 'admin-authentication-create',
-   templateUrl: './admin-authentication-create.component.html',
-   styleUrls: ['./admin-authentication-create.component.scss'],
-   providers: [{
-      provide: STEPPER_GLOBAL_OPTIONS, useValue: { showError: true }
-   }]
+  selector: 'admin-authentication-create',
+  templateUrl: './admin-authentication-create.component.html',
+  styleUrls: ['./admin-authentication-create.component.scss'],
+  providers: [
+    {
+      provide: STEPPER_GLOBAL_OPTIONS,
+      useValue: { showError: true }
+    }
+  ]
 })
 export class AuthenticationCreateComponent implements OnInit {
-   breadcrumbs: AdminBreadcrumb[] = [{
+  breadcrumbs: AdminBreadcrumb[] = [
+    {
       title: 'Security',
       icon: 'shield',
-      state: {
-         name: 'admin.security'
-      }
-   }];
-   strategy: Strategy;
+      route: ['../security']
+    }
+  ];
 
-   readonly TYPE_CHOICES: TypeChoice[] = [{
+  strategy: Strategy & { settings: any } = this.buildDefaultStrategy();
+
+  readonly TYPE_CHOICES: TypeChoice[] = [
+    {
       title: 'OpenID Connect',
       type: 'openidconnect',
       name: 'openidconnect'
-   }, {
+    },
+    {
       title: 'OAuth2',
       type: 'oauth',
       name: 'oauth'
-   }, {
+    },
+    {
       title: 'LDAP',
       type: 'ldap',
       name: 'ldap'
-   }, {
+    },
+    {
       title: 'SAML',
       type: 'saml',
       name: 'saml'
-   }];
+    }
+  ];
 
-   private readonly REQUIRED_SETTINGS = {
-      oauth: ['clientSecret', 'clientID', 'authorizationURL', 'tokenURL', 'profileURL'],
-      openidconnect: ['clientSecret', 'clientID', 'issuer', 'authorizationURL', 'tokenURL', 'profileURL'],
-      ldap: ['url'],
-      saml: ['entryPoint', 'cert']
-   }
+  private readonly REQUIRED_SETTINGS: Record<string, string[]> = {
+    oauth: [
+      'clientSecret',
+      'clientID',
+      'authorizationURL',
+      'tokenURL',
+      'profileURL'
+    ],
+    openidconnect: [
+      'clientSecret',
+      'clientID',
+      'issuer',
+      'authorizationURL',
+      'tokenURL',
+      'profileURL'
+    ],
+    ldap: ['url'],
+    saml: ['entryPoint', 'cert']
+  };
 
-   constructor(
-      private readonly stateService: UiStateService,
-      private readonly snackBar: MatSnackBar,
-      @Inject(AuthenticationConfigurationService)
-      private readonly authenticationConfigurationService: any) {
+  private readonly destroy$ = new Subject<void>();
 
-      this.breadcrumbs.push({ title: 'New' });
-      this.reset();
-   }
+  constructor(
+    private readonly snackBar: MatSnackBar,
+    private readonly router: Router,
+    @Inject(AuthenticationConfigurationService)
+    private readonly authenticationConfigurationService: AuthenticationConfigurationService
+  ) {
+    this.breadcrumbs.push({ title: 'New' });
+    this.reset();
+  }
 
-   ngOnInit(): void {
-      this.authenticationConfigurationService.getAllConfigurations({ includeDisabled: true }).then(response => {
-         const strategies = response.data
-         strategies.forEach(strategy => {
-            let idx = -1;
-            for (let i = 0; i < this.TYPE_CHOICES.length; i++) {
-               const choice = this.TYPE_CHOICES[i];
-               if (choice.name === strategy.name) {
-                  idx = i;
-                  break;
-               }
-            }
+  ngOnInit(): void {
+    this.authenticationConfigurationService
+      .getAllConfigurations({ includeDisabled: true })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          const strategies: any[] = Array.isArray(response?.data)
+            ? response.data
+            : [];
+          strategies.forEach((strategy) => {
+            const idx = this.TYPE_CHOICES.findIndex(
+              (choice) => choice.name === strategy?.name
+            );
             if (idx > -1) {
-               this.TYPE_CHOICES.splice(idx, 1);
+              this.TYPE_CHOICES.splice(idx, 1);
             }
-         });
-      })
-   }
-
-   stepChanged(stepper: CdkStepper): void {
-      if (stepper.selected.label === 'Title') {
-         stepper.selected.hasError = !this.strategy.title.length;
-      } else if (stepper.selected.label === 'Type') {
-         stepper.selected.hasError = !this.strategy.name.length;
-         this.loadTemplate();
-      } else if(stepper.selected.label == "Settings") {
-         stepper.selected.hasError = !this.hasRequiredSettings();
-      }
-   }
-
-   loadTemplate(): void {
-      // Clear out any settings in case a user navigated back
-      this.strategy.settings = {
-         usersReqAdmin: {
-            enabled: true
-         },
-         devicesReqAdmin: {
-            enabled: true
-         },
-         headers: {},
-         profile: {}
-      }
-
-      this.strategy.buttonColor = '#1E88E5'
-      this.strategy.textColor = '#FFFFFF'
-
-      // let settingsDefaultKey: string;
-      switch (this.strategy.name) {
-         case 'geoaxis':
-            this.strategy.type = 'oauth';
-            break;
-         default:
-            this.strategy.type = this.strategy.name;
-            break;
-      }
-
-      const settings = this.REQUIRED_SETTINGS[this.strategy.type] || []
-      settings.forEach(setting => {
-         this.strategy.settings[setting] = null
-      })
-   }
-
-   save(): void {
-      this.authenticationConfigurationService.createConfiguration(this.strategy).then(() => {
-         this.stateService.go('admin.security');
-      }).catch((err: any) => {
-         console.error(err);
-         this.snackBar.open('An error occured while creating ' + this.strategy.title, null, {
-            duration: 2000,
-         })
-         this.stateService.go('admin.security');
+          });
+        },
+        error: () => {
+          return;
+        }
       });
-   }
+  }
 
-   isValid(): boolean {
-      return this.strategy.title.length > 0 &&
-         this.strategy.name.length > 0 &&
-         this.hasRequiredSettings();
-   }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-   private hasRequiredSettings(): boolean {
-      const requiredSettings = this.REQUIRED_SETTINGS[this.strategy.type] || []
-      const missingSettings = requiredSettings.filter(setting => {
-         const value = this.strategy.settings[setting];
-         if (value == null || value === '') {
-            return true;
-         }
-         return false;
+  stepChanged(stepper: CdkStepper): void {
+    const selected = stepper?.selected;
+    const label = selected?.label;
+
+    if (!selected || typeof label !== 'string') {
+      return;
+    }
+
+    if (label === 'Title') {
+      selected.hasError = !((this.strategy?.title?.length || 0) > 0);
+    } else if (label === 'Type') {
+      selected.hasError = !(this.strategy?.name?.length > 0);
+      this.loadTemplate();
+    } else if (label === 'Settings') {
+      selected.hasError = !this.hasRequiredSettings();
+    }
+  }
+
+  loadTemplate(): void {
+    this.strategy.settings = {
+      usersReqAdmin: { enabled: true },
+      devicesReqAdmin: { enabled: true },
+      headers: {},
+      profile: {}
+    };
+
+    this.strategy.buttonColor = '#1E88E5';
+    this.strategy.textColor = '#FFFFFF';
+
+    switch (this.strategy.name) {
+      case 'geoaxis':
+        this.strategy.type = 'oauth';
+        break;
+      default:
+        this.strategy.type = this.strategy.name;
+        break;
+    }
+
+    const required = this.REQUIRED_SETTINGS[this.strategy.type] || [];
+    required.forEach((setting) => {
+      this.strategy.settings[setting] = null;
+    });
+  }
+
+  save(): void {
+    this.authenticationConfigurationService
+      .createConfiguration(this.strategy)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.router.navigateByUrl('/admin/security');
+        },
+        error: () => {
+          this.snackBar.open(
+            'An error occured while creating ' + (this.strategy?.title || ''),
+            undefined,
+            { duration: 2000 }
+          );
+          this.router.navigateByUrl('/admin/security');
+        }
       });
+  }
 
-      return missingSettings.length === 0;
-   }
+  isValid(): boolean {
+    return (
+      (this.strategy?.title?.length ?? 0) > 0 &&
+      (this.strategy?.name?.length ?? 0) > 0 &&
+      this.hasRequiredSettings()
+    );
+  }
 
-   reset(): void {
-      this.strategy = {
-         enabled: true,
-         name: '',
-         type: '',
-         title: '',
-         textColor: '#FFFFFF',
-         buttonColor: '#1E88E5',
-         icon: null,
-         settings: {
-            usersReqAdmin: {
-               enabled: true
-            },
-            devicesReqAdmin: {
-               enabled: true
-            },
-            headers: {},
-            profile: {}
-         }
+  private hasRequiredSettings(): boolean {
+    const type = this.strategy?.type || '';
+    const requiredSettings = this.REQUIRED_SETTINGS[type] || [];
+    const settings = this.strategy?.settings || {};
+
+    const missing = requiredSettings.filter((key) => {
+      const value = settings[key];
+      return value == null || value === '';
+    });
+
+    return missing.length === 0;
+  }
+
+  reset(): void {
+    this.strategy = this.buildDefaultStrategy();
+  }
+
+  private buildDefaultStrategy(): Strategy & { settings: any } {
+    return {
+      enabled: true,
+      name: '',
+      type: '',
+      title: '',
+      textColor: '#FFFFFF',
+      buttonColor: '#1E88E5',
+      icon: null,
+      settings: {
+        usersReqAdmin: { enabled: true },
+        devicesReqAdmin: { enabled: true },
+        headers: {},
+        profile: {}
       }
-   }
+    };
+  }
 }

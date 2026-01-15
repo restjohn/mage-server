@@ -12,20 +12,16 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AdminBreadcrumb } from '../admin-breadcrumb/admin-breadcrumb.model';
 import { Strategy } from '../admin-authentication/admin-settings.model';
 import { MatDialog } from '@angular/material/dialog';
-import { UiStateService } from '../services/ui-state.service';
 import { AuthenticationDeleteComponent } from './admin-authentication-delete/admin-authentication-delete.component';
 import { AdminSettingsUnsavedComponent } from '../admin-settings/admin-settings-unsaved/admin-settings-unsaved.component';
 import { lastValueFrom, Subject, takeUntil } from 'rxjs';
 import { AdminUserService } from '../services/admin-user.service';
-import { LocalStorageService } from 'src/app/http/local-storage.service';
+import { LocalStorageService } from '../../../../../../web-app/src/app/http/local-storage.service';
 import { AuthenticationConfigurationService } from '../services/admin-authentication-configuration.service';
 import { AdminTeamsService } from '../services/admin-teams-service';
 import { AdminEventsService } from '../services/admin-events.service';
+import { Router } from '@angular/router';
 
-/**
- * Implement this interface on components that want to block navigation
- * when there are unsaved changes.
- */
 export interface CanComponentDeactivate {
   canDeactivate: () => boolean | Promise<boolean>;
 }
@@ -53,23 +49,23 @@ export class AdminAuthenticationComponent
   teams: any[] = [];
   events: any[] = [];
 
-  isDirty: boolean = false;
+  isDirty = false;
 
   strategies: Strategy[] = [];
 
-  hasAuthConfigEditPermission: boolean = false;
+  hasAuthConfigEditPermission = false;
 
   private destroy$ = new Subject<void>();
 
   constructor(
     private dialog: MatDialog,
-    private stateService: UiStateService,
     private readonly snackBar: MatSnackBar,
     private teamsService: AdminTeamsService,
     private eventsService: AdminEventsService,
     public localStorageService: LocalStorageService,
     private authenticationConfigurationService: AuthenticationConfigurationService,
-    private userService: AdminUserService
+    private userService: AdminUserService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -131,9 +127,9 @@ export class AdminAuthenticationComponent
   }
 
   private processUnsortedStrategies(unsortedStrategies: Strategy[]): void {
-    this.strategies = (unsortedStrategies || []).sort((a, b) =>
-      a.title.localeCompare(b.title)
-    );
+    this.strategies = (unsortedStrategies || [])
+      .slice()
+      .sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''));
 
     this.strategies.forEach((strategy) => {
       if (strategy.settings?.newUserEvents) {
@@ -142,11 +138,13 @@ export class AdminAuthenticationComponent
             this.events.some((event) => event.id === id)
           );
       }
+
       if (strategy.settings?.newUserTeams) {
         strategy.settings.newUserTeams = strategy.settings.newUserTeams.filter(
           (id) => this.teams.some((team) => team.id === id)
         );
       }
+
       if (strategy.icon) {
         strategy.icon = 'data:image/png;base64,' + strategy.icon;
       }
@@ -188,8 +186,6 @@ export class AdminAuthenticationComponent
   }
 
   async save(): Promise<void> {
-    console.log('Saving authentication configurations');
-
     try {
       const dirty = this.strategies.filter((s) => (s as any).isDirty);
       await Promise.all(
@@ -260,11 +256,7 @@ export class AdminAuthenticationComponent
         }
       });
   }
-
-  createAuthentication(): void {
-    this.stateService.go('admin.authenticationCreate');
-  }
-
+  
   onAuthenticationToggled(strategy: Strategy): void {
     (strategy as any).isDirty = true;
     this.isDirty = true;

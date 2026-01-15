@@ -9,7 +9,7 @@ import {
   } from "@angular/core";
   import { take } from "rxjs/operators";
   import { Disclaimer } from "./security-disclaimer.model";
-  import { SettingsService } from "admin/src/app/services/settings.service";
+  import { SettingsService } from '../../../../../src/app/services/settings.service';
   
   @Component({
     selector: "security-disclaimer",

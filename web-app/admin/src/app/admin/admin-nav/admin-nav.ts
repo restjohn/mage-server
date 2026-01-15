@@ -37,7 +37,7 @@ export class AdminNavComponent implements OnInit, OnDestroy, OnChanges {
   navItems = [
     {
       label: 'Dashboard',
-      route: 'dashboard',
+      route: '/dashboard',
       icon: 'fa fa-dashboard',
       count: 0
     },
@@ -109,9 +109,9 @@ export class AdminNavComponent implements OnInit, OnDestroy, OnChanges {
     this.unregisteredDevices = this.parseInput(this.unregisteredDevices);
     this.inactiveUsers = this.parseInput(this.inactiveUsers);
 
-    const dashboardItem = this.navItems.find((i) => i.route === 'dashboard');
-    const usersItem = this.navItems.find((i) => i.route === 'users');
-    const devicesItem = this.navItems.find((i) => i.route === 'devices');
+    const dashboardItem = this.navItems.find((i) => i.route === '/dashboard');
+    const usersItem = this.navItems.find((i) => i.route === '/users');
+    const devicesItem = this.navItems.find((i) => i.route === '/devices');
 
     if (dashboardItem) {
       dashboardItem.count =
@@ -138,7 +138,7 @@ export class AdminNavComponent implements OnInit, OnDestroy, OnChanges {
 
   pluginRouterLink(plugin: PluginTab): any[] {
     return ['/plugins', plugin.id];
-  }  
+  }
 
   toggleDrawer(): void {
     this.drawerOpen = !this.drawerOpen;

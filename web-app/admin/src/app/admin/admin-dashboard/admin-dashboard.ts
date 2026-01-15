@@ -1,40 +1,47 @@
-import { Component, EventEmitter, Output, OnDestroy, OnInit } from "@angular/core";
-import { Subject, takeUntil } from "rxjs";
+import {
+  Component,
+  EventEmitter,
+  Output,
+  OnDestroy,
+  OnInit
+} from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 
-import { AdminBreadcrumb } from "../admin-breadcrumb/admin-breadcrumb.model";
-import { AdminUserService } from "../services/admin-user.service";
-import { AdminDeviceService } from "../services/admin-device.service";
-import { UiStateService } from "../services/ui-state.service";
-import { DevicePagingService } from "../../services/device-paging.service";
-import { UserPagingService } from "../../services/user-paging.service";
-import { User } from "../admin-users/user";
+import { AdminBreadcrumb } from '../admin-breadcrumb/admin-breadcrumb.model';
+import { AdminUserService } from '../services/admin-user.service';
+import { AdminDeviceService } from '../services/admin-device.service';
+import { DevicePagingService } from '../../services/device-paging.service';
+import { UserPagingService } from '../../services/user-paging.service';
+import { User } from '../admin-users/user';
 
 @Component({
-  selector: "admin-dashboard",
-  templateUrl: "./admin-dashboard.html",
-  styleUrls: ["./admin-dashboard.scss"],
+  selector: 'admin-dashboard',
+  templateUrl: './admin-dashboard.html',
+  styleUrls: ['./admin-dashboard.scss']
 })
 export class AdminDashboardComponent implements OnInit, OnDestroy {
   @Output() onUserActivated = new EventEmitter<any>();
   @Output() onDeviceEnabled = new EventEmitter<any>();
 
-  userSearch = "";
-  userState = "inactive";
+  userSearch = '';
+  userState = 'inactive';
 
-  deviceSearch = "";
-  deviceState = "unregistered";
+  deviceSearch = '';
+  deviceState = 'unregistered';
 
-  stateAndData!: ReturnType<UserPagingService["constructDefault"]>;
-  deviceStateAndData!: ReturnType<DevicePagingService["constructDefault"]>;
+  stateAndData!: ReturnType<UserPagingService['constructDefault']>;
+  deviceStateAndData!: ReturnType<DevicePagingService['constructDefault']>;
 
-  inactiveUsers: Array<ReturnType<UserPagingService["users"]>[number]> = [];
-  unregisteredDevices: Array<ReturnType<DevicePagingService["devices"]>[number]> = [];
+  inactiveUsers: Array<ReturnType<UserPagingService['users']>[number]> = [];
+  unregisteredDevices: Array<
+    ReturnType<DevicePagingService['devices']>[number]
+  > = [];
 
   breadcrumbs: AdminBreadcrumb[] = [
     {
-      title: "Dashboard",
-      iconClass: "fa fa-dashboard",
-    },
+      title: 'Dashboard',
+      iconClass: 'fa fa-dashboard'
+    }
   ];
 
   private destroy$ = new Subject<void>();
@@ -45,8 +52,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private userService: AdminUserService,
     private deviceService: AdminDeviceService,
     private devicePagingService: DevicePagingService,
-    private userPagingService: UserPagingService,
-    private state: UiStateService
+    private userPagingService: UserPagingService
   ) {}
 
   ngOnInit(): void {
@@ -101,7 +107,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   hasPrevious(): boolean {
-    return this.userPagingService.hasPrevious(this.stateAndData[this.userState]);
+    return this.userPagingService.hasPrevious(
+      this.stateAndData[this.userState]
+    );
   }
 
   previous(): void {
@@ -168,25 +176,16 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   iconClass(device: any): string {
-    if (!device) return "";
+    if (!device) return '';
     if (device.iconClass) return device.iconClass;
 
-    const userAgent = (device.userAgent || "").toLowerCase();
-    if (device.appVersion === "Web Client")
-      return "fa fa-desktop admin-desktop-icon-xs";
-    if (userAgent.includes("android"))
-      return "fa fa-android admin-android-icon-xs";
-    if (userAgent.includes("ios"))
-      return "fa fa-apple admin-apple-icon-xs";
-    return "fa fa-mobile admin-generic-icon-xs";
-  }
-
-  gotoUser(user: any): void {
-    this.state.go("admin.user", { userId: user.id });
-  }
-
-  gotoDevice(device: any): void {
-    this.state.go("admin.device", { deviceId: device.id });
+    const userAgent = (device.userAgent || '').toLowerCase();
+    if (device.appVersion === 'Web Client')
+      return 'fa fa-desktop admin-desktop-icon-xs';
+    if (userAgent.includes('android'))
+      return 'fa fa-android admin-android-icon-xs';
+    if (userAgent.includes('ios')) return 'fa fa-apple admin-apple-icon-xs';
+    return 'fa fa-mobile admin-generic-icon-xs';
   }
 
   hasPermission(permission: string): boolean {
@@ -194,6 +193,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   activateUser(event: MouseEvent, user: any): void {
+    event.preventDefault();
     event.stopPropagation();
     user.active = true;
 
@@ -212,6 +212,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   registerDevice(event: MouseEvent, device: any): void {
+    event.preventDefault();
     event.stopPropagation();
 
     this.deviceService

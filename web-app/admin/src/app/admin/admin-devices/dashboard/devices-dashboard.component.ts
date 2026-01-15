@@ -1,4 +1,5 @@
-import { Component, OnInit, Inject, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import {
@@ -7,19 +8,18 @@ import {
   SearchOptions
 } from '../../services/admin-device.service';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
-import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
+import { Device } from '../../../../@types/dashboard/devices-dashboard';
 import { CreateDeviceDialogComponent } from '../create-device/create-device.component';
 import { AdminUserService } from '../../services/admin-user.service';
-import { takeUntil, Subject } from 'rxjs';
-import { UiStateService } from '../../services/ui-state.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'admin-devices',
   templateUrl: './devices-dashboard.component.html',
   styleUrls: ['./devices-dashboard.component.scss']
 })
-export class DeviceDashboardComponent implements OnInit {
-  devices: DevicesResponse;
+export class DeviceDashboardComponent implements OnInit, OnDestroy {
+  devices!: DevicesResponse;
   filteredDevices: Device[] = [];
   displayedColumns: string[] = ['device'];
 
@@ -48,7 +48,7 @@ export class DeviceDashboardComponent implements OnInit {
 
   constructor(
     private modal: MatDialog,
-    private stateService: UiStateService,
+    private router: Router,
     private deviceService: AdminDeviceService,
     private userService: AdminUserService
   ) {}
@@ -64,17 +64,16 @@ export class DeviceDashboardComponent implements OnInit {
     this.destroy$.complete();
   }
 
-  /** Subscribe to current user and compute permissions */
   private subscribeToUser(): void {
     this.userService.myself$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
+      .subscribe((user) => {
         this.currentUser = user;
-        this.hasDeviceCreatePermission = user?.role?.permissions?.includes('CREATE_USER') || false;
+        this.hasDeviceCreatePermission =
+          user?.role?.permissions?.includes('CREATE_USER') || false;
       });
   }
 
-  /** Fetch and apply filters to the device list */
   refreshDevices(): void {
     this.deviceService.getDevices(this.searchOptions).subscribe({
       next: (devices) => {
@@ -85,7 +84,6 @@ export class DeviceDashboardComponent implements OnInit {
     });
   }
 
-  /** Apply search term filter */
   private applyFilters(): void {
     if (!this.devices) return;
 
@@ -93,7 +91,6 @@ export class DeviceDashboardComponent implements OnInit {
     this.totalDevices = this.devices.totalCount ?? this.filteredDevices.length;
   }
 
-  /** Handle search term change */
   onSearchTermChanged(term: string): void {
     this.deviceSearch = term;
 
@@ -106,7 +103,6 @@ export class DeviceDashboardComponent implements OnInit {
     this.refreshDevices();
   }
 
-  /** Clear search */
   onSearchCleared(): void {
     this.deviceSearch = '';
     this.searchOptions = {
@@ -117,7 +113,6 @@ export class DeviceDashboardComponent implements OnInit {
     this.refreshDevices();
   }
 
-  /** Reset all filters and pagination */
   reset(): void {
     this.deviceSearch = '';
     this.searchOptions = {
@@ -129,7 +124,6 @@ export class DeviceDashboardComponent implements OnInit {
     this.refreshDevices();
   }
 
-  /** Handle pagination change */
   onPageChange(device: PageEvent): void {
     this.searchOptions = {
       ...this.searchOptions,
@@ -139,18 +133,11 @@ export class DeviceDashboardComponent implements OnInit {
     this.refreshDevices();
   }
 
-  /** Navigate to device detail */
-  gotoDevice(device: Device): void {
-    this.stateService.go('admin.device', { deviceId: device.id });
-  }
-
-  /** Handle status filter change */
   onStatusFilterChange(value: 'all' | 'registered' | 'unregistered'): void {
     this.searchOptions = { ...this.searchOptions, state: value, page: 0 };
     this.refreshDevices();
   }
 
-  /** Open create device dialog */
   createDevice(): void {
     const dialogRef = this.modal.open(CreateDeviceDialogComponent, {
       maxWidth: '100vw',
@@ -162,19 +149,16 @@ export class DeviceDashboardComponent implements OnInit {
     });
   }
 
-  /** Update layout-related values on resize */
   @HostListener('window:resize')
   onResize(): void {
     this.updateResponsiveLayout();
   }
 
-  /** Calculates responsive values */
   private updateResponsiveLayout(): void {
     this.numChars = Math.ceil(window.innerWidth / 8.5);
     this.toolTipWidth = `${window.innerWidth * 0.75}px`;
   }
 
-  /** Determine icon class for device */
   iconClass(device: Device): string {
     if (!device) return 'fa fa-mobile admin-generic-icon';
 

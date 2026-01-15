@@ -1,13 +1,13 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { from, lastValueFrom, EMPTY, async, Subject } from 'rxjs';
+import { from, lastValueFrom, EMPTY, Subject } from 'rxjs';
 import { mergeMap, tap, catchError, finalize, takeUntil } from 'rxjs/operators';
 
-import { UserPagingService } from 'admin/src/app/services/user-paging.service';
-import { LocalStorageService } from 'src/app/http/local-storage.service';
-import { User } from 'core-lib-src/user';
+import { UserPagingService } from '../../../services/user-paging.service';
+import { LocalStorageService } from '../../../../../../../web-app/src/app/http/local-storage.service';
+import { User } from '@ngageoint/mage.web-core-lib/user';
 import { CreateUserModalComponent } from '../create-user/create-user.component';
 import { Role } from '../user';
 import { BulkUserComponent } from '../bulk-user/bulk-user.component';
@@ -28,18 +28,18 @@ type UserFilter = {
   templateUrl: './user-dashboard.component.html',
   styleUrls: ['./user-dashboard.component.scss']
 })
-export class UserDashboardComponent implements OnInit {
+export class UserDashboardComponent implements OnInit, OnDestroy {
   dataSource: User[] = [];
   displayedColumns: string[] = ['user'];
 
-  userSearch: string = '';
+  userSearch = '';
 
   totalUsers = 0;
   pageSize = 10;
   pageIndex = 0;
   pageSizeOptions = [5, 10, 25, 50];
 
-  token: string;
+  token = '';
   error: string | null = null;
 
   hasUserCreatePermission = false;
@@ -73,16 +73,6 @@ export class UserDashboardComponent implements OnInit {
 
   loadingUsers = false;
 
-  /**
-   * Constructs the UserDashboardComponent with necessary services.
-   * @param dialog Angular Material dialog service
-   * @param router Angular router for navigation
-   * @param localStorageService Service to access local storage
-   * @param stateService UI-Router state service
-   * @param teamService Service for fetching team data
-   * @param userService Service for user operations
-   * @param userPagingService Service for paginated user data
-   */
   constructor(
     private dialog: MatDialog,
     private router: Router,
@@ -91,13 +81,10 @@ export class UserDashboardComponent implements OnInit {
     private userService: AdminUserService,
     private userPagingService: UserPagingService
   ) {
-    this.token = this.localStorageService.getToken();
+    this.token = this.localStorageService.getToken() || '';
     this.stateAndData = this.userPagingService.constructDefault();
   }
 
-  /**
-   * Initializes component data and permissions.
-   */
   ngOnInit(): void {
     this.initPermissions();
     this.refreshUsers();
@@ -108,6 +95,8 @@ export class UserDashboardComponent implements OnInit {
 
   ngOnDestroy(): void {
     window.removeEventListener('beforeunload', this.beforeUnloadListener);
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   beforeUnloadListener = (event: BeforeUnloadEvent) => {
@@ -119,28 +108,24 @@ export class UserDashboardComponent implements OnInit {
     return;
   };
 
-  /**
-   * Initializes permission flags for the current user.
-   */
   private initPermissions(): void {
-    this.userService.myself$.subscribe((user) => {
-      const permissions = user?.role?.permissions ?? [];
-      this.hasUserCreatePermission = permissions.includes('CREATE_USER');
-    });
+    this.userService.myself$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((user) => {
+        const permissions = user?.role?.permissions ?? [];
+        this.hasUserCreatePermission = permissions.includes('CREATE_USER');
+      });
   }
 
-  /**
-   * Loads available user roles from the server.
-   */
   private loadRoles(): void {
-    this.userService.getRoles().subscribe((roles: any[]) => {
-      this.roles = roles;
-    });
+    this.userService
+      .getRoles()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((roles: any[]) => {
+        this.roles = roles || [];
+      });
   }
 
-  /**
-   * Fetches team data for use in bulk user import.
-   */
   private fetchTeams(): void {
     this.teamService
       .getTeams({
@@ -148,18 +133,19 @@ export class UserDashboardComponent implements OnInit {
         sort: { name: 1 },
         omit_event_teams: true
       })
-      .subscribe((results) => {
-        if (results?.length > 0) {
-          this.teams = results[0].items;
-        }
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((results: any) => {
+        const items = Array.isArray(results) ? results : results?.items;
+        this.teams = (items || []) as Team[];
       });
   }
 
   getFilter(): UserFilter {
-    const filterObject: UserFilter = {};
+    const filterObject: UserFilter = {
+      limit: this.pageSize,
+      page: this.pageIndex
+    };
 
-    filterObject.limit = this.pageSize;
-    filterObject.page = this.pageIndex;
     if (this.userStatusFilter === 'all') return filterObject;
 
     if (this.userStatusFilter === 'disabled') {
@@ -174,9 +160,6 @@ export class UserDashboardComponent implements OnInit {
     return filterObject;
   }
 
-  /**
-   * Refreshes the paginated list of users.
-   */
   refreshUsers(onDone?: () => void): void {
     const state = this.stateAndData['all'];
     state.pageSize = this.pageSize;
@@ -187,39 +170,29 @@ export class UserDashboardComponent implements OnInit {
       .refresh(this.stateAndData)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
-        const users = this.userPagingService.users(state);
+        const users = this.userPagingService.users(state) || [];
         this.dataSource = users;
         this.totalUsers = state.pageInfo?.totalCount || 0;
         onDone?.();
       });
   }
 
-  /**
-   * Handles search input change.
-   * @param term The search term entered by the user
-   */
   onSearchTermChanged(term: string): void {
-    this.userSearch = term;
+    this.userSearch = term || '';
     this.pageIndex = 0;
     this.search();
   }
 
-  /**
-   * Clears the current search and refreshes the user list.
-   */
   onSearchCleared(): void {
     this.userSearch = '';
     this.refreshUsers();
   }
 
-  /**
-   * Executes a search query on the user list.
-   */
   search(): void {
     const state = this.stateAndData['all'];
     state.userFilter = this.getFilter();
     this.error = null;
-  
+
     this.userPagingService
       .search(state, this.userSearch)
       .pipe(
@@ -231,15 +204,12 @@ export class UserDashboardComponent implements OnInit {
         })
       )
       .subscribe((users) => {
-        this.dataSource = users;
-        this.totalUsers = state.pageInfo?.totalCount || users.length;
+        const list = users || [];
+        this.dataSource = list;
+        this.totalUsers = state.pageInfo?.totalCount || list.length;
       });
   }
-  
 
-  /**
-   * Resets the search and pagination state.
-   */
   reset(): void {
     this.userSearch = '';
     this.stateAndData = this.userPagingService.constructDefault();
@@ -247,27 +217,12 @@ export class UserDashboardComponent implements OnInit {
     this.refreshUsers();
   }
 
-  /**
-   * Handles page change events from the paginator.
-   * @param event The page event
-   */
   onPageChange(event: PageEvent): void {
     this.pageSize = event.pageSize;
     this.pageIndex = event.pageIndex;
     this.refreshUsers();
   }
 
-  /**
-   * Navigates to a specific user's detail page.
-   * @param user The user to navigate to
-   */
-  gotoUser(user: User): void {
-    this.router.navigate(['/admin', 'users', user.id]);
-  }  
-
-  /**
-   * Opens a modal to create a new user.
-   */
   createUser(): void {
     const dialogRef = this.dialog.open(CreateUserModalComponent, {
       width: '80%',
@@ -275,7 +230,7 @@ export class UserDashboardComponent implements OnInit {
       data: { roles: this.roles }
     });
 
-    dialogRef.afterClosed().subscribe((newUser) => {
+    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((newUser) => {
       if (!newUser?.confirmed) {
         return;
       }
@@ -292,9 +247,6 @@ export class UserDashboardComponent implements OnInit {
     });
   }
 
-  /**
-   * Opens a modal for bulk user import.
-   */
   openImportModal(): void {
     const dialogRef = this.dialog.open(BulkUserComponent, {
       width: '80vw',
@@ -304,57 +256,51 @@ export class UserDashboardComponent implements OnInit {
       }
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result?.users?.length) {
-        this.isBulkUploading = true;
-        this.isFinalizing = false;
-        this.bulkProgress = {
-          total: result.users.length,
-          completed: 0,
-          failed: 0
-        };
+    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((result) => {
+      if (!result?.users?.length) return;
 
-        this.bulkCreateUsers(result.users)
-          .then(async (createdUsers) => {
-            this.isFinalizing = true;
+      this.isBulkUploading = true;
+      this.isFinalizing = false;
+      this.isFinished = false;
+      this.showErrorTable = false;
 
-            if (result.selectedTeam) {
-              await Promise.all(
-                createdUsers.map((u) =>
-                  this.teamService
-                    .addUserToTeam(result.selectedTeam.id, u)
-                    .toPromise()
-                )
-              );
+      this.bulkProgress = {
+        total: result.users.length,
+        completed: 0,
+        failed: 0
+      };
+
+      this.bulkCreateUsers(result.users)
+        .then(async (createdUsers) => {
+          this.isFinalizing = true;
+
+          if (result.selectedTeam?.id) {
+            await Promise.all(
+              createdUsers.map((u) =>
+                lastValueFrom(this.teamService.addUserToTeam(String(result.selectedTeam.id), u))
+              )
+            );
+          }
+        })
+        .finally(() => {
+          this.refreshUsers(() => {
+            this.isFinalizing = false;
+            if (this.bulkErrors.length === 0) {
+              this.isFinished = true;
+            } else {
+              this.showErrorTable = true;
             }
-          })
-          .finally(() => {
-            this.refreshUsers(() => {
-              this.isFinalizing = false;
-              if (this.bulkErrors.length === 0) {
-                this.isFinished = true;
-              } else {
-                this.showErrorTable = true;
-              }
-            });
           });
-      }
+        });
     });
   }
 
-  onStatusFilterChange(
-    value: 'all' | 'active' | 'inactive' | 'disabled'
-  ): void {
+  onStatusFilterChange(value: 'all' | 'active' | 'inactive' | 'disabled'): void {
     this.userStatusFilter = value;
     this.pageIndex = 0;
     this.refreshUsers();
   }
 
-  /**
-   * Creates users in bulk via the user service.
-   * @param users Array of user data to create
-   * @returns A promise that resolves to the list of successfully created users
-   */
   async bulkCreateUsers(users: User[]): Promise<User[]> {
     const usersAdded: User[] = [];
 
@@ -381,12 +327,8 @@ export class UserDashboardComponent implements OnInit {
                   error: err?.error || err?.message || 'Unknown error'
                 });
 
-                console.error(
-                  `Failed to create user ${userData.username}`,
-                  err
-                );
-
-                return EMPTY; // continue stream
+                console.error(`Failed to create user ${userData.username}`, err);
+                return EMPTY;
               }),
               finalize(() => {
                 this.bulkProgress.completed++;
@@ -416,9 +358,9 @@ export class UserDashboardComponent implements OnInit {
   downloadErrorCSV(): void {
     const headers = ['Username', 'Email', 'Error'];
     const rows = this.bulkErrors.map((err) => [
-      err.user.username || '',
-      err.user.email || '',
-      err.error
+      err.user?.username || '',
+      err.user?.email || '',
+      err.error || ''
     ]);
 
     const csvContent = [headers, ...rows]
@@ -438,5 +380,8 @@ export class UserDashboardComponent implements OnInit {
     this.isBulkUploading = false;
     this.bulkErrors = [];
     this.bulkProgress = { total: 0, completed: 0, failed: 0 };
+    this.showErrorTable = false;
+    this.isFinalizing = false;
+    this.isFinished = false;
   }
 }

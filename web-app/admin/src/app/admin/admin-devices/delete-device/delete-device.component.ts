@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
+import { Device } from '../../../../@types/dashboard/devices-dashboard';
 
 @Component({
     selector: 'mage-delete-device',

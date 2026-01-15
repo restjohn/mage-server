@@ -47,10 +47,8 @@ import {
             throw new Error(`Plugin not found: ${pluginId}`);
           }
   
-          // Create the plugin module (so its providers exist)
           const moduleRef = await this.pluginService.loadPluginModule(pluginId);
   
-          // We need a root component to render
           const hooks: any = plugin.MAGE_WEB_HOOKS;
           const root: Type<any> | undefined = hooks.rootComponent;
   
@@ -60,7 +58,6 @@ import {
             );
           }
   
-          // Render the plugin root component using the plugin module injector
           this.host.createComponent(root, {
             injector: moduleRef.injector
           });

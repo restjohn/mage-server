@@ -21,6 +21,7 @@ import { AdminEventFormModule } from './admin-event/admin-event-form/admin-event
 import { AdminGuard } from './services/admin-guard.service';
 
 import { PluginModule } from './admin-plugins/plugins.module';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   imports: [
@@ -36,7 +37,8 @@ import { PluginModule } from './admin-plugins/plugins.module';
     AdminDevicesModule,
     AdminFeedsModule,
     AdminEventFormModule,
-    PluginModule
+    PluginModule,
+    RouterModule
   ],
   declarations: [
     AdminComponent,

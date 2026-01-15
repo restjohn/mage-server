@@ -28,13 +28,15 @@
               </mat-form-field>
             </div>
             <mat-list>
-              <mat-list-item
+              <a
+                mat-list-item
                 *ngFor="let user of inactiveUsers || []"
-                (click)="gotoUser(user)"
                 class="clickable"
+                [routerLink]="['../users', user?.id]"
               >
                 <mat-icon matListIcon>person</mat-icon>
                 <div matLine>{{ user?.displayName || 'Unknown User' }}</div>
+
                 <button
                   mat-mini-button
                   color="primary"
@@ -44,7 +46,7 @@
                   <mat-icon>check</mat-icon>
                   <span>Activate</span>
                 </button>
-              </mat-list-item>
+              </a>
             </mat-list>
             <div class="pagination-controls">
               <button
@@ -85,12 +87,13 @@
               </mat-form-field>
             </div>
             <mat-list>
-              <mat-list-item
+              <a
+                mat-list-item
                 *ngFor="let d of unregisteredDevices || []"
-                (click)="gotoDevice(d)"
                 class="clickable"
+                [routerLink]="['../devices', d?.id]"
               >
-                <mat-icon matListIcon [ngClass]="iconClass(d)"></mat-icon>
+                <i matListIcon [ngClass]="iconClass(d)"></i>
                 <div class="mat-line-horizontal">
                   <span *ngIf="d?.user"
                     >{{ d.user?.displayName || 'Unknown User' }}</span
@@ -99,6 +102,7 @@
                     >({{ d?.uid || 'Unknown UID' }})</span
                   >
                 </div>
+
                 <button
                   mat-mini-button
                   color="primary"
@@ -107,7 +111,7 @@
                 >
                   <mat-icon>check</mat-icon> Register
                 </button>
-              </mat-list-item>
+              </a>
             </mat-list>
             <div class="pagination-controls">
               <button
@@ -133,7 +137,10 @@
 
   <div class="section-card">
     <div class="table-wrapper mat-elevation-z2">
-      <mage-logins [devices]="unregisteredDevices" [users]="inactiveUsers"></mage-logins>
+      <mage-logins
+        [devices]="unregisteredDevices"
+        [users]="inactiveUsers"
+      ></mage-logins>
     </div>
   </div>
 </div>

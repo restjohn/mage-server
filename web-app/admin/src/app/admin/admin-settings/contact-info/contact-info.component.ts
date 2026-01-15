@@ -7,7 +7,7 @@ import {
   Output,
   SimpleChanges
 } from '@angular/core';
-import { SettingsService } from 'admin/src/app/services/settings.service';
+import { SettingsService } from '../../../../../src/app/services/settings.service';
 import { take } from 'rxjs/operators';
 
 @Component({

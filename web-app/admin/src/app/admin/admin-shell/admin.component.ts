@@ -5,7 +5,7 @@ import { filter, Subject, takeUntil } from 'rxjs';
 import { PluginService } from '../../plugin/plugin.service';
 import { UserPagingService } from '../../services/user-paging.service';
 import { DevicePagingService } from '../../services/device-paging.service';
-import { LocalStorageService } from 'mage-web-app/http/local-storage.service';
+import { LocalStorageService } from '../../../../../../web-app/src/app/http/local-storage.service';
 
 @Component({
   selector: 'admin',
@@ -62,7 +62,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       unregistered: defaultDeviceQueries.unregistered
     };
 
-    this.token = this.localStorage.getToken();
+    this.token = this.localStorage.getToken() ?? '';
 
     this.refreshInactiveUsers();
     this.refreshUnregisteredDevices();
@@ -135,7 +135,7 @@ export class AdminComponent implements OnInit, OnDestroy {
             acc.push({
               id: pluginId,
               title: adminTab.title,
-              state: `/admin/${suffix}`,
+              state: `../${suffix}`,
               icon: adminTab.icon
             });
 

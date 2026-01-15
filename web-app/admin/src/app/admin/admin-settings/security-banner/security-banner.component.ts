@@ -14,7 +14,7 @@ import {
   import { ColorPickerComponent } from '../../../../app/color-picker/color-picker.component';
   import { Subject } from 'rxjs';
   import { takeUntil } from 'rxjs/operators';
-  import { SettingsService } from 'admin/src/app/services/settings.service';
+  import { SettingsService } from '../../../../../src/app/services/settings.service';
   
   @Component({
     selector: 'security-banner',

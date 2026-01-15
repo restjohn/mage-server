@@ -1,19 +1,31 @@
-import _ from 'underscore'
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core'
-import { UntypedFormControl } from '@angular/forms'
-import { Observable } from 'rxjs'
-import { map, startWith, debounceTime, switchMap } from 'rxjs/operators'
-import { ServiceType, FeedTopic, Service, FeedExpanded, FeedService } from 'core-lib-src/feed'
-import { MatDialog } from '@angular/material/dialog'
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete'
-import { MatSnackBar } from '@angular/material/snack-bar'
-import { trigger, state, transition, style, animate } from '@angular/animations'
-import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model'
-import { AdminFeedDeleteComponent } from './admin-feed-delete/admin-feed-delete.component'
-import { AdminEventsService } from '../../services/admin-events.service'
-import { AdminUserService } from '../../services/admin-user.service'
-import { EventService } from 'admin/src/app/services/event.service'
-import { UiStateService } from '../../services/ui-state.service'
+import _ from 'underscore';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { UntypedFormControl } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { map, startWith, debounceTime, switchMap } from 'rxjs/operators';
+import {
+  ServiceType,
+  FeedTopic,
+  Service,
+  FeedExpanded,
+  FeedService
+} from 'core-lib-src/feed';
+import { MatDialog } from '@angular/material/dialog';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+  trigger,
+  state,
+  transition,
+  style,
+  animate
+} from '@angular/animations';
+import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
+import { AdminFeedDeleteComponent } from './admin-feed-delete/admin-feed-delete.component';
+import { AdminEventsService } from '../../services/admin-events.service';
+import { AdminUserService } from '../../services/admin-user.service';
+import { EventService } from '../../../../app/services/event.service';
 
 @Component({
   selector: 'app-admin-feed',
@@ -35,241 +47,266 @@ import { UiStateService } from '../../services/ui-state.service'
   ]
 })
 export class AdminFeedComponent implements OnInit {
-  breadcrumbs: AdminBreadcrumb[] = [{
-    title: 'Feeds',
-    icon: 'rss_feed',
-    state: {
-      name: 'admin.feeds'
+  breadcrumbs: AdminBreadcrumb[] = [
+    {
+      title: 'Feeds',
+      icon: 'rss_feed',
+      route: ['../feeds']
     }
-  }]
+  ];
 
-  feedLoaded: Promise<boolean>
-  feed: FeedExpanded
-  fullFeed: string
-  hasFeedCreatePermission: boolean
-  hasFeedEditPermission: boolean
-  hasFeedDeletePermission: boolean
-  hasUpdateEventPermission: boolean
+  feedsRoute: any[] = ['../feeds'];
+  feedEditRoute: any[] | null = null;
 
-  eventsPerPage = 10
-  eventsPage = 0
-  totalFeedEvents = 0
-  editEvent = false
-  addEvent = false
-  selectedEvent: string
+  feedId: string | null = null;
 
-  searchControl: UntypedFormControl = new UntypedFormControl()
-  eventModel: any
-  filteredChoices: Observable<any[]>
-  events = []
-  nonFeedEvents: Array<any> = []
-  feedEvents = [] as any[]
-  loadingEvents = false
+  feedLoaded!: Promise<boolean>;
+  feed!: FeedExpanded;
+  fullFeed = '';
+  hasFeedCreatePermission = false;
+  hasFeedEditPermission = false;
+  hasFeedDeletePermission = false;
+  hasUpdateEventPermission = false;
 
-  service: Service
-  feedServiceType: ServiceType
-  feedTopic: FeedTopic
+  eventsPerPage = 10;
+  eventsPage = 0;
+  totalFeedEvents = 0;
+  editEvent = false;
+  addEvent = false;
+  selectedEvent = '';
 
-  private myself: any | null = null
+  searchControl: UntypedFormControl = new UntypedFormControl();
+  eventModel: any;
+  filteredChoices!: Observable<any[]>;
+  events: any[] = [];
+  nonFeedEvents: Array<any> = [];
+  feedEvents: any[] = [];
+  loadingEvents = false;
 
-  @ViewChild('eventSelect', { static: false }) eventSelect: ElementRef
+  service!: Service;
+  feedServiceType!: ServiceType;
+  feedTopic!: FeedTopic;
+
+  private myself: any | null = null;
+
+  @ViewChild('eventSelect', { static: false }) eventSelect!: ElementRef;
 
   constructor(
     private feedService: FeedService,
-    private stateService: UiStateService,
+    private route: ActivatedRoute,
+    private router: Router,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private eventsService: AdminEventsService,
     private adminUserService: AdminUserService,
     private eventService: EventService
-  ) {
-    this.hasFeedCreatePermission = false
-    this.hasFeedEditPermission = false
-    this.hasFeedDeletePermission = false
-    this.hasUpdateEventPermission = false
-  }
+  ) {}
 
   ngOnInit(): void {
+    this.feedId = this.route.snapshot.paramMap.get('feedId');
+
     this.adminUserService.getMyself().subscribe({
       next: (myself) => {
-        this.myself = myself
+        this.myself = myself;
 
-        const perms: string[] = myself?.role?.permissions || []
-        this.hasFeedCreatePermission = perms.includes('FEEDS_CREATE_FEED')
-        this.hasFeedEditPermission = perms.includes('FEEDS_CREATE_FEED')
-        this.hasFeedDeletePermission = perms.includes('FEEDS_CREATE_FEED')
-        this.hasUpdateEventPermission = perms.includes('UPDATE_EVENT')
+        const perms: string[] = myself?.role?.permissions || [];
+        this.hasFeedCreatePermission = perms.includes('FEEDS_CREATE_FEED');
+        this.hasFeedEditPermission = perms.includes('FEEDS_CREATE_FEED');
+        this.hasFeedDeletePermission = perms.includes('FEEDS_CREATE_FEED');
+        this.hasUpdateEventPermission = perms.includes('UPDATE_EVENT');
 
-        this.initFeed()
+        this.initFeed();
       },
       error: () => {
-        this.myself = null
-        this.hasFeedCreatePermission = false
-        this.hasFeedEditPermission = false
-        this.hasFeedDeletePermission = false
-        this.hasUpdateEventPermission = false
+        this.myself = null;
+        this.hasFeedCreatePermission = false;
+        this.hasFeedEditPermission = false;
+        this.hasFeedDeletePermission = false;
+        this.hasUpdateEventPermission = false;
 
-        this.initFeed()
+        this.initFeed();
       }
-    })
+    });
   }
 
   private initFeed(): void {
-    if (this.stateService.params.feedId) {
-      this.feedService.fetchFeed(this.stateService.params.feedId).subscribe(feed => {
-        this.feed = feed
+    if (!this.feedId) return;
 
-        this.breadcrumbs.push({
-          title: this.feed.title
+    this.feedService.fetchFeed(this.feedId).subscribe((feed) => {
+      this.feed = feed;
+
+      this.breadcrumbs = [
+        {
+          title: 'Feeds',
+          icon: 'rss_feed',
+          route: ['../feeds']
+        },
+        {
+          title: this.feed.title,
+          route: ['../feed', this.feed.id]
+        }
+      ];
+
+      this.feedEditRoute = ['../feedEdit', this.feed.id];
+
+      this.fullFeed = JSON.stringify(feed, null, 2);
+      this.feedLoaded = Promise.resolve(true);
+      this.service = this.feed.service as Service;
+      this.feedTopic = this.feed.topic as FeedTopic;
+
+      this.feedService
+        .fetchServiceType(this.service.serviceType as string)
+        .subscribe((serviceType) => {
+          this.feedServiceType = serviceType;
+        });
+
+      this.loadAllEvents();
+
+      this.filteredChoices = this.searchControl.valueChanges.pipe(
+        startWith(''),
+        debounceTime(300),
+        switchMap((value) => {
+          const searchTerm =
+            !value || typeof value === 'string' ? value : value.name;
+          return this.loadAvailableEvents(searchTerm || '');
         })
-
-        this.fullFeed = JSON.stringify(feed, null, 2)
-        this.feedLoaded = Promise.resolve(true)
-        this.service = this.feed.service as Service
-        this.feedTopic = this.feed.topic as FeedTopic
-
-        this.feedService.fetchServiceType(this.service.serviceType as string).subscribe(serviceType => {
-          this.feedServiceType = serviceType
-        })
-
-        this.loadAllEvents()
-        this.filteredChoices = this.searchControl.valueChanges.pipe(
-          startWith(''),
-          debounceTime(300),
-          switchMap(value => {
-            const searchTerm = !value || typeof value === 'string' ? value : value.name
-            return this.loadAvailableEvents(searchTerm || '')
-          })
-        )
-      })
-    }
+      );
+    });
   }
 
   loadAllEvents(): void {
-    this.loadingEvents = true
-    this.eventsService.getEvents({
-      feedId: this.feed.id,
-      page: this.eventsPage,
-      page_size: this.eventsPerPage
-    }).subscribe({
-      next: (response) => {
-        this.feedEvents = response.items || []
-        this.totalFeedEvents = response.totalCount || 0
-        this.loadingEvents = false
-      },
-      error: (err) => {
-        console.error('Error loading feed events:', err)
-        this.loadingEvents = false
-      }
-    })
+    this.loadingEvents = true;
+
+    this.eventsService
+      .getEvents({
+        feedId: this.feed.id,
+        page: this.eventsPage,
+        page_size: this.eventsPerPage
+      })
+      .subscribe({
+        next: (response) => {
+          this.feedEvents = response.items || [];
+          this.totalFeedEvents = response.totalCount || 0;
+          this.loadingEvents = false;
+        },
+        error: (err) => {
+          console.error('Error loading feed events:', err);
+          this.loadingEvents = false;
+        }
+      });
   }
 
   loadAvailableEvents(searchTerm: string): Observable<any[]> {
-    return this.eventsService.getEvents({
-      term: searchTerm,
-      excludeFeedId: this.feed.id,
-      page: 0,
-      page_size: 20
-    }).pipe(
-      map(response => {
-        let events = response.items || []
-
-        if (!this.hasUpdateEventPermission) {
-          const myId = this.myself?.id
-          events = events.filter(event => {
-            const permissions = myId ? (event.acl?.[myId]?.permissions || []) : []
-            return permissions.includes('update')
-          })
-        }
-
-        return events
+    return this.eventsService
+      .getEvents({
+        term: searchTerm,
+        excludeFeedId: this.feed.id,
+        page: 0,
+        page_size: 20
       })
-    )
+      .pipe(
+        map((response) => {
+          let events = response.items || [];
+
+          if (!this.hasUpdateEventPermission) {
+            const myId = this.myself?.id;
+            events = events.filter((event) => {
+              const permissions = myId
+                ? event.acl?.[myId]?.permissions || []
+                : [];
+              return permissions.includes('update');
+            });
+          }
+
+          return events;
+        })
+      );
   }
 
   toggleNewEvent(): void {
-    this.addEvent = !this.addEvent
+    this.addEvent = !this.addEvent;
 
     if (this.addEvent) {
       setTimeout(() => {
-        this.eventSelect.nativeElement.focus()
-      })
+        const el = this.eventSelect?.nativeElement;
+        if (el) el.focus();
+      });
     }
   }
 
   addFeedToEvent($event: MatAutocompleteSelectedEvent): void {
-    const eventId = String($event.option.id)
+    const eventId = String($event.option.id);
 
     this.eventService.addFeed(eventId, `"${this.feed.id}"`).subscribe({
       next: (event: any) => {
-        this.searchControl.reset()
-        this.eventModel = null
-        this.addEvent = false
+        this.searchControl.reset();
+        this.eventModel = null;
+        this.addEvent = false;
 
-        this.loadAllEvents()
+        this.loadAllEvents();
 
-        this.snackBar.open(`Feed added to event ${event?.name || ''}`, undefined, {
-          duration: 5 * 1000
-        })
+        this.snackBar.open(
+          `Feed added to event ${event?.name || ''}`,
+          undefined,
+          {
+            duration: 5 * 1000
+          }
+        );
       },
       error: () => {
         this.snackBar.open(`Failed to add feed to event`, undefined, {
           duration: 5 * 1000
-        })
+        });
       }
-    })
+    });
   }
 
   removeFeedFromEvent($event: MouseEvent, event: any): void {
-    $event.stopPropagation()
+    $event.stopPropagation();
 
-    this.eventService.removeFeed(String(event.id), String(this.feed.id)).subscribe({
-      next: () => {
-        this.searchControl.reset()
+    this.eventService
+      .removeFeed(String(event.id), String(this.feed.id))
+      .subscribe({
+        next: () => {
+          this.searchControl.reset();
+          this.loadAllEvents();
 
-        this.loadAllEvents()
-
-        this.snackBar.open(`Feed removed from event ${event?.name || ''}`, undefined, {
-          duration: 5 * 1000
-        })
-      },
-      error: () => {
-        this.snackBar.open(`Failed to remove feed from event`, undefined, {
-          duration: 5 * 1000
-        })
-      }
-    })
+          this.snackBar.open(
+            `Feed removed from event ${event?.name || ''}`,
+            undefined,
+            {
+              duration: 5 * 1000
+            }
+          );
+        },
+        error: () => {
+          this.snackBar.open(`Failed to remove feed from event`, undefined, {
+            duration: 5 * 1000
+          });
+        }
+      });
   }
 
   onEventsPageChange(event: any): void {
-    this.eventsPage = event.pageIndex
-    this.eventsPerPage = event.pageSize
-    this.loadAllEvents()
-  }
-
-  editFeed(): void {
-    this.stateService.go('admin.feedEdit', { feedId: this.feed.id })
+    this.eventsPage = event.pageIndex;
+    this.eventsPerPage = event.pageSize;
+    this.loadAllEvents();
   }
 
   deleteFeed(): void {
-    this.dialog.open(AdminFeedDeleteComponent, {
-      data: this.feed,
-      autoFocus: false,
-      disableClose: true
-    }).afterClosed().subscribe(result => {
-      if (result === true) {
-        this.feedService.deleteFeed(this.feed).subscribe(() => {
-          this.goToFeeds()
-        })
-      }
-    })
-  }
-
-  goToFeeds(): void {
-    this.stateService.go('admin.feeds')
-  }
-
-  goToEvent(event: any): void {
-    this.stateService.go('admin.event', { eventId: event.id })
+    this.dialog
+      .open(AdminFeedDeleteComponent, {
+        data: this.feed,
+        autoFocus: false,
+        disableClose: true
+      })
+      .afterClosed()
+      .subscribe((result) => {
+        if (result === true) {
+          this.feedService.deleteFeed(this.feed).subscribe(() => {
+            this.router.navigate(['../feeds'], { relativeTo: this.route });
+          });
+        }
+      });
   }
 }

@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AdminEventsService } from '../../services/admin-events.service';
-import { Event } from 'src/app/filter/filter.types';
+import { Event } from '../../../../../../src/app/filter/filter.types';
 
 /**
  * Dialog component for creating new events.

@@ -1,12 +1,12 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { LayersService, Layer } from '../layers.service';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { CreateLayerDialogComponent } from '../create-layer/create-layer.component';
 import { AdminUserService } from '../../services/admin-user.service';
-import { UiStateService } from '../../services/ui-state.service';
 
 @Component({
   selector: 'mage-layer-dashboard',
@@ -39,9 +39,10 @@ export class LayerDashboardComponent implements OnInit {
 
   constructor(
     private modal: MatDialog,
-    private stateService: UiStateService,
     private layersService: LayersService,
-    private adminUserService: AdminUserService
+    private adminUserService: AdminUserService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -50,7 +51,6 @@ export class LayerDashboardComponent implements OnInit {
     this.updateResponsiveLayout();
   }
 
-  /** Initialize permission flags */
   private initPermissions(): void {
     this.adminUserService.getMyself().subscribe({
       next: (myself) => {
@@ -67,29 +67,25 @@ export class LayerDashboardComponent implements OnInit {
     });
   }
 
-  /** Fetch and apply filters to the layer list */
   refreshLayers(): void {
     this.layersService.getLayers({ includeUnavailable: true }).subscribe({
       next: (layers) => {
-        this.layers = layers;
+        this.layers = layers ?? [];
         this.applyFilters();
       },
       error: (err) => console.error('Error fetching layers:', err)
     });
   }
 
-  /** Apply search and type filters */
   private applyFilters(): void {
-    if (!this.layers) return;
-
     const term = this.layerSearch.trim().toLowerCase();
 
-    this.filteredLayers = this.layers.filter(layer => {
+    this.filteredLayers = (this.layers ?? []).filter(layer => {
       const matchesSearch =
         !term ||
-        layer.name?.toLowerCase().includes(term) ||
-        layer.description?.toLowerCase().includes(term) ||
-        layer.url?.toLowerCase().includes(term);
+        (layer.name ?? '').toLowerCase().includes(term) ||
+        (layer.description ?? '').toLowerCase().includes(term) ||
+        (layer.url ?? '').toLowerCase().includes(term);
 
       const matchesType = this.filterByType(layer);
 
@@ -99,7 +95,6 @@ export class LayerDashboardComponent implements OnInit {
     this.totalLayers = this.filteredLayers.length;
   }
 
-  /** Filter layers by type */
   private filterByType(layer: Layer): boolean {
     switch (this.typeFilter) {
       case 'all':
@@ -113,14 +108,12 @@ export class LayerDashboardComponent implements OnInit {
     }
   }
 
-  /** Get paginated layers for display */
   getPaginatedLayers(): Layer[] {
     const startIndex = this.page * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     return this.filteredLayers.slice(startIndex, endIndex);
   }
 
-  /** Get count for specific type filter */
   getTypeCount(type: 'all' | 'online' | 'offline'): number {
     if (type === 'all') return this.filteredLayers.length;
     if (type === 'online') {
@@ -129,27 +122,23 @@ export class LayerDashboardComponent implements OnInit {
     return this.filteredLayers.filter(l => l.type !== 'Imagery').length;
   }
 
-  /** Handle search term change */
   onSearchChanged(): void {
     this.page = 0;
     this.applyFilters();
   }
 
-  /** Handle search term change from card navbar */
   onSearchTermChanged(term: string): void {
     this.layerSearch = term;
     this.page = 0;
     this.applyFilters();
   }
 
-  /** Handle search cleared from card navbar */
   onSearchCleared(): void {
     this.layerSearch = '';
     this.page = 0;
     this.applyFilters();
   }
 
-  /** Reset all filters and pagination */
   reset(): void {
     this.layerSearch = '';
     this.page = 0;
@@ -157,47 +146,41 @@ export class LayerDashboardComponent implements OnInit {
     this.applyFilters();
   }
 
-  /** Handle type filter change */
   onTypeFilterChange(type: 'all' | 'online' | 'offline'): void {
     this.typeFilter = type;
     this.page = 0;
     this.applyFilters();
   }
 
-  /** Handle pagination change */
   onPageChange(event: PageEvent): void {
     this.page = event.pageIndex;
     this.itemsPerPage = event.pageSize;
   }
 
-  /** Open create layer dialog */
   newLayer(): void {
     const dialogRef = this.modal.open(CreateLayerDialogComponent, {
       data: { layer: {} }
     });
 
-    dialogRef.afterClosed().subscribe((newLayer) => {
-      if (newLayer) {
-        this.refreshLayers();
-        this.stateService.go('admin.layer', { layerId: newLayer.id });
-      }
+    dialogRef.afterClosed().subscribe((newLayer: Layer | undefined) => {
+      if (!newLayer?.id) return;
+
+      this.refreshLayers();
+      this.router.navigate(['../layers', newLayer.id], { relativeTo: this.route });
     });
   }
 
-  /** Navigate to layer detail */
-  gotoLayer(layer: Layer): void {
-    this.stateService.go('admin.layer', { layerId: layer.id });
-  }
-
-  /** Update layout-related values on resize */
   @HostListener('window:resize')
   onResize(): void {
     this.updateResponsiveLayout();
   }
 
-  /** Calculates responsive values */
   private updateResponsiveLayout(): void {
     this.numChars = Math.ceil(window.innerWidth / 8.5);
     this.toolTipWidth = `${window.innerWidth * 0.75}px`;
+  }
+
+  layerRoute(layer: Layer): any[] {
+    return ['../layers', layer.id];
   }
 }

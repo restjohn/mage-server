@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { forkJoin } from 'rxjs';
 import {
   Feed,
-  FeedExpanded,
   Service,
   ServiceType,
   FeedService
@@ -12,7 +12,6 @@ import {
 import { AdminUserService } from '../../services/admin-user.service';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { AdminServiceDeleteComponent } from './admin-service-delete/admin-service-delete.component';
-import { UiStateService } from '../../services/ui-state.service';
 
 @Component({
   selector: 'app-admin-service',
@@ -24,15 +23,13 @@ export class AdminServiceComponent implements OnInit {
     {
       title: 'Feeds',
       icon: 'rss_feed',
-      state: {
-        name: 'admin.feeds'
-      }
+      route: ['../feeds']
     }
   ];
 
-  serviceLoaded: Promise<boolean>;
-  service: Service;
-  serviceType: ServiceType;
+  serviceLoaded!: Promise<boolean>;
+  service!: Service;
+  serviceType!: ServiceType;
 
   feeds: Feed[] = [];
   feedPage = 0;
@@ -48,22 +45,24 @@ export class AdminServiceComponent implements OnInit {
     }
   };
 
+  serviceId: string | null = null;
+
   constructor(
     private feedService: FeedService,
-    private stateService: UiStateService,
+    private route: ActivatedRoute,
     public dialog: MatDialog,
     private adminUserService: AdminUserService
   ) {}
 
   ngOnInit(): void {
-    // Load permissions via AdminUserService
+    this.serviceId = this.route.snapshot.paramMap.get('serviceId');
+    if (!this.serviceId) return;
+
     this.adminUserService.getMyself().subscribe({
       next: (myself) => {
         const perms: string[] = myself?.role?.permissions || [];
         this.hasServiceEditPermission = perms.includes('FEEDS_CREATE_SERVICE');
-        this.hasServiceDeletePermission = perms.includes(
-          'FEEDS_CREATE_SERVICE'
-        );
+        this.hasServiceDeletePermission = perms.includes('FEEDS_CREATE_SERVICE');
       },
       error: () => {
         this.hasServiceEditPermission = false;
@@ -71,51 +70,43 @@ export class AdminServiceComponent implements OnInit {
       }
     });
 
-    forkJoin(
-      this.feedService.fetchService(this.stateService.params.serviceId),
-      this.feedService.fetchServiceFeeds(this.stateService.params.serviceId)
-    ).subscribe((result) => {
-      this.service = result[0];
-      this.feeds = result[1];
+    forkJoin({
+      service: this.feedService.fetchService(this.serviceId),
+      feeds: this.feedService.fetchServiceFeeds(this.serviceId)
+    }).subscribe(({ service, feeds }) => {
+      this.service = service;
+      this.feeds = feeds ?? [];
 
       this.breadcrumbs.push({
-        title: this.service.title
+        title: this.service.title,
+        route: ['../service', this.service.id]
       });
 
       const serviceType: ServiceType = this.service.serviceType as ServiceType;
-      this.feedService
-        .fetchServiceType(serviceType.id)
-        .subscribe((serviceType) => {
-          this.serviceType = serviceType;
 
-          // Wrap non-object schemas (ajsf bug workaround)
-          if (
-            this.serviceType.configSchema.hasOwnProperty('type') &&
-            this.serviceType.configSchema.type !== 'object'
-          ) {
-            this.serviceType.configSchema = {
-              type: 'object',
-              properties: {
-                wrapped: this.serviceType.configSchema
-              }
-            };
+      this.feedService.fetchServiceType(serviceType.id).subscribe((st) => {
+        this.serviceType = st;
 
-            this.service.config = {
-              wrapped: this.service.config
-            };
-          }
+        if (
+          this.serviceType.configSchema &&
+          Object.prototype.hasOwnProperty.call(this.serviceType.configSchema, 'type') &&
+          this.serviceType.configSchema.type !== 'object'
+        ) {
+          this.serviceType.configSchema = {
+            type: 'object',
+            properties: {
+              wrapped: this.serviceType.configSchema
+            }
+          };
 
-          this.serviceLoaded = Promise.resolve(true);
-        });
+          this.service.config = {
+            wrapped: this.service.config
+          };
+        }
+
+        this.serviceLoaded = Promise.resolve(true);
+      });
     });
-  }
-
-  goToFeeds(): void {
-    this.stateService.go('admin.feeds');
-  }
-
-  goToFeed(feed: Feed | FeedExpanded): void {
-    this.stateService.go('admin.feed', { feedId: feed.id });
   }
 
   deleteService(): void {
@@ -132,7 +123,7 @@ export class AdminServiceComponent implements OnInit {
       .subscribe((result) => {
         if (result === true) {
           this.feedService.deleteService(this.service).subscribe(() => {
-            this.goToFeeds();
+            history.back();
           });
         }
       });

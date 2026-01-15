@@ -7,7 +7,6 @@ import { AdminFeedDeleteComponent } from './admin-feed/admin-feed-delete/admin-f
 import { AdminServiceDeleteComponent } from './admin-service/admin-service-delete/admin-service-delete.component'
 import { AdminBreadcrumb } from '../admin-breadcrumb/admin-breadcrumb.model'
 import { AdminUserService } from '../services/admin-user.service'
-import { UiStateService } from '../services/ui-state.service'
 
 @Component({
   selector: 'admin-feeds',
@@ -17,7 +16,8 @@ import { UiStateService } from '../services/ui-state.service'
 export class AdminFeedsComponent implements OnInit {
   breadcrumbs: AdminBreadcrumb[] = [{
     title: 'Feeds',
-    icon: 'rss_feed'
+    icon: 'rss_feed',
+    route: ['../feeds']
   }]
 
   services: Service[] = []
@@ -40,7 +40,6 @@ export class AdminFeedsComponent implements OnInit {
 
   constructor(
     private feedService: FeedService,
-    private stateService: UiStateService,
     public dialog: MatDialog,
     private adminUserService: AdminUserService
   ) {}
@@ -62,16 +61,16 @@ export class AdminFeedsComponent implements OnInit {
       }
     })
 
-    forkJoin([
-      this.feedService.fetchServices(),
-      this.feedService.fetchAllFeeds()
-    ]).subscribe(result => {
-      this._services = result[0].sort(this.sortByTitle)
+    forkJoin({
+      services: this.feedService.fetchServices(),
+      feeds: this.feedService.fetchAllFeeds()
+    }).subscribe(({ services, feeds }) => {
+      this._services = (services ?? []).sort(this.sortByTitle)
       this.services = this._services.slice()
-
-      this._feeds = result[1].sort(this.sortByTitle)
+    
+      this._feeds = (feeds ?? []).sort(this.sortByTitle)
       this.feeds = this._feeds.slice()
-    })
+    })    
   }
 
   onFeedSearchChange(): void {
@@ -104,22 +103,6 @@ export class AdminFeedsComponent implements OnInit {
     this.services = this._services.filter(this.filterByTitleAndSummary(this.serviceSearch))
   }
 
-  goToService(service: Service): void {
-    this.stateService.go('admin.service', { serviceId: service.id })
-  }
-
-  goToFeed(feed: Feed): void {
-    this.stateService.go('admin.feed', { feedId: feed.id })
-  }
-
-  newFeed(): void {
-    this.stateService.go('admin.feedCreate')
-  }
-
-  editFeed(feed: Feed): void {
-    // TODO edit feed, and edit service
-  }
-
   deleteService($event: MouseEvent, service: Service): void {
     $event.stopPropagation()
 
@@ -131,7 +114,7 @@ export class AdminFeedsComponent implements OnInit {
       if (result === true) {
         this.feedService.deleteService(service).subscribe(() => {
           this.services = this.services.filter(s => s.id !== service.id)
-          this._feeds = this._feeds.filter(feed => feed.service === service.id)
+          this._feeds = this._feeds.filter(f => f.service !== service.id)
           this.updateFilteredFeeds()
           this.updateFilteredServices()
         })

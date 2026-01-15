@@ -92,7 +92,6 @@ export class DeleteTeamComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error deleting users:', error);
-        // keep existing behavior: close anyway
         this.dialogRef.close(this.team);
       }
     });

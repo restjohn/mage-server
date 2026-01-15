@@ -335,6 +335,7 @@
       background-color: #22c55e;
       border-color: #22c55e;
       color: white;
+      float: inline-end;
     
       &:hover:not(:disabled) {
         background-color: #16a34a;

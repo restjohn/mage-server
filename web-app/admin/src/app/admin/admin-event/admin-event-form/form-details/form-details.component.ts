@@ -1,4 +1,5 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
@@ -6,9 +7,9 @@ import { firstValueFrom } from 'rxjs';
 
 import { AdminEventsService } from '../../../services/admin-events.service';
 import { AdminUserService } from '../../../services/admin-user.service';
-import { LocalStorageService } from 'src/app/http/local-storage.service';
+import { LocalStorageService } from '../../../../../../../../web-app/src/app/http/local-storage.service';
 
-import { Event as MageEvent } from 'src/app/filter/filter.types';
+import { Event as MageEvent } from '../../../../../../../src/app/filter/filter.types';
 import { AdminBreadcrumb } from '../../../admin-breadcrumb/admin-breadcrumb.model';
 import {
   ObservationFeedHelper,
@@ -29,7 +30,6 @@ import {
   prepareFormPayload,
   isUserFieldType
 } from '../../helpers/form-field-utils';
-import { UiStateService } from '../../../services/ui-state.service';
 
 interface FormData {
   id?: number;
@@ -125,86 +125,99 @@ export class FormDetailsComponent implements OnInit {
     previewUrl: string;
   }> = [];
 
+  eventId: string | null = null;
+  formId: string | null = null;
+
+  fieldsRoute: any[] | null = null;
+  mapRoute: any[] | null = null;
+  feedRoute: any[] | null = null;
+
   constructor(
+    private route: ActivatedRoute,
     private eventsService: AdminEventsService,
     private adminUserService: AdminUserService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private localStorageService: LocalStorageService,
-    private stateService: UiStateService
+    private localStorageService: LocalStorageService
   ) {}
 
   ngOnInit(): void {
-    this.token = this.localStorageService.getToken();
+    this.token = this.localStorageService.getToken() ?? null;
 
-    const eventId = this.stateService.params.eventId;
-    const formId = this.stateService.params.formId;
+    this.eventId = this.route.snapshot.paramMap.get('eventId');
+    this.formId = this.route.snapshot.paramMap.get('formId');
 
     this.newField = {
       type: 'textfield',
       required: false
     };
 
-    if (eventId) {
-      this.eventsService.getEventById(eventId).subscribe({
-        next: (event) => {
-          this.event = event;
+    if (!this.eventId) return;
 
-          this.breadcrumbs = [
-            {
-              title: 'Events',
-              icon: 'fa-calendar',
-              state: { name: 'admin.events' }
-            },
-            {
-              title: event.name,
-              state: { name: 'admin.event', params: { eventId: event.id } }
-            },
-            {
-              title: formId ? 'Edit Form' : 'New Form'
-            }
-          ];
+    this.eventsService.getEventById(this.eventId).subscribe({
+      next: (event) => {
+        this.event = event;
 
-          if (formId && event.forms) {
-            const existingForm = event.forms.find(
-              (f) => f.id?.toString() === formId
-            );
-            if (existingForm) {
-              this.form = { ...existingForm };
-              if (!this.form.fields) {
-                this.form.fields = [];
-              }
-              if (!this.form.userFields) {
-                this.form.userFields = [];
-              }
-              this.breadcrumbs[2].title = existingForm.name || 'Edit Form';
-            }
-          } else {
-            this.form = {
-              archived: false,
-              color:
-                '#' +
-                ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, '0'),
-              fields: [],
-              userFields: []
-            };
+        this.breadcrumbs = [
+          {
+            title: 'Events',
+            iconClass: 'fa fa-calendar',
+            route: ['../']
+          },
+          {
+            title: event.name,
+            route: ['../../', String(event?.id ?? '')]
+          },
+          {
+            title: this.formId ? 'Edit Form' : 'New Form'
           }
+        ];
 
-          decorateFormForDisplay(this.form as FormData);
-
-          if (this.form.id) {
-            this.generateSampleObservations();
-            this.fetchFormIcons();
+        if (this.formId && event.forms) {
+          const existingForm = event.forms.find(
+            (f) => f.id?.toString() === this.formId
+          );
+          if (existingForm) {
+            this.form = { ...existingForm };
+            if (!this.form.fields) this.form.fields = [];
+            if (!this.form.userFields) this.form.userFields = [];
+            this.breadcrumbs[2].title = existingForm.name || 'Edit Form';
           }
-        },
-        error: (error) => {
-          console.error('Error loading event:', error);
-          this.snackBar.open('Error loading event', 'Close', {
-            duration: 3000
-          });
+        } else {
+          this.form = {
+            archived: false,
+            color:
+              '#' +
+              ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, '0'),
+            fields: [],
+            userFields: []
+          };
         }
-      });
-    }
+
+        decorateFormForDisplay(this.form as FormData);
+
+        if (this.event?.id && this.form.id) {
+          this.fieldsRoute = ['/admin/events', this.event.id, 'forms', this.form.id, 'fields'];
+          this.mapRoute = ['/admin/events', this.event.id, 'forms', this.form.id, 'map'];
+          this.feedRoute = ['/admin/events', this.event.id, 'forms', this.form.id, 'feed'];
+        } else {
+          this.fieldsRoute = null;
+          this.mapRoute = null;
+          this.feedRoute = null;
+        }
+
+        if (this.form.id) {
+          this.generateSampleObservations();
+          this.fetchFormIcons();
+        }
+      },
+      error: (error) => {
+        console.error('Error loading event:', error);
+        this.snackBar.open('Error loading event', 'Close', {
+          duration: 3000
+        });
+      }
+    });
   }
 
   fetchFormIcons(): void {
@@ -225,7 +238,7 @@ export class FormDetailsComponent implements OnInit {
             if (!this.iconCache[iconData.primary]) {
               this.iconCache[iconData.primary] = {};
             }
-            this.iconCache[iconData.primary][iconData.variant] = iconData.icon; // base64 data
+            this.iconCache[iconData.primary][iconData.variant] = iconData.icon;
           } else if (iconData.primary) {
             this.iconCache[iconData.primary] = {
               ...this.iconCache[iconData.primary],
@@ -574,33 +587,6 @@ export class FormDetailsComponent implements OnInit {
   showError(error: ErrorDialogData): void {
     const errorMessage = error.title + ': ' + error.message;
     this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
-  }
-
-  navigateToFields(): void {
-    if (this.event?.id && this.form.id) {
-      this.stateService.go('admin.formFieldsEdit', {
-        eventId: this.event.id,
-        formId: this.form.id
-      });
-    }
-  }
-
-  navigateToMap(): void {
-    if (this.event?.id && this.form.id) {
-      this.stateService.go('admin.formMapEdit', {
-        eventId: this.event.id,
-        formId: this.form.id
-      });
-    }
-  }
-
-  navigateToFeed(): void {
-    if (this.event?.id && this.form.id) {
-      this.stateService.go('admin.formFeedEdit', {
-        eventId: this.event.id,
-        formId: this.form.id
-      });
-    }
   }
 
   exportForm(): void {
@@ -1110,18 +1096,27 @@ export class FormDetailsComponent implements OnInit {
 
   async generateSampleObservations(): Promise<void> {
     try {
+      const eventId = this.eventId;
+      const token = this.localStorageService.getToken() ?? null;
+  
+      if (!eventId || !token) {
+        this.observations = [];
+        return;
+      }
+  
       const myself = await firstValueFrom(this.adminUserService.getMyself());
-
+  
       this.observations = ObservationFeedHelper.generateSampleObservations(
         this.form,
         Number(this.form.id),
         myself,
-        this.stateService.params.eventId,
-        this.localStorageService.getToken()
+        eventId,
+        token
       );
     } catch (e) {
       console.error('Error generating sample observations:', e);
       this.observations = [];
     }
   }
+  
 }

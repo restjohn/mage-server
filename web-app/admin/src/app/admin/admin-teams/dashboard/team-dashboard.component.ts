@@ -6,7 +6,6 @@ import { Team } from '../team';
 import { Subject } from 'rxjs';
 import { AdminTeamsService } from '../../services/admin-teams-service';
 import { CreateTeamDialogComponent } from '../create-team/create-team.component';
-import { CardActionButton } from '../../../core/card-navbar/card-navbar.component';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 
 /**
@@ -125,17 +124,6 @@ export class TeamDashboardComponent implements OnInit, OnDestroy {
         this.fetchTeams();
       }
     });
-  }
-
-  /**
-   * Navigates to the detailed view of a specific team
-   * 
-   * @param team - The team to navigate to
-   */
-  gotoTeam(team: Team): void {
-    // TODO: convert to this to using a router once upgrade is complete
-    const baseUrl = window.location.href.split('#')[0];
-    window.location.href = `${baseUrl}#/home/teams/${team.id}`;
   }
 
   /** Update layout-related values on resize */

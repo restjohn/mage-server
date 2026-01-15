@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { DeleteDeviceComponent } from '../delete-device/delete-device.component';
-import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
+import { Device } from '../../../../@types/dashboard/devices-dashboard';
 import { User } from '../../admin-users/user';
 import { AdminUserService } from '../../services/admin-user.service';
 import { AdminDeviceService } from '../../services/admin-device.service';
-import { UiStateService } from '../../services/ui-state.service';
 
 @Component({
   selector: 'mage-device-details',
@@ -26,7 +26,7 @@ export class DeviceDetailsComponent implements OnInit {
     {
       title: 'Devices',
       iconClass: 'fa fa-mobile',
-      state: { name: 'admin.devices' }
+      route: ['../devices']
     }
   ];
 
@@ -41,15 +41,19 @@ export class DeviceDetailsComponent implements OnInit {
   } = {};
 
   constructor(
-    public stateService: UiStateService,
+    private route: ActivatedRoute,
+    private router: Router,
     private dialog: MatDialog,
     private deviceService: AdminDeviceService,
     private adminUserService: AdminUserService
   ) {}
 
   ngOnInit(): void {
-    const deviceId = this.stateService.params.deviceId;
-    if (!deviceId) return;
+    const deviceId = this.route.snapshot.paramMap.get('deviceId');
+    if (!deviceId) {
+      this.error = 'Missing deviceId route param';
+      return;
+    }
 
     this.hasUpdatePermission =
       this.adminUserService.hasPermission('UPDATE_DEVICE');
@@ -60,7 +64,14 @@ export class DeviceDetailsComponent implements OnInit {
     this.deviceService.getDeviceById(deviceId).subscribe({
       next: (device: Device) => {
         this.device = device;
-        this.breadcrumbs.push({ title: device?.uid || 'Device' });
+        this.breadcrumbs = [
+          {
+            title: 'Devices',
+            iconClass: 'fa fa-mobile',
+            route: ['../']
+          },
+          { title: device?.uid || 'Device' }
+        ];
 
         this.currentUserDisplayName = device?.user?.displayName || null;
         this.selectedUserDisplayName = null;
@@ -110,6 +121,8 @@ export class DeviceDetailsComponent implements OnInit {
   saveDeviceDetails(): void {
     if (!this.device?.id) return;
 
+    const deviceId = this.device.id;
+
     this.saving = true;
     this.error = null;
 
@@ -117,7 +130,7 @@ export class DeviceDetailsComponent implements OnInit {
       uid: this.deviceEditForm.uid,
       description: this.deviceEditForm.description,
       user: this.deviceEditForm.userId
-        ? { id: this.deviceEditForm.userId } as any
+        ? ({ id: this.deviceEditForm.userId } as any)
         : null
     };
 
@@ -126,10 +139,15 @@ export class DeviceDetailsComponent implements OnInit {
         this.editingDetails = false;
         this.saving = false;
 
-        this.deviceService.getDeviceById(this.device!.id).subscribe(d => {
-          this.device = d;
-          this.currentUserDisplayName = d?.user?.displayName || null;
-          this.resetEditForm();
+        this.deviceService.getDeviceById(deviceId).subscribe({
+          next: (d) => {
+            this.device = d;
+            this.currentUserDisplayName = d?.user?.displayName || null;
+            this.resetEditForm();
+          },
+          error: () => {
+            this.error = 'Failed to reload device';
+          }
         });
       },
       error: (err) => {
@@ -142,13 +160,17 @@ export class DeviceDetailsComponent implements OnInit {
   registerDevice(device: Device): void {
     if (!device.id) return;
 
-    this.deviceService.updateDevice(device.id, { registered: true }).subscribe();
+    this.deviceService
+      .updateDevice(device.id, { registered: true })
+      .subscribe();
   }
 
   unregisterDevice(device: Device): void {
     if (!device.id) return;
 
-    this.deviceService.updateDevice(device.id, { registered: false }).subscribe();
+    this.deviceService
+      .updateDevice(device.id, { registered: false })
+      .subscribe();
   }
 
   confirmDeleteDevice(): void {
@@ -168,8 +190,11 @@ export class DeviceDetailsComponent implements OnInit {
   private deleteDevice(): void {
     if (!this.device?.id) return;
 
-    this.deviceService.deleteDevice(this.device.id).subscribe(() => {
-      this.stateService.go('admin.devices');
+    this.deviceService.deleteDevice(this.device.id).subscribe({
+      next: () => this.router.navigate(['/admin/devices']),
+      error: () => {
+        this.error = 'Failed to delete device';
+      }
     });
   }
 
@@ -182,8 +207,7 @@ export class DeviceDetailsComponent implements OnInit {
       return 'fa fa-desktop admin-desktop-icon';
     if (userAgent.includes('android'))
       return 'fa fa-android admin-android-icon';
-    if (userAgent.includes('ios'))
-      return 'fa fa-apple admin-apple-icon';
+    if (userAgent.includes('ios')) return 'fa fa-apple admin-apple-icon';
 
     return 'fa fa-mobile admin-generic-icon';
   }

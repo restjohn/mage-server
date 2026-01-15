@@ -45,6 +45,7 @@ const routes: Routes = [
 
       { path: 'events', component: EventDashboardComponent },
       { path: 'events/:eventId', component: EventDetailsComponent },
+      { path: 'events/:eventId/forms/:formId', component: FormDetailsComponent },
 
       {
         path: 'events/:eventId/forms/:formId',
@@ -72,6 +73,7 @@ const routes: Routes = [
         canDeactivate: [AdminUnsavedChangesGuard]
       },
       { path: 'security/new', component: AuthenticationCreateComponent },
+
       {
         path: 'settings',
         component: AdminSettingsComponent,

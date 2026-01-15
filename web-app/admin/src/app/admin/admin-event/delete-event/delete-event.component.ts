@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AdminEventsService } from '../../services/admin-events.service';
-import { Event as MageEvent } from 'src/app/filter/filter.types';
+import { Event as MageEvent } from '../../../../../../src/app/filter/filter.types';
 
 /**
  * Modal component for confirming event deletion.

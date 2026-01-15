@@ -21,6 +21,7 @@ import { DeleteTeamComponent } from './delete-team/delete-team.component';
 import { AdminBreadcrumbModule } from '../admin-breadcrumb/admin-breadcrumb.module';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AdminTeamsService } from '../services/admin-teams-service';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
     declarations: [
@@ -46,6 +47,7 @@ import { AdminTeamsService } from '../services/admin-teams-service';
         MatProgressSpinnerModule,
         AdminBreadcrumbModule,
         MatTooltipModule,
+        RouterModule
     ],
     providers: [
         AdminTeamsService,

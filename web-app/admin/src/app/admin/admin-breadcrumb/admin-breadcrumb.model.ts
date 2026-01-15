@@ -4,6 +4,7 @@ export interface AdminBreadcrumb {
   title: string;
   icon?: string;
   iconClass?: string;
+  route?: string[];
   state?: AdminBreadcrumbState;
 }
 
