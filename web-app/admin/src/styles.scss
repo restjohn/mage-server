@@ -391,3 +391,19 @@
     }
   }
 }
+
+td.mat-cell .icon,
+td.mat-cell i.icon,
+td.mat-cell i.fa,
+td.mat-cell i.fas,
+td.mat-cell i.far,
+td.mat-cell i.fal,
+td.mat-cell i.fab {
+  font-size: 25px;
+  line-height: 1;
+  width: 25px;
+  min-width: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

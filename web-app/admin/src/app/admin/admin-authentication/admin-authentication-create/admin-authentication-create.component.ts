@@ -24,7 +24,7 @@ export class AuthenticationCreateComponent implements OnInit {
     {
       title: 'Security',
       icon: 'shield',
-      route: ['../security']
+      route: ['../../security']
     }
   ];
 

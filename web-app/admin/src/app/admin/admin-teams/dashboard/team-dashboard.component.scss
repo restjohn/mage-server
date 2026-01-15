@@ -463,3 +463,8 @@ $max-height: 72.8vh;
 .w-90 {
   width: 90% !important;
 }
+
+:host ::ng-deep .mat-cell a {
+  color: inherit;
+  text-decoration: none;
+}

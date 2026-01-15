@@ -175,3 +175,9 @@
     margin-top: -10px;
   }
 }
+
+:host ::ng-deep .mat-cell a {
+  color: inherit;
+  text-decoration: none;
+}
+
