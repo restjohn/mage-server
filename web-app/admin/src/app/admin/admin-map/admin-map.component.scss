@@ -1,5 +1,5 @@
 @import '~@angular/material/theming';
-@import "variables.scss";
+@import 'variables.scss';
 
 :host ::ng-deep label {
   font-weight: unset;
@@ -12,7 +12,7 @@
   right: 0;
   left: 0;
   overflow-y: auto;
-  background-color: #F0F0F0;
+  background-color: #f0f0f0;
 }
 
 .content {
@@ -20,16 +20,14 @@
   margin: 16px;
 }
 
-.platform {}
-
 .platform__label {
-  font: 500 20px/32px Roboto, "Helvetica Neue", sans-serif;
+  font: 500 20px/32px Roboto, 'Helvetica Neue', sans-serif;
   letter-spacing: normal;
   margin: 0 0 16px;
 }
 
 .platform__description {
-    color: rgba(0, 0, 0, .6);
+  color: rgba(0, 0, 0, 0.6);
 }
 
 .radio-group {
@@ -62,4 +60,3 @@ mat-card-content {
 mat-form-field {
   width: 600px;
 }
-

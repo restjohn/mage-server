@@ -1,7 +1,8 @@
-<div class="banner banner-header" *ngIf=" type==='header' && banner.showHeader">
+<div class="banner banner-header" *ngIf="type === 'header' && banner.showHeader">
     {{ banner.headerText }}
-</div>
-
-<div class="banner" *ngIf="type === 'footer' && banner.showFooter">
+  </div>
+  
+  <div class="banner banner-footer" *ngIf="type === 'footer' && banner.showFooter">
     {{ banner.footerText }}
-</div>
+  </div>
+  

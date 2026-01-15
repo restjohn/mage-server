@@ -2,7 +2,7 @@
   position: relative;
 }
 
-::ng-deep app-admin-side-nav>admin-breadcrumb {
+::ng-deep app-admin-side-nav > admin-breadcrumb {
   display: block;
   position: fixed;
   width: 100%;
@@ -11,14 +11,24 @@
 }
 
 .nav-float-wrapper {
-  position: fixed;
+  position: sticky;
   top: 72px;
-  left: 5px;
   z-index: 10000;
-  display: flex;
+  pointer-events: none;
+  width: 0;
+  height: 0;
 
   @media (max-width: 599px) {
     top: 66px !important;
+  }
+
+  .nav-float-inner {
+    position: absolute;
+    left: 5px;
+    top: 0;
+    display: flex;
+    width: max-content;
+    pointer-events: auto;
   }
 
   .nav-divider {
@@ -28,7 +38,8 @@
     background: rgba(0, 0, 0, 0.25);
     margin: 0 4px;
     border-radius: 1px;
-    position: fixed;
+    position: absolute;
+    top: 0;
   }
 
   .nav-toggle {
@@ -41,7 +52,7 @@
     padding: 0.55rem 0.9rem;
     cursor: pointer;
     transition: background 0.25s ease, transform 0.15s ease;
-    position: fixed;
+    position: relative;
 
     .label {
       font-weight: 400;
@@ -180,8 +191,6 @@
       opacity: 0;
 
       &.open {
-        transform: translateY(0);
-        opacity: 1;
         margin-top: 86px;
         transform: translateY(0);
         opacity: 1;
