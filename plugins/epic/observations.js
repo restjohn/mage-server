@@ -9,6 +9,7 @@ const moment = require('moment');
 const ArcGIS = require('terraformer-arcgis-parser');
 const Event = require('../../models/event');
 const Observation = require('../../models/observation');
+const { mongooseLogger } = require('../../logger');
 
 // setup mongoose to talk to mongodb
 const mongodbConfig = config.mongodb;
@@ -22,9 +23,6 @@ mongoose.connect(
     }
   }
 );
-
-// 🔹 FIXED: use your new mongooseLogger
-const { mongooseLogger } = require('../../logger');
 
 mongoose.set('debug', function(collection, method, query, doc, options) {
   mongooseLogger.debug("%s.%s(%j, %j, %j)", collection, method, query, doc, options);
