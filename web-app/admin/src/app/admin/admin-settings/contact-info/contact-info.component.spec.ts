@@ -19,21 +19,19 @@ const MOCK_CONTACT_INFO = {
   showDevContact: true
 };
 
-const MOCK_SETTINGS_RESPONSE = [
-  {
-    type: 'contactinfo',
-    settings: { ...MOCK_CONTACT_INFO }
-  }
-];
+const MOCK_SETTINGS_RESPONSE = {
+  type: 'contactinfo',
+  settings: { ...MOCK_CONTACT_INFO }
+};
 
-const MOCK_EMPTY_RESPONSE: any[] = [];
+const MOCK_EMPTY_RESPONSE: any = null;
 
 class MockSettingsService {
-  query() {
+  get(_key: string) {
     return of(MOCK_SETTINGS_RESPONSE);
   }
 
-  update(params: any, data: any) {
+  update(_key: string, _data: any) {
     return of(null);
   }
 }
@@ -62,12 +60,12 @@ describe('ContactInfoComponent', () => {
   });
 
   it('should load settings in ngOnInit', fakeAsync(() => {
-    spyOn(settingsService, 'query').and.callThrough();
+    spyOn(settingsService, 'get').and.callThrough();
 
     component.ngOnInit();
     tick();
 
-    expect(settingsService.query).toHaveBeenCalled();
+    expect(settingsService.get).toHaveBeenCalledWith('contactinfo');
     expect(component.contactinfo).toEqual(MOCK_CONTACT_INFO);
     expect(component.oldEmail).toBe(MOCK_CONTACT_INFO.email);
     expect(component.oldPhone).toBe(MOCK_CONTACT_INFO.phone);
@@ -75,7 +73,7 @@ describe('ContactInfoComponent', () => {
   }));
 
   it('should handle empty settings in ngOnInit', fakeAsync(() => {
-    spyOn(settingsService, 'query').and.returnValue(of(MOCK_EMPTY_RESPONSE));
+    spyOn(settingsService, 'get').and.returnValue(of(MOCK_EMPTY_RESPONSE));
 
     component.ngOnInit();
     tick();
@@ -89,7 +87,7 @@ describe('ContactInfoComponent', () => {
 
   it('should handle error in ngOnInit', fakeAsync(() => {
     const consoleSpy = spyOn(console, 'log');
-    spyOn(settingsService, 'query').and.returnValue(throwError(() => 'Error!'));
+    spyOn(settingsService, 'get').and.returnValue(throwError(() => 'Error!'));
 
     component.ngOnInit();
     tick();
@@ -132,25 +130,35 @@ describe('ContactInfoComponent', () => {
 
   it('should emit saveComplete(true) on successful save', fakeAsync(() => {
     const saveSpy = spyOn(component.saveComplete, 'emit');
+    const updateSpy = spyOn(settingsService, 'update').and.returnValue(
+      of(null)
+    );
 
-    spyOn(settingsService, 'update').and.returnValue(of(null));
-
+    component.contactinfo = { ...MOCK_CONTACT_INFO };
     component.save();
     tick();
 
+    expect(updateSpy).toHaveBeenCalledWith(
+      'contactinfo',
+      component.contactinfo
+    );
     expect(saveSpy).toHaveBeenCalledWith(true);
   }));
 
   it('should emit saveComplete(false) on failed save', fakeAsync(() => {
     const saveSpy = spyOn(component.saveComplete, 'emit');
-
-    spyOn(settingsService, 'update').and.returnValue(
+    const updateSpy = spyOn(settingsService, 'update').and.returnValue(
       throwError(() => new Error('nope'))
     );
 
+    component.contactinfo = { ...MOCK_CONTACT_INFO };
     component.save();
     tick();
 
+    expect(updateSpy).toHaveBeenCalledWith(
+      'contactinfo',
+      component.contactinfo
+    );
     expect(saveSpy).toHaveBeenCalledWith(false);
   }));
 });

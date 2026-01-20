@@ -29,7 +29,6 @@ describe('DeleteTeamComponent', () => {
   };
 
   beforeEach(async () => {
-    // Create spies for dependencies
     mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
     mockTeamsService = jasmine.createSpyObj('TeamsService', ['deleteTeam']);
     mockUserService = jasmine.createSpyObj('UserService', ['deleteUser']);
@@ -202,11 +201,11 @@ describe('DeleteTeamComponent', () => {
 
     it('should call deleteUser for each user in the team', () => {
       (component as any).deleteUsers();
-
+    
       expect(mockUserService.deleteUser).toHaveBeenCalledTimes(2);
-      expect(mockUserService.deleteUser).toHaveBeenCalledWith(mockTeam.users![0]);
-      expect(mockUserService.deleteUser).toHaveBeenCalledWith(mockTeam.users![1]);
-    });
+      expect(mockUserService.deleteUser).toHaveBeenCalledWith(mockTeam.users![0].id);
+      expect(mockUserService.deleteUser).toHaveBeenCalledWith(mockTeam.users![1].id);
+    });    
 
     it('should close dialog with team after all users are deleted successfully', () => {
       (component as any).deleteUsers();
@@ -226,7 +225,6 @@ describe('DeleteTeamComponent', () => {
     });
 
     it('should handle mixed success and failure of user deletions', () => {
-      // First user deletion succeeds, second fails
       mockUserService.deleteUser.and.returnValues(
         of({}),
         throwError(() => new Error('Failed'))

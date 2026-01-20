@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input'
 import { MatListModule } from '@angular/material/list'
 import { MatSelectModule } from '@angular/material/select'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { BehaviorSubject, of } from 'rxjs'
 import { AdminBreadcrumbModule } from '../../../../../app/admin/admin-breadcrumb/admin-breadcrumb.module';
@@ -31,16 +32,19 @@ import { AdminFeedEditTopicComponent } from './admin-feed-edit-topic/admin-feed-
 import { AdminFeedEditComponent } from './admin-feed-edit.component';
 import { FeedEditState, freshEditState } from './feed-edit.model'
 import { FeedEditService } from './feed-edit.service'
-import { UiStateService } from '../../../services/ui-state.service';
 
-class MockStateService {
-  get params(): any {
-    return {};
-  }
-}
-
-type MockFeedEditService = Partial<jasmine.SpyObj<FeedEditService>> & {
+type MockFeedEditService = {
   state$: BehaviorSubject<FeedEditState>
+  newFeed: jasmine.Spy
+  editFeed: jasmine.Spy
+  serviceCreated: jasmine.Spy
+  selectService: jasmine.Spy
+  selectTopic: jasmine.Spy
+  fetchParametersChanged: jasmine.Spy
+  itemPropertiesSchemaChanged: jasmine.Spy
+  feedMetaDataChanged: jasmine.Spy
+  saveFeed: jasmine.Spy
+  readonly currentState: FeedEditState
 }
 
 describe('FeedEditComponent', () => {
@@ -49,30 +53,60 @@ describe('FeedEditComponent', () => {
   let fixture: ComponentFixture<AdminFeedEditComponent>
   let mockEditService: MockFeedEditService
   let mockFeedService: jasmine.SpyObj<FeedService>
+  let routerSpy: jasmine.SpyObj<Router>
+
+  const serviceTypes: ServiceType[] = [
+    {
+      pluginServiceTypeId: 'test:plugin1:type1',
+      id: 'type1',
+      title: 'Type 1',
+      summary: 'Type 1 for testing',
+      configSchema: {
+        properties: {
+          url: { type: 'string' }
+        }
+      }
+    }
+  ]
 
   beforeEach(waitForAsync(() => {
+    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate'])
+
     mockEditService = {
       state$: new BehaviorSubject<FeedEditState>(freshEditState()),
-      newFeed: jasmine.createSpy<FeedEditService['newFeed']>(),
-      editFeed: jasmine.createSpy<FeedEditService['editFeed']>(),
+      newFeed: jasmine.createSpy('newFeed'),
+      editFeed: jasmine.createSpy('editFeed'),
+      serviceCreated: jasmine.createSpy('serviceCreated'),
+      selectService: jasmine.createSpy('selectService'),
+      selectTopic: jasmine.createSpy('selectTopic'),
+      fetchParametersChanged: jasmine.createSpy('fetchParametersChanged'),
+      itemPropertiesSchemaChanged: jasmine.createSpy('itemPropertiesSchemaChanged'),
+      feedMetaDataChanged: jasmine.createSpy('feedMetaDataChanged'),
+      saveFeed: jasmine.createSpy('saveFeed').and.returnValue(of({ id: 'feed-1' })),
       get currentState() {
         return this.state$.value
       }
     }
+
     mockFeedService = jasmine.createSpyObj<FeedService>('MockFeedService', [
       'fetchServiceTypes',
       'fetchServices',
       'createService'
     ])
+
+    mockFeedService.fetchServiceTypes.and.returnValue(of(serviceTypes))
+    mockFeedService.fetchServices.and.returnValue(of([]))
+
     TestBed.configureTestingModule({
       providers: [
+        { provide: FeedService, useValue: mockFeedService },
         {
-          provide: UiStateService,
-          useClass: MockStateService
-        },
-        {
-          provide: FeedService,
-          useValue: mockFeedService
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              paramMap: convertToParamMap({})
+            }
+          }
         }
       ],
       imports: [
@@ -88,7 +122,6 @@ describe('FeedEditComponent', () => {
         MatIconModule,
         NgxMatSelectSearchModule,
         FormsModule,
-        NgxMatSelectSearchModule,
         ReactiveFormsModule,
         JsonSchemaFormModule,
         JsonSchemaModule,
@@ -110,33 +143,15 @@ describe('FeedEditComponent', () => {
         JsonSchemaWidgetAutocompleteComponent
       ]
     })
-    .overrideComponent(AdminFeedEditComponent, {
-      set: {
-        providers: [
-          { provide: FeedEditService, useValue: mockEditService }
-        ]
-      }
-    })
-    .compileComponents();
+      .overrideComponent(AdminFeedEditComponent, {
+        set: {
+          providers: [{ provide: FeedEditService, useValue: mockEditService }]
+        }
+      })
+      .compileComponents();
   }));
 
-  const serviceTypes: ServiceType[] = [
-    {
-      pluginServiceTypeId: 'test:plugin1:type1',
-      id: 'type1',
-      title: 'Type 1',
-      summary: 'Type 1 for testing',
-      configSchema: {
-        properties: {
-          url: { type: 'string' }
-        }
-      }
-    }
-  ]
-
   beforeEach(() => {
-    mockFeedService.fetchServiceTypes.and.returnValue(of(serviceTypes))
-    mockFeedService.fetchServices.and.returnValue(of([]))
     fixture = TestBed.createComponent(AdminFeedEditComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

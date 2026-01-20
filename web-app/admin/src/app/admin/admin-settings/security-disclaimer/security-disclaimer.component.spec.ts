@@ -1,32 +1,37 @@
-import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
-import { NoopAnimationsModule } from "@angular/platform-browser/animations";
-import { of, throwError } from "rxjs";
-import { SecurityDisclaimerComponent } from "./security-disclaimer.component";
-import { SettingsService } from "admin/src/app/services/settings.service";
+import {
+  ComponentFixture,
+  TestBed,
+  waitForAsync,
+  fakeAsync,
+  tick
+} from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { of, throwError } from 'rxjs';
+import { SecurityDisclaimerComponent } from './security-disclaimer.component';
+import { SettingsService } from 'admin/src/app/services/settings.service';
 
-describe("SecurityDisclaimerComponent", () => {
+describe('SecurityDisclaimerComponent', () => {
   let component: SecurityDisclaimerComponent;
   let fixture: ComponentFixture<SecurityDisclaimerComponent>;
   let settingsService: jasmine.SpyObj<SettingsService>;
 
-  beforeEach(
-    waitForAsync(() => {
-      settingsService = jasmine.createSpyObj<SettingsService>("SettingsService", [
-        "get",
-        "update",
-      ]);
+  beforeEach(waitForAsync(() => {
+    settingsService = jasmine.createSpyObj<SettingsService>('SettingsService', [
+      'get',
+      'update'
+    ]);
 
-      TestBed.configureTestingModule({
-        imports: [NoopAnimationsModule],
-        declarations: [SecurityDisclaimerComponent],
-        providers: [{ provide: SettingsService, useValue: settingsService }]
-      }).compileComponents();
-    })
-  );
+    TestBed.configureTestingModule({
+      imports: [NoopAnimationsModule],
+      declarations: [SecurityDisclaimerComponent],
+      providers: [{ provide: SettingsService, useValue: settingsService }]
+    }).compileComponents();
+  }));
 
   beforeEach(() => {
-    // default happy-path stubs
-    settingsService.get.and.returnValue(of({ settings: { show: true, title: "T", text: "X" } }));
+    settingsService.get.and.returnValue(
+      of({ settings: { show: true, title: 'T', text: 'X' } })
+    );
     settingsService.update.and.returnValue(of({}));
 
     fixture = TestBed.createComponent(SecurityDisclaimerComponent);
@@ -34,18 +39,18 @@ describe("SecurityDisclaimerComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it("should load disclaimer settings on init", () => {
-    expect(settingsService.get).toHaveBeenCalledWith("disclaimer");
+  it('should load disclaimer settings on init', () => {
+    expect(settingsService.get).toHaveBeenCalledWith('disclaimer');
     expect(component.disclaimer).toEqual(
-      jasmine.objectContaining({ show: true, title: "T", text: "X" })
+      jasmine.objectContaining({ show: true, title: 'T', text: 'X' })
     );
   });
 
-  it("should save when dirty and beginSave changes", () => {
+  it('should save when dirty and beginSave changes', fakeAsync(() => {
     component.setDirty(true);
     settingsService.update.calls.reset();
 
@@ -56,13 +61,19 @@ describe("SecurityDisclaimerComponent", () => {
         firstChange: false,
         isFirstChange: () => false
       }
-    });
+    } as any);
 
-    expect(settingsService.update).toHaveBeenCalledWith("disclaimer", component.disclaimer);
-  });
+    tick();
 
-  it("should emit saveComplete true on successful save", () => {
-    const emitSpy = spyOn(component.saveComplete, "emit");
+    expect(settingsService.update).toHaveBeenCalledWith(
+      'disclaimer',
+      component.disclaimer
+    );
+    expect(component.isDirty).toBeFalse();
+  }));
+
+  it('should emit saveComplete true on successful save', fakeAsync(() => {
+    const emitSpy = spyOn(component.saveComplete, 'emit');
     component.setDirty(true);
 
     component.ngOnChanges({
@@ -72,14 +83,18 @@ describe("SecurityDisclaimerComponent", () => {
         firstChange: false,
         isFirstChange: () => false
       }
-    });
+    } as any);
+
+    tick();
 
     expect(emitSpy).toHaveBeenCalledWith(true);
-  });
+  }));
 
-  it("should emit saveComplete false on save error", () => {
-    const emitSpy = spyOn(component.saveComplete, "emit");
-    settingsService.update.and.returnValue(throwError(() => ({ error: "nope" })));
+  it('should emit saveComplete false on save error', fakeAsync(() => {
+    const emitSpy = spyOn(component.saveComplete, 'emit');
+    settingsService.update.and.returnValue(
+      throwError(() => ({ error: 'nope' }))
+    );
 
     component.setDirty(true);
     component.ngOnChanges({
@@ -89,8 +104,10 @@ describe("SecurityDisclaimerComponent", () => {
         firstChange: false,
         isFirstChange: () => false
       }
-    });
+    } as any);
+
+    tick();
 
     expect(emitSpy).toHaveBeenCalledWith(false);
-  });
+  }));
 });

@@ -1,7 +1,12 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  flushMicrotasks
+} from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { UserSearchBoxComponent } from './user-search-box.component';
-import { UserPagingService } from 'admin/src/app/services/user-paging.service';
+import { UserPagingService } from '../../../services/user-paging.service';
 
 describe('UserSearchBoxComponent', () => {
   let component: UserSearchBoxComponent;
@@ -13,26 +18,28 @@ describe('UserSearchBoxComponent', () => {
   ];
 
   const mockUserPaging = {
-    constructDefault: jasmine.createSpy('constructDefault').and.returnValue({
-      all: {}
-    }),
+    constructDefault: jasmine
+      .createSpy('constructDefault')
+      .and.returnValue({ all: {} }),
     refresh: jasmine.createSpy('refresh').and.returnValue(Promise.resolve()),
-    search: jasmine.createSpy('search').and.returnValue(Promise.resolve(mockUsers))
+    search: jasmine
+      .createSpy('search')
+      .and.returnValue(Promise.resolve(mockUsers))
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [FormsModule],
       declarations: [UserSearchBoxComponent],
-      providers: [
-        { provide: UserPagingService, useValue: mockUserPaging }
-      ]
+      providers: [{ provide: UserPagingService, useValue: mockUserPaging }]
     }).compileComponents();
-
+  
     fixture = TestBed.createComponent(UserSearchBoxComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
+  
+    mockUserPaging.search.calls.reset();
+  });  
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -42,24 +49,30 @@ describe('UserSearchBoxComponent', () => {
 
   it('should call search and update results when user types', fakeAsync(() => {
     component.onUserInput('al');
-    tick();
+    flushMicrotasks();
 
-    expect(mockUserPaging.search).toHaveBeenCalled();
+    expect(mockUserPaging.search).toHaveBeenCalledWith(
+      component.userStateAndData[component.userState],
+      'al'
+    );
     expect(component.searchResults.length).toBe(2);
     expect(component.searchResults[0].displayName).toBe('Alice Adams');
   }));
 
   it('should clear results when input is empty', fakeAsync(() => {
+    component.searchResults = [...mockUsers];
+
     component.onUserInput('');
-    tick();
+    flushMicrotasks();
 
     expect(component.searchResults.length).toBe(0);
+    expect(mockUserPaging.search).not.toHaveBeenCalled();
   }));
 
   it('should emit selected user and update text', () => {
     const emitSpy = spyOn(component.userSelected, 'emit');
-    component.searchResults = mockUsers;
 
+    component.searchResults = [...mockUsers];
     component.selectUser(mockUsers[1]);
 
     expect(emitSpy).toHaveBeenCalledWith(mockUsers[1]);
@@ -71,6 +84,8 @@ describe('UserSearchBoxComponent', () => {
     const emitSpy = spyOn(component.userSelected, 'emit');
 
     component.userText = 'something';
+    component.searchResults = [...mockUsers];
+
     component.clear();
 
     expect(emitSpy).toHaveBeenCalledWith(null);
@@ -78,14 +93,16 @@ describe('UserSearchBoxComponent', () => {
     expect(component.searchResults.length).toBe(0);
   });
 
-  it('should render suggestion items', fakeAsync(() => {
-    component.onUserInput('a');
-    tick();
-    fixture.detectChanges();
+  it('should cap results at 10', fakeAsync(() => {
+    const many = Array.from({ length: 25 }).map((_, i) => ({
+      id: String(i),
+      displayName: `User ${i}`
+    })) as any[];
+    mockUserPaging.search.and.returnValue(Promise.resolve(many));
 
-    const items = fixture.nativeElement.querySelectorAll('.suggestion-item');
+    component.onUserInput('u');
+    flushMicrotasks();
 
-    expect(items.length).toBe(2);
-    expect(items[0].textContent.trim()).toBe('Alice Adams');
+    expect(component.searchResults.length).toBe(10);
   }));
 });

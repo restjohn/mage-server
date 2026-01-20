@@ -105,7 +105,7 @@ export class AdminFeedsComponent implements OnInit {
 
   deleteService($event: MouseEvent, service: Service): void {
     $event.stopPropagation()
-
+  
     this.dialog.open(AdminServiceDeleteComponent, {
       data: service,
       autoFocus: false,
@@ -113,14 +113,17 @@ export class AdminFeedsComponent implements OnInit {
     }).afterClosed().subscribe(result => {
       if (result === true) {
         this.feedService.deleteService(service).subscribe(() => {
+          this._services = this._services.filter(s => s.id !== service.id)
           this.services = this.services.filter(s => s.id !== service.id)
+  
           this._feeds = this._feeds.filter(f => f.service !== service.id)
+  
           this.updateFilteredFeeds()
           this.updateFilteredServices()
         })
       }
     })
-  }
+  }  
 
   deleteFeed($event: MouseEvent, feed: Feed): void {
     $event.stopPropagation()

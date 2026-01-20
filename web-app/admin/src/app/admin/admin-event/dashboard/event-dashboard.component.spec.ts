@@ -4,7 +4,8 @@ import {
   fakeAsync,
   tick
 } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,12 +14,11 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { Router } from '@angular/router';
 
 import { EventDashboardComponent } from './event-dashboard.component';
 import { AdminEventsService } from '../../services/admin-events.service';
 import { AdminUserService } from '../../services/admin-user.service';
-import { LocalStorageService } from 'src/app/http/local-storage.service';
-import { UiStateService } from '../../services/ui-state.service';
 
 const mockEventsResponse = {
   totalCount: 2,
@@ -61,19 +61,17 @@ const mockEventsResponse = {
 describe('EventDashboardComponent', () => {
   let component: EventDashboardComponent;
   let fixture: ComponentFixture<EventDashboardComponent>;
+
   let eventServiceSpy: jasmine.SpyObj<AdminEventsService>;
-  let userServiceSpy: any;
+  let userServiceSpy: jasmine.SpyObj<AdminUserService>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
-  let stateSpy: jasmine.SpyObj<UiStateService>;
-  let localStorageSpy: jasmine.SpyObj<LocalStorageService>;
+  let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    eventServiceSpy = jasmine.createSpyObj('EventsService', ['getEvents']);
-    userServiceSpy = { myself: { role: { permissions: ['CREATE_USER'] } } };
+    eventServiceSpy = jasmine.createSpyObj('AdminEventsService', ['getEvents']);
+    userServiceSpy = jasmine.createSpyObj('AdminUserService', ['getMyself']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    stateSpy = jasmine.createSpyObj('StateService', ['go']);
-    localStorageSpy = jasmine.createSpyObj('LocalStorageService', ['getToken']);
-    localStorageSpy.getToken.and.returnValue('mockToken');
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
       declarations: [EventDashboardComponent],
@@ -91,8 +89,7 @@ describe('EventDashboardComponent', () => {
         { provide: AdminEventsService, useValue: eventServiceSpy },
         { provide: AdminUserService, useValue: userServiceSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        { provide: UiStateService, useValue: stateSpy },
-        { provide: LocalStorageService, useValue: localStorageSpy }
+        { provide: Router, useValue: routerSpy }
       ]
     }).compileComponents();
 
@@ -104,15 +101,35 @@ describe('EventDashboardComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize permissions properly', () => {
-    component['initPermissions']();
-    expect(component.hasEventCreatePermission).toBeTrue();
-  });
+  it('should initialize permissions properly (has CREATE_EVENT)', fakeAsync(() => {
+    userServiceSpy.getMyself.and.returnValue(
+      of({ role: { permissions: ['CREATE_EVENT'] } } as any)
+    );
 
-  it('should fetch events and apply filters', fakeAsync(() => {
-    eventServiceSpy.getEvents.and.returnValue(of(mockEventsResponse));
+    (component as any).initPermissions();
+    tick();
+
+    expect(userServiceSpy.getMyself).toHaveBeenCalled();
+    expect(component.hasEventCreatePermission).toBeTrue();
+  }));
+
+  it('should set hasEventCreatePermission false on permission load error', fakeAsync(() => {
+    userServiceSpy.getMyself.and.returnValue(
+      throwError(() => new Error('nope'))
+    );
+
+    (component as any).initPermissions();
+    tick();
+
+    expect(component.hasEventCreatePermission).toBeFalse();
+  }));
+
+  it('should fetch events and set filtered list + totals', fakeAsync(() => {
+    eventServiceSpy.getEvents.and.returnValue(of(mockEventsResponse as any));
+
     component.refreshEvents();
     tick();
+
     expect(eventServiceSpy.getEvents).toHaveBeenCalledWith(
       component.searchOptions
     );
@@ -120,77 +137,124 @@ describe('EventDashboardComponent', () => {
     expect(component.totalEvents).toBe(2);
   }));
 
-  it('should no longer filter events client-side', () => {
-    component.events = mockEventsResponse;
-    component.filteredEvents = mockEventsResponse.items;
-
-    component.eventSearch = 'event a';
-
-    expect(component.filteredEvents.length).toBe(2);
-    expect(component.filteredEvents[0].name).toBe('Event A');
-    expect(component.filteredEvents[1].name).toBe('Event B');
-  });
-
   it('should send search term to server when searching', fakeAsync(() => {
-    eventServiceSpy.getEvents.and.returnValue(of(mockEventsResponse));
+    eventServiceSpy.getEvents.and.returnValue(of(mockEventsResponse as any));
 
     component.onSearchTermChanged('event a');
     tick();
 
+    expect(component.eventSearch).toBe('event a');
     expect(component.searchOptions.term).toBe('event a');
+    expect(component.searchOptions.page).toBe(0);
     expect(eventServiceSpy.getEvents).toHaveBeenCalledWith(
-      jasmine.objectContaining({ term: 'event a' })
+      jasmine.objectContaining({ term: 'event a', page: 0 })
     );
   }));
 
   it('should clear search and refresh events', fakeAsync(() => {
-    eventServiceSpy.getEvents.and.returnValue(of(mockEventsResponse));
+    eventServiceSpy.getEvents.and.returnValue(of(mockEventsResponse as any));
+
+    component.eventSearch = 'something';
+    component.searchOptions = { ...component.searchOptions, term: 'something' };
+
     component.onSearchCleared();
     tick();
+
     expect(component.eventSearch).toBe('');
+    expect(component.searchOptions.term).toBe('');
+    expect(component.searchOptions.page).toBe(0);
+    expect(eventServiceSpy.getEvents).toHaveBeenCalled();
+  }));
+
+  it('should reset filters and refresh events', fakeAsync(() => {
+    eventServiceSpy.getEvents.and.returnValue(of(mockEventsResponse as any));
+
+    component.eventSearch = 'abc';
+    component.eventStatusFilter = 'active';
+    component.searchOptions = {
+      ...component.searchOptions,
+      page: 3,
+      state: 'active',
+      term: 'abc'
+    };
+
+    component.reset();
+    tick();
+
+    expect(component.eventSearch).toBe('');
+    expect(component.eventStatusFilter).toBe('all');
+    expect(component.searchOptions.page).toBe(0);
+    expect(component.searchOptions.state).toBe('all');
+    expect(component.searchOptions.term).toBe('');
     expect(eventServiceSpy.getEvents).toHaveBeenCalled();
   }));
 
   it('should handle page change', fakeAsync(() => {
     const pageEvent: PageEvent = { length: 20, pageIndex: 1, pageSize: 25 };
-    eventServiceSpy.getEvents.and.returnValue(of(mockEventsResponse));
+    eventServiceSpy.getEvents.and.returnValue(of(mockEventsResponse as any));
+
     component.onPageChange(pageEvent);
     tick();
+
     expect(component.searchOptions.page).toBe(1);
     expect(component.searchOptions.page_size).toBe(25);
     expect(eventServiceSpy.getEvents).toHaveBeenCalled();
   }));
 
-  it('should navigate to event on click', () => {
-    const event = { id: 123 };
-    component.gotoEvent(event as any);
-    expect(stateSpy.go).toHaveBeenCalledWith('admin.event', { eventId: 123 });
-  });
-
   it('should update status filter and refresh events', fakeAsync(() => {
-    eventServiceSpy.getEvents.and.returnValue(of(mockEventsResponse));
-    component.onStatusFilterChange('active');
-    tick();
-    expect(component.searchOptions.state).toBe('active');
-    expect(eventServiceSpy.getEvents).toHaveBeenCalled();
-  }));
-
-  it('should update status filter and refresh events', fakeAsync(() => {
-    eventServiceSpy.getEvents.and.returnValue(of(mockEventsResponse));
+    eventServiceSpy.getEvents.and.returnValue(of(mockEventsResponse as any));
 
     component.onStatusFilterChange('active');
     tick();
-    fixture.detectChanges();
 
+    expect(component.eventStatusFilter).toBe('active');
     expect(component.searchOptions.state).toBe('active');
+    expect(component.searchOptions.page).toBe(0);
     expect(eventServiceSpy.getEvents).toHaveBeenCalled();
   }));
 
+  it('should open create event dialog and navigate on close when event has id', fakeAsync(() => {
+    const dialogRefMock = {
+      afterClosed: () => of({ id: 123 } as any)
+    };
+
+    dialogSpy.open.and.returnValue(dialogRefMock as any);
+
+    component.createEvent();
+    tick();
+
+    expect(dialogSpy.open).toHaveBeenCalled();
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/admin/event', 123]);
+  }));
+
+  it('should not navigate if dialog closes without event id', fakeAsync(() => {
+    const dialogRefMock = {
+      afterClosed: () => of(undefined)
+    };
+
+    dialogSpy.open.and.returnValue(dialogRefMock as any);
+
+    component.createEvent();
+    tick();
+
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
+  }));
 
   it('should handle window resize updating numChars and tooltip width', () => {
     spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1000);
+
     component.onResize();
+
     expect(component.numChars).toBe(Math.ceil(1000 / 8.5));
-    expect(component.toolTipWidth).toBe(1000 * 0.75 + 'px');
+    expect(component.toolTipWidth).toBe('750px');
+  });
+
+  it('trackByEventId returns id when present', () => {
+    expect(component.trackByEventId(0, { id: 5 } as any)).toBe(5);
+  });
+
+  it('trackByEventId returns event when id is missing', () => {
+    const obj = { name: 'no-id' } as any;
+    expect(component.trackByEventId(0, obj)).toBe(obj);
   });
 });

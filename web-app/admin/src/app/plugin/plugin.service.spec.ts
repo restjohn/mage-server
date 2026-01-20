@@ -27,21 +27,29 @@ describe('PluginService', () => {
   let service: PluginService
 
   beforeEach(() => {
-
     system = {
       register: jasmine.createSpy('SystemJS.Context.register'),
       import: jasmine.createSpy('SystemJS.Context.import')
     }
+  
     mockClient = {
       get: jasmine.createSpy('HttpClient.get')
     }
+  
+    injector = {
+      get: jasmine.createSpy('Injector.get')
+    }
+  
+    localStorageService = jasmine.createSpyObj<LocalStorageService>('LocalStorageService', ['getToken'])
+    localStorageService.getToken.and.returnValue(token)
+  
     service = new PluginService(
       mockClient as unknown as HttpClient,
       injector as unknown as Injector,
       system as unknown as SystemJS.Registry,
       localStorageService
     )
-  })
+  })  
 
   it('registers shared libraries', async () => {
 

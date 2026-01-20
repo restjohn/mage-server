@@ -45,20 +45,27 @@ describe('SecurityBannerComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [NoopAnimationsModule],
-      declarations: [
+      declarations: [SecurityBannerComponent, MockColorPickerComponent],
+      providers: [{ provide: SettingsService, useClass: MockSettingsService }]
+    })
+      .overrideTemplate(
         SecurityBannerComponent,
-        MockColorPickerComponent
-      ],
-      providers: [
-        { provide: SettingsService, useClass: MockSettingsService }
-      ]
-    }).compileComponents();
+        `
+          <color-picker #headerTextColor></color-picker>
+          <color-picker #headerBackgroundColor></color-picker>
+          <color-picker #footerTextColor></color-picker>
+          <color-picker #footerBackgroundColor></color-picker>
+        `
+      )
+      .compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SecurityBannerComponent);
     component = fixture.componentInstance;
-    settingsService = TestBed.inject(SettingsService) as unknown as MockSettingsService;
+    settingsService = TestBed.inject(
+      SettingsService
+    ) as unknown as MockSettingsService;
     fixture.detectChanges();
   });
 
@@ -68,5 +75,27 @@ describe('SecurityBannerComponent', () => {
 
   it('should load banner settings on init', () => {
     expect(settingsService.get).toHaveBeenCalledWith('banner');
+    expect(component.banner).toEqual({
+      headerTextColor: '#000000',
+      headerText: '',
+      headerBackgroundColor: '#FFFFFF',
+      footerTextColor: '#000000',
+      footerText: '',
+      footerBackgroundColor: '#FFFFFF',
+      showHeader: false,
+      showFooter: false
+    });
+  });
+
+  it('should initialize pickers with loaded values and update banner on color change', () => {
+    expect(component.isDirty).toBe(false);
+
+    const dirtySpy = spyOn(component.onDirty, 'emit');
+
+    component.headerTextColorPicker?.onColorChanged.emit({ color: '#111111' });
+
+    expect(component.banner.headerTextColor).toBe('#111111');
+    expect(component.isDirty).toBe(true);
+    expect(dirtySpy).toHaveBeenCalledWith(true);
   });
 });
