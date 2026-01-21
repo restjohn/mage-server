@@ -12,6 +12,7 @@ import { Device } from '../../../../@types/dashboard/devices-dashboard';
 import { CreateDeviceDialogComponent } from '../create-device/create-device.component';
 import { AdminUserService } from '../../services/admin-user.service';
 import { Subject, takeUntil } from 'rxjs';
+import { AdminToastService } from '../../services/admin-toast.service';
 
 @Component({
   selector: 'admin-devices',
@@ -50,7 +51,8 @@ export class DeviceDashboardComponent implements OnInit, OnDestroy {
     private modal: MatDialog,
     private router: Router,
     private deviceService: AdminDeviceService,
-    private userService: AdminUserService
+    private userService: AdminUserService,
+    private toastService: AdminToastService
   ) {}
 
   ngOnInit(): void {
@@ -70,7 +72,7 @@ export class DeviceDashboardComponent implements OnInit, OnDestroy {
       .subscribe((user) => {
         this.currentUser = user;
         this.hasDeviceCreatePermission =
-          user?.role?.permissions?.includes('CREATE_USER') || false;
+          user?.role?.permissions?.includes('CREATE_DEVICE') || false;
       });
   }
 
@@ -144,8 +146,15 @@ export class DeviceDashboardComponent implements OnInit, OnDestroy {
       data: { device: { uid: '', description: '', user: { id: '' } } }
     });
 
-    dialogRef.afterClosed().subscribe((newDevice) => {
-      if (newDevice) this.refreshDevices();
+    dialogRef.afterClosed().subscribe((newDevice: Device) => {
+      if (newDevice) {
+        this.toastService.show(
+          'Device Created',
+          ['../devices', newDevice.id],
+          'Go to Device'
+        );
+        this.refreshDevices();
+      } 
     });
   }
 

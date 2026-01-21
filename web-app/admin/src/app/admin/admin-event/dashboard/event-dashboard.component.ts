@@ -13,6 +13,7 @@ import {
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { Event } from '../../../../../../src/app/filter/filter.types';
 import { CreateEventDialogComponent } from '../create-event/create-event.component';
+import { AdminToastService } from '../../services/admin-toast.service';
 
 @Component({
   selector: 'admin-events',
@@ -48,7 +49,8 @@ export class EventDashboardComponent implements OnInit {
     private modal: MatDialog,
     private eventService: AdminEventsService,
     private adminUserService: AdminUserService,
-    private router: Router
+    private router: Router,
+    private toastService: AdminToastService
   ) {}
 
   ngOnInit(): void {
@@ -103,7 +105,12 @@ export class EventDashboardComponent implements OnInit {
   reset(): void {
     this.eventSearch = '';
     this.eventStatusFilter = 'all';
-    this.searchOptions = { ...this.searchOptions, page: 0, state: 'all', term: '' };
+    this.searchOptions = {
+      ...this.searchOptions,
+      page: 0,
+      state: 'all',
+      term: ''
+    };
     this.refreshEvents();
   }
 
@@ -129,7 +136,12 @@ export class EventDashboardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((newEvent: Event | undefined) => {
       if (newEvent?.id) {
-        this.router.navigate(['/admin/event', newEvent.id]);
+        this.toastService.show(
+          'Event Created',
+          ['../events', newEvent.id],
+          'Go To Event'
+        );
+        this.refreshEvents();
       }
     });
   }

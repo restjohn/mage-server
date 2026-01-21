@@ -138,6 +138,7 @@ export class AdminComponent implements OnInit, OnDestroy {
               state: `../${suffix}`,
               icon: adminTab.icon
             });
+            console.log(acc)
 
             return acc;
           },

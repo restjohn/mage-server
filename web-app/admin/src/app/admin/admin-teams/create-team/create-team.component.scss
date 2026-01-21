@@ -1,99 +1,160 @@
-.error-alert {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    background-color: #fef2f2;
-    border: 1px solid #fecaca;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-    color: #dc2626;
-    font-size: 0.875rem;
+.dialog-modal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 90vh;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  box-sizing: border-box;
 
-    i {
-        flex-shrink: 0;
-        font-size: 1rem;
+  @media (max-width: 1200px) {
+    max-width: 95vw;
+    border-radius: 8px;
+  }
+
+  @media (max-width: 480px) {
+    max-width: 98vw;
+    margin: 0 auto;
+  }
+}
+
+.dialog-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+
+  .dialog-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.025em;
+
+    @media (max-width: 480px) {
+      font-size: 1.25rem;
     }
+  }
+}
+
+.dialog-content {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  position: relative;
+
+  @media (max-width: 1200px) {
+    padding: 1rem;
+  }
+}
+
+.dialog-actions {
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  background: #f9fafb;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem;
+  }
+}
+
+.error-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  color: #dc2626;
+  font-size: 0.875rem;
+
+  i {
+    flex-shrink: 0;
+    font-size: 1rem;
+  }
 }
 
 .team-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .field-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    background-color: #f9fafb;
+    transition: all 0.2s ease;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+
+    &:disabled {
+      background-color: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+  }
+
+  .field-error {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.25rem;
+    color: #dc2626;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
 
-    .field-label {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #374151;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+    i {
+      font-size: 0.75rem;
     }
-
-    .form-input {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        font-size: 0.875rem;
-        background-color: #f9fafb;
-        transition: all 0.2s ease;
-        resize: vertical;
-
-        &:focus {
-            outline: none;
-            border-color: #3b82f6;
-            background-color: white;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        &::placeholder {
-            color: #9ca3af;
-        }
-
-        &:disabled {
-            background-color: #f3f4f6;
-            color: #9ca3af;
-            cursor: not-allowed;
-        }
-    }
-
-    .field-error {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-        color: #dc2626;
-        font-size: 0.75rem;
-        margin-top: 0.25rem;
-
-        i {
-            font-size: 0.75rem;
-        }
-    }
+  }
 }
 
 ::ng-deep .mat-dialog-container {
-    padding: 0;
-    border-radius: 12px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-}
-
-::ng-deep .mat-dialog-actions {
-    padding: 0;
-    margin: 0;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 12px !important;
 }
 
 ::ng-deep .mat-dialog-content {
-    padding: 0;
-    margin: 0;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
-::ng-deep .mat-dialog-title {
-    padding: 0;
-    margin: 0;
+::ng-deep .mat-dialog-actions {
+  padding: 0 !important;
+  margin: 0 !important;
 }

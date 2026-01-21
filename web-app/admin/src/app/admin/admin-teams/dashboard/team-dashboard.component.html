@@ -17,9 +17,14 @@
       </div>
 
       <div class="button-group">
-        <a mat-flat-button class="btn-primary" [routerLink]="['../teams/create']">
+        <button
+          mat-flat-button
+          class="btn-primary"
+          *ngIf="hasTeamCreatePermission"
+          (click)="createTeam()"
+        >
           New Team
-        </a>
+        </button>
       </div>
     </div>
 

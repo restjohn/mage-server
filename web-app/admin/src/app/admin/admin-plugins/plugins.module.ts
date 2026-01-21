@@ -1,15 +1,16 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { PluginsComponent } from './plugins.component';
-import { PluginsDashboardComponent } from "./dashboard/plugins-dashboard.component";
-import { PluginHostComponent } from "./host/plugins-host.component";
+import { PluginHostComponent } from './host/plugins-host.component';
+import { CommonModule } from '@angular/common';
+import { AdminBreadcrumbModule } from '../admin-breadcrumb/admin-breadcrumb.module';
 
 @NgModule({
-  declarations: [PluginsComponent, PluginsDashboardComponent, PluginHostComponent],
+  declarations: [PluginsComponent, PluginHostComponent],
   imports: [
-    RouterModule.forChild([
-      { path: '', component: PluginsComponent }
-    ])
+    CommonModule,
+    AdminBreadcrumbModule,
+    RouterModule.forChild([{ path: '', component: PluginsComponent }])
   ]
 })
 export class PluginModule {}

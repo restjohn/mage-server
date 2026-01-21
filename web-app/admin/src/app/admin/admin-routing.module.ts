@@ -24,7 +24,6 @@ import { AdminServiceComponent } from './admin-feeds/admin-service/admin-service
 import { LayerDetailsComponent } from './admin-layers/layer-details/layer-details.component';
 import { AdminGuard } from './services/admin-guard.service';
 import { PluginsComponent } from './admin-plugins/plugins.component';
-import { PluginsDashboardComponent } from './admin-plugins/dashboard/plugins-dashboard.component';
 import { PluginHostComponent } from './admin-plugins/host/plugins-host.component';
 import { AdminUnsavedChangesGuard } from './services/admin-unsaved-changes.guard'
 
@@ -84,7 +83,6 @@ const routes: Routes = [
         path: 'plugins',
         component: PluginsComponent,
         children: [
-          { path: '', component: PluginsDashboardComponent },
           { path: ':pluginId', component: PluginHostComponent }
         ]
       },

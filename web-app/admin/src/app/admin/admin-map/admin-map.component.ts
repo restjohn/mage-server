@@ -34,21 +34,31 @@ export class AdminMapComponent implements OnInit {
     private mapSettingsService: MapSettingsService,
     private snackBar: MatSnackBar
   ) {
-    this.mapSettingsService
-      .getMapSettings()
-      .subscribe((settings: MapSettings) => {
-        const webType = (settings.webSearchType ?? 'NONE') as WebSearchType;
-        const mobileType = (settings.mobileSearchType ??
-          'NONE') as MobileSearchType;
+    this.mapSettingsService.getMapSettings().subscribe({
+      next: (settings: MapSettings | null | undefined) => {
+        const s: any = settings ?? {};
+
+        const webType = (s.webSearchType ?? 'NONE') as WebSearchType;
+        const mobileType = (s.mobileSearchType ?? 'NONE') as MobileSearchType;
 
         this.webSearchType = this.isWebSearchType(webType) ? webType : 'NONE';
         this.mobileSearchType = this.isMobileSearchType(mobileType)
           ? mobileType
           : 'NONE';
 
-        this.webNominatimUrl = settings.webNominatimUrl ?? '';
-        this.mobileNominatimUrl = settings.mobileNominatimUrl ?? '';
-      });
+        this.webNominatimUrl = s.webNominatimUrl ?? '';
+        this.mobileNominatimUrl = s.mobileNominatimUrl ?? '';
+      },
+      error: (err) => {
+        this.webSearchType = 'NONE';
+        this.mobileSearchType = 'NONE';
+        this.webNominatimUrl = '';
+        this.mobileNominatimUrl = '';
+
+        const message = err?.error?.message || 'Error loading map settings';
+        this.snackBar.open(message, undefined, { duration: 3000 });
+      }
+    });
   }
 
   ngOnInit(): void {}

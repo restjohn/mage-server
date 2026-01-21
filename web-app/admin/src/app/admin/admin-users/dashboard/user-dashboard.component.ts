@@ -15,6 +15,7 @@ import { AdminTeamsService } from '../../services/admin-teams-service';
 import { Team } from '../../admin-teams/team';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { AdminUserService } from '../../services/admin-user.service';
+import { AdminToastService } from '../../services/admin-toast.service';
 
 type UserFilter = {
   limit?: number;
@@ -79,7 +80,8 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     private localStorageService: LocalStorageService,
     private teamService: AdminTeamsService,
     private userService: AdminUserService,
-    private userPagingService: UserPagingService
+    private userPagingService: UserPagingService,
+    private toastService: AdminToastService
   ) {
     this.token = this.localStorageService.getToken() || '';
     this.stateAndData = this.userPagingService.constructDefault();
@@ -230,21 +232,30 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
       data: { roles: this.roles }
     });
 
-    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((newUser) => {
-      if (!newUser?.confirmed) {
-        return;
-      }
-
-      this.userService.createUser(newUser.user).subscribe({
-        next: () => {
-          this.refreshUsers();
-        },
-        error: (err) => {
-          console.error(err);
-          this.refreshUsers();
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((newUser) => {
+        if (!newUser?.confirmed) {
+          return;
         }
+
+        this.userService.createUser(newUser.user).subscribe({
+          next: (createdUser) => {
+            this.refreshUsers(() => {
+              this.toastService.show(
+                'User Created',
+                ['../users', createdUser.id],
+                'Go to User'
+              );
+            });
+          },
+          error: (err) => {
+            console.error(err);
+            this.refreshUsers();
+          }
+        });
       });
-    });
   }
 
   openImportModal(): void {
@@ -256,46 +267,56 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
       }
     });
 
-    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe((result) => {
-      if (!result?.users?.length) return;
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        if (!result?.users?.length) return;
 
-      this.isBulkUploading = true;
-      this.isFinalizing = false;
-      this.isFinished = false;
-      this.showErrorTable = false;
+        this.isBulkUploading = true;
+        this.isFinalizing = false;
+        this.isFinished = false;
+        this.showErrorTable = false;
 
-      this.bulkProgress = {
-        total: result.users.length,
-        completed: 0,
-        failed: 0
-      };
+        this.bulkProgress = {
+          total: result.users.length,
+          completed: 0,
+          failed: 0
+        };
 
-      this.bulkCreateUsers(result.users)
-        .then(async (createdUsers) => {
-          this.isFinalizing = true;
+        this.bulkCreateUsers(result.users)
+          .then(async (createdUsers) => {
+            this.isFinalizing = true;
 
-          if (result.selectedTeam?.id) {
-            await Promise.all(
-              createdUsers.map((u) =>
-                lastValueFrom(this.teamService.addUserToTeam(String(result.selectedTeam.id), u))
-              )
-            );
-          }
-        })
-        .finally(() => {
-          this.refreshUsers(() => {
-            this.isFinalizing = false;
-            if (this.bulkErrors.length === 0) {
-              this.isFinished = true;
-            } else {
-              this.showErrorTable = true;
+            if (result.selectedTeam?.id) {
+              await Promise.all(
+                createdUsers.map((u) =>
+                  lastValueFrom(
+                    this.teamService.addUserToTeam(
+                      String(result.selectedTeam.id),
+                      u
+                    )
+                  )
+                )
+              );
             }
+          })
+          .finally(() => {
+            this.refreshUsers(() => {
+              this.isFinalizing = false;
+              if (this.bulkErrors.length === 0) {
+                this.isFinished = true;
+              } else {
+                this.showErrorTable = true;
+              }
+            });
           });
-        });
-    });
+      });
   }
 
-  onStatusFilterChange(value: 'all' | 'active' | 'inactive' | 'disabled'): void {
+  onStatusFilterChange(
+    value: 'all' | 'active' | 'inactive' | 'disabled'
+  ): void {
     this.userStatusFilter = value;
     this.pageIndex = 0;
     this.refreshUsers();
@@ -327,7 +348,10 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
                   error: err?.error || err?.message || 'Unknown error'
                 });
 
-                console.error(`Failed to create user ${userData.username}`, err);
+                console.error(
+                  `Failed to create user ${userData.username}`,
+                  err
+                );
                 return EMPTY;
               }),
               finalize(() => {

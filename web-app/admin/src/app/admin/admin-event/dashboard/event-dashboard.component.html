@@ -46,6 +46,7 @@
       <table
         mat-table
         [dataSource]="filteredEvents"
+        [trackBy]="trackByEventId"
         class="mat-table-even-columns mat-table"
       >
         <ng-container matColumnDef="event">
@@ -74,14 +75,7 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr
-          mat-row
-          *matRowDef="
-            let row;
-            columns: displayedColumns;
-            trackBy: trackByEventId
-          "
-        ></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
       </table>
     </div>
 

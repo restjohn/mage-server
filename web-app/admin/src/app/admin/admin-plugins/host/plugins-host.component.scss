@@ -7,3 +7,16 @@
   padding: 12px;
   border-radius: 4px;
 }
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+:host ::ng-deep .admin-main-content {
+  padding: 0;
+}
+
+.plugin-host {
+  width: 100%;
+}

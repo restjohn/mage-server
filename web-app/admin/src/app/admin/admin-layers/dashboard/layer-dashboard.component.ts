@@ -7,6 +7,7 @@ import { LayersService, Layer } from '../layers.service';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
 import { CreateLayerDialogComponent } from '../create-layer/create-layer.component';
 import { AdminUserService } from '../../services/admin-user.service';
+import { AdminToastService } from '../../services/admin-toast.service';
 
 @Component({
   selector: 'mage-layer-dashboard',
@@ -42,7 +43,8 @@ export class LayerDashboardComponent implements OnInit {
     private layersService: LayersService,
     private adminUserService: AdminUserService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private toastService: AdminToastService
   ) {}
 
   ngOnInit(): void {
@@ -165,8 +167,14 @@ export class LayerDashboardComponent implements OnInit {
     dialogRef.afterClosed().subscribe((newLayer: Layer | undefined) => {
       if (!newLayer?.id) return;
 
+
+      this.toastService.show(
+        'Layer Created',
+        ['../layers', newLayer.id],
+        'Go to Layer'
+      );
+
       this.refreshLayers();
-      this.router.navigate(['../layers', newLayer.id], { relativeTo: this.route });
     });
   }
 
