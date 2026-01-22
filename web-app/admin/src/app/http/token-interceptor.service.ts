@@ -10,10 +10,11 @@ import { LocalStorageService } from '../../../../src/app/http/local-storage.serv
 
 @Injectable()
 export class TokenInterceptorService implements HttpInterceptor {
-  constructor(private localStorage: LocalStorageService) {}
+  constructor(private localStorage: LocalStorageService) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const isApiCall = req.url.startsWith('/api/') || req.url.includes('/api/');
+    const isApiCall = req.url.startsWith('/api/') || req.url.includes('/api/')
+      || req.url.startsWith('/plugins/') || req.url.includes('/plugins/');
     if (!isApiCall) return next.handle(req);
 
     const token = this.localStorage.getToken();

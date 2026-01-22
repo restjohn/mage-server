@@ -27,14 +27,14 @@ export class TokenInterceptorService implements HttpInterceptor {
     public dialog: MatDialog,
     private userService: UserService,
     private localStorageService: LocalStorageService
-  ) {}
+  ) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (req.context.get(BYPASS_TOKEN) === true) {
       return next.handle(req);
     }
 
-    if (!req.url.startsWith('/api/')) {
+    if (!req.url.startsWith('/api/') && !req.url.startsWith('/plugins/')) {
       return next.handle(req);
     }
 
