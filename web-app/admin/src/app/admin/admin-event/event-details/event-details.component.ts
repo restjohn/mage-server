@@ -166,7 +166,7 @@ export class EventDetailsComponent implements OnInit, OnDestroy {
 
     if (!eventId) {
       console.error('Missing eventId route param');
-      this.router.navigateByUrl('/admin/events');
+      this.router.navigateByUrl('../events');
       return;
     }
 
@@ -594,7 +594,7 @@ export class EventDetailsComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        this.router.navigateByUrl('/admin/events');
+        this.router.navigateByUrl('../events');
       }
     });
   }

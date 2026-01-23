@@ -435,7 +435,7 @@ export class TeamDetailsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.router.navigateByUrl('/admin/teams');
+        this.router.navigateByUrl('../teams');
       }
     });
   }

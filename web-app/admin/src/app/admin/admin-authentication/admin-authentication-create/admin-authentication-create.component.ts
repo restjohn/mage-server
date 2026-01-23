@@ -1,56 +1,44 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { TypeChoice } from './admin-create.model';
 import { AdminBreadcrumb } from '../../admin-breadcrumb/admin-breadcrumb.model';
-import { CdkStepper, STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { AuthenticationConfigurationService } from '../../services/admin-authentication-configuration.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Strategy } from '../../admin-authentication/admin-settings.model';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
+import {
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ValidationErrors,
+  Validators
+} from '@angular/forms';
+
 @Component({
   selector: 'admin-authentication-create',
   templateUrl: './admin-authentication-create.component.html',
   styleUrls: ['./admin-authentication-create.component.scss'],
-  providers: [
-    {
-      provide: STEPPER_GLOBAL_OPTIONS,
-      useValue: { showError: true }
-    }
-  ]
+  providers: []
 })
-export class AuthenticationCreateComponent implements OnInit {
+export class AuthenticationCreateComponent implements OnInit, OnDestroy {
   breadcrumbs: AdminBreadcrumb[] = [
     {
       title: 'Security',
       icon: 'shield',
       route: ['../../security']
-    }
+    },
+    { title: 'New' }
   ];
 
   strategy: Strategy & { settings: any } = this.buildDefaultStrategy();
 
   readonly TYPE_CHOICES: TypeChoice[] = [
-    {
-      title: 'OpenID Connect',
-      type: 'openidconnect',
-      name: 'openidconnect'
-    },
-    {
-      title: 'OAuth2',
-      type: 'oauth',
-      name: 'oauth'
-    },
-    {
-      title: 'LDAP',
-      type: 'ldap',
-      name: 'ldap'
-    },
-    {
-      title: 'SAML',
-      type: 'saml',
-      name: 'saml'
-    }
+    { title: 'OpenID Connect', type: 'openidconnect', name: 'openidconnect' },
+    { title: 'OAuth2', type: 'oauth', name: 'oauth' },
+    { title: 'LDAP', type: 'ldap', name: 'ldap' },
+    { title: 'SAML', type: 'saml', name: 'saml' }
   ];
 
   private readonly REQUIRED_SETTINGS: Record<string, string[]> = {
@@ -75,17 +63,55 @@ export class AuthenticationCreateComponent implements OnInit {
 
   private readonly destroy$ = new Subject<void>();
 
+  readonly form: FormGroup<{
+    title: FormControl<string>;
+    name: FormControl<string>;
+    settingsValid: FormControl<boolean>;
+  }>;
+
   constructor(
+    private readonly fb: FormBuilder,
     private readonly snackBar: MatSnackBar,
     private readonly router: Router,
     @Inject(AuthenticationConfigurationService)
     private readonly authenticationConfigurationService: AuthenticationConfigurationService
   ) {
-    this.breadcrumbs.push({ title: 'New' });
+    this.form = this.fb.group({
+      title: this.fb.nonNullable.control('', Validators.required),
+      name: this.fb.nonNullable.control('', Validators.required),
+      settingsValid: this.fb.nonNullable.control(true, this.settingsValidator())
+    });
+
     this.reset();
   }
 
+  get titleCtrl(): FormControl<string> {
+    return this.form.controls.title;
+  }
+
+  get nameCtrl(): FormControl<string> {
+    return this.form.controls.name;
+  }
+
+  get settingsCtrl(): FormControl<boolean> {
+    return this.form.controls.settingsValid;
+  }
+
   ngOnInit(): void {
+    this.titleCtrl.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((v) => {
+        this.strategy.title = v ?? '';
+      });
+
+    this.nameCtrl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((v) => {
+      this.strategy.name = v ?? '';
+      if (this.strategy.name) {
+        this.loadTemplate();
+        this.settingsCtrl.updateValueAndValidity({ emitEvent: false });
+      }
+    });
+
     this.authenticationConfigurationService
       .getAllConfigurations({ includeDisabled: true })
       .pipe(takeUntil(this.destroy$))
@@ -94,13 +120,11 @@ export class AuthenticationCreateComponent implements OnInit {
           const strategies: any[] = Array.isArray(response?.data)
             ? response.data
             : [];
-          strategies.forEach((strategy) => {
+          strategies.forEach((s) => {
             const idx = this.TYPE_CHOICES.findIndex(
-              (choice) => choice.name === strategy?.name
+              (choice) => choice.name === s?.name
             );
-            if (idx > -1) {
-              this.TYPE_CHOICES.splice(idx, 1);
-            }
+            if (idx > -1) this.TYPE_CHOICES.splice(idx, 1);
           });
         },
         error: () => {
@@ -114,22 +138,8 @@ export class AuthenticationCreateComponent implements OnInit {
     this.destroy$.complete();
   }
 
-  stepChanged(stepper: CdkStepper): void {
-    const selected = stepper?.selected;
-    const label = selected?.label;
-
-    if (!selected || typeof label !== 'string') {
-      return;
-    }
-
-    if (label === 'Title') {
-      selected.hasError = !((this.strategy?.title?.length || 0) > 0);
-    } else if (label === 'Type') {
-      selected.hasError = !(this.strategy?.name?.length > 0);
-      this.loadTemplate();
-    } else if (label === 'Settings') {
-      selected.hasError = !this.hasRequiredSettings();
-    }
+  onSettingsChanged(): void {
+    this.settingsCtrl.updateValueAndValidity({ emitEvent: false });
   }
 
   loadTemplate(): void {
@@ -154,17 +164,30 @@ export class AuthenticationCreateComponent implements OnInit {
 
     const required = this.REQUIRED_SETTINGS[this.strategy.type] || [];
     required.forEach((setting) => {
-      this.strategy.settings[setting] = null;
+      this.strategy.settings[setting] = this.strategy.settings[setting] ?? null;
     });
   }
 
   save(): void {
+    this.settingsCtrl.updateValueAndValidity({ emitEvent: false });
+
+    if (!this.isValid()) {
+      this.snackBar.open(
+        'Please fix validation errors before saving.',
+        undefined,
+        {
+          duration: 2000
+        }
+      );
+      return;
+    }
+
     this.authenticationConfigurationService
       .createConfiguration(this.strategy)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.router.navigateByUrl('/admin/security');
+          this.router.navigateByUrl('../../security');
         },
         error: () => {
           this.snackBar.open(
@@ -172,17 +195,27 @@ export class AuthenticationCreateComponent implements OnInit {
             undefined,
             { duration: 2000 }
           );
-          this.router.navigateByUrl('/admin/security');
+          this.router.navigateByUrl('../../security');
         }
       });
   }
 
   isValid(): boolean {
+    this.settingsCtrl.updateValueAndValidity({ emitEvent: false });
+
     return (
-      (this.strategy?.title?.length ?? 0) > 0 &&
-      (this.strategy?.name?.length ?? 0) > 0 &&
-      this.hasRequiredSettings()
+      this.titleCtrl.valid && this.nameCtrl.valid && this.hasRequiredSettings()
     );
+  }
+
+  reset(): void {
+    this.strategy = this.buildDefaultStrategy();
+    this.form.reset(
+      { title: '', name: '', settingsValid: true },
+      { emitEvent: false }
+    );
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
   }
 
   private hasRequiredSettings(): boolean {
@@ -198,8 +231,11 @@ export class AuthenticationCreateComponent implements OnInit {
     return missing.length === 0;
   }
 
-  reset(): void {
-    this.strategy = this.buildDefaultStrategy();
+  private settingsValidator() {
+    return (_control: AbstractControl): ValidationErrors | null => {
+      if (!this.strategy?.type) return { missing: true };
+      return this.hasRequiredSettings() ? null : { missing: true };
+    };
   }
 
   private buildDefaultStrategy(): Strategy & { settings: any } {
