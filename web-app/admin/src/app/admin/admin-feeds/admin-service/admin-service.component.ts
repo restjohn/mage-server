@@ -21,9 +21,6 @@ import { AdminServiceDeleteComponent } from './admin-service-delete/admin-servic
 export class AdminServiceComponent implements OnInit {
   breadcrumbs: AdminBreadcrumb[] = [
     {
-      title: 'Service',
-    },
-    {
       title: 'Feeds',
       icon: 'rss_feed',
       route: ['../../feeds']
