@@ -15,7 +15,7 @@
     "build:tsc": "tsc -b src",
     "build": "tsc -b src",
     "test:run": "jest lib",
-    "test": "tsc -b src && jest lib",
+    "test": "tsc -b src && jest",
     "clean": "rm -rf lib"
   },
   "repository": {
