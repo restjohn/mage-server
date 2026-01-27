@@ -16,7 +16,7 @@ export class AdminFeedEditComponent implements OnInit {
     {
       title: 'Feeds',
       icon: 'rss_feed',
-      route: ['../feeds']
+      route: ['../../../feeds']
     }
   ];
 
@@ -58,7 +58,7 @@ export class AdminFeedEditComponent implements OnInit {
       if (nextOriginalFeed && !this.editState.originalFeed) {
         this.breadcrumbs[1] = {
           title: nextOriginalFeed.title,
-          route: ['../feed', nextOriginalFeed.id]
+          route: ['../../../feeds', nextOriginalFeed.id]
         };
         this.step = 1;
       }
@@ -131,7 +131,7 @@ export class AdminFeedEditComponent implements OnInit {
     }
 
     this.feedEdit.saveFeed().subscribe((feed) => {
-      this.router.navigate(['../feed', feed.id], { relativeTo: this.route });
+      this.router.navigate(['../../../feeds', feed.id], { relativeTo: this.route });
     });
   }
 
