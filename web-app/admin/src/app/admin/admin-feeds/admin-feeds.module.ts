@@ -66,7 +66,6 @@ import { RouterModule } from '@angular/router';
     AdminBreadcrumbModule,
     MatAutocompleteModule,
     MatTabsModule,
-    MatSnackBarModule,
     MatToolbarModule,
     MatIconModule,
     MatTooltipModule,

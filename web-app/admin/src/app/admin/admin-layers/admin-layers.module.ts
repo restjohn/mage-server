@@ -13,7 +13,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatInputModule } from '@angular/material/input';
 import { CoreModule } from '../../core/core.module';
 import { LayerDashboardComponent } from './dashboard/layer-dashboard.component';
@@ -34,7 +33,6 @@ import { RouterModule } from '@angular/router';
         DeleteLayerComponent,
         LayerPreviewComponent,
         ImageryLayerSettingsComponent,
-        MatSnackBarModule
     ],
     imports: [
         CommonModule,
@@ -52,7 +50,6 @@ import { RouterModule } from '@angular/router';
         MatDividerModule,
         MatProgressBarModule,
         MatProgressSpinnerModule,
-        MatSnackBarModule,
         MatInputModule,
         CoreModule,
         AdminBreadcrumbModule,
