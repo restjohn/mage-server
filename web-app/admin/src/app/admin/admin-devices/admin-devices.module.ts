@@ -30,6 +30,7 @@ import { AdminUsersModule } from '../admin-users/admin-users.module';
 import { DeviceDetailsComponent } from './device-details/device-details.component';
 import { DeleteDeviceComponent } from './delete-device/delete-device.component';
 import { LoginsModule } from '../../logins/logins.module';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
     declarations: [
@@ -37,6 +38,7 @@ import { LoginsModule } from '../../logins/logins.module';
         DeviceDetailsComponent,
         DeleteDeviceComponent,
         CreateDeviceDialogComponent,
+        MatSnackBarModule
     ],
     imports: [
         CommonModule,

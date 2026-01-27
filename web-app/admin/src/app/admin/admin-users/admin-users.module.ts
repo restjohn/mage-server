@@ -26,6 +26,7 @@ import { BulkUserComponent } from './bulk-user/bulk-user.component';
 import { AdminBreadcrumbModule } from '../admin-breadcrumb/admin-breadcrumb.module';
 import { UserSearchBoxComponent } from './user-search/user-search-box.component';
 import { RouterModule } from '@angular/router';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   imports: [
@@ -48,7 +49,8 @@ import { RouterModule } from '@angular/router';
     MatProgressBarModule,
     MatOptionModule,
     AdminBreadcrumbModule,
-    RouterModule
+    RouterModule,
+    MatSnackBarModule
   ],
   declarations: [
     UserDashboardComponent,

@@ -22,12 +22,14 @@ import { AdminBreadcrumbModule } from '../admin-breadcrumb/admin-breadcrumb.modu
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AdminTeamsService } from '../services/admin-teams-service';
 import { RouterModule } from '@angular/router';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
     declarations: [
         TeamDashboardComponent,
         CreateTeamDialogComponent,
         TeamDetailsComponent,
+        MatSnackBarModule,
         DeleteTeamComponent
     ],
     imports: [

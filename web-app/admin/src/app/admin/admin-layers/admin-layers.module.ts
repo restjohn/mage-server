@@ -33,7 +33,8 @@ import { RouterModule } from '@angular/router';
         LayerDetailsComponent,
         DeleteLayerComponent,
         LayerPreviewComponent,
-        ImageryLayerSettingsComponent
+        ImageryLayerSettingsComponent,
+        MatSnackBarModule
     ],
     imports: [
         CommonModule,

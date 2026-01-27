@@ -92,7 +92,8 @@ import { RouterModule } from '@angular/router';
     FeedItemSummaryModule,
     JsonSchemaModule,
     StaticIconModule,
-    RouterModule
+    RouterModule,
+    MatSnackBarModule
   ],
   exports: [
     AdminFeedsComponent,
