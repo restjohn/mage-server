@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "@types/geojson": "7946.0.16",
+    "@types/jest": "^30.0.0",
     "@types/json-schema": "7.0.15",
     "typescript": "5.8.2"
   },
