@@ -1,11 +1,6 @@
 {
   "include": ["src/**/*.ts"],
-  "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts",
-    "**/__tests__/**",
-    "node_modules"
-  ],
+  "exclude": ["node_modules"],
   "references": [],
   "compilerOptions": {
     "target": "ES2016",
