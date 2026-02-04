@@ -100,6 +100,18 @@ export class AdminDeviceService {
     return this.http.put<Device>(`/api/devices/${deviceId}`, device);
   }
 
+  updateDevicePatch<T extends Partial<Device>>(
+    deviceId: string,
+    patch: T
+  ): Observable<Device> {
+    const cleaned: any = {};
+    Object.keys(patch || {}).forEach((k) => {
+      const v = (patch as any)[k];
+      if (v !== undefined) cleaned[k] = v;
+    });
+    return this.http.put<Device>(`/api/devices/${deviceId}`, cleaned);
+  }
+
   deleteDevice(deviceId: string): Observable<void> {
     return this.http.delete<void>(`/api/devices/${deviceId}`);
   }

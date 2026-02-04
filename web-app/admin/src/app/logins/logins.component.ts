@@ -110,6 +110,9 @@ export class LoginsComponent implements OnInit, OnDestroy {
   }
 
   get hasNext(): boolean {
+    if (!this.isValidPageLink((this.loginPage as any)?.next)) return false;
+    if (!this.loginPage?.logins?.length) return false;
+    if (!this.firstLogin?.id) return false;
     return this.isValidPageLink((this.loginPage as any)?.next);
   }
 
