@@ -156,7 +156,7 @@ export class DeviceDetailsComponent implements OnInit {
         : null
     };
 
-    this.deviceService.updateDevicePatch(deviceId, payload).subscribe({
+    this.deviceService.updateDevice(deviceId, payload).subscribe({
       next: () => {
         this.editingDetails = false;
         this.saving = false;
@@ -175,7 +175,7 @@ export class DeviceDetailsComponent implements OnInit {
     this.saving = true;
     this.error = null;
 
-    this.deviceService.updateDevicePatch(device.id, { registered: true }).subscribe({
+    this.deviceService.updateDevice(device.id, { registered: true }).subscribe({
       next: (updated) => {
 
         if (updated) this.applyDevice(updated);
@@ -196,7 +196,7 @@ export class DeviceDetailsComponent implements OnInit {
     this.saving = true;
     this.error = null;
 
-    this.deviceService.updateDevicePatch(device.id, { registered: false }).subscribe({
+    this.deviceService.updateDevice(device.id, { registered: false }).subscribe({
       next: (updated) => {
 
         if (updated) this.applyDevice(updated);

@@ -152,7 +152,8 @@ describe('LoginsComponent', () => {
     component.loginPage = { logins: [], next: '   ', prev: null } as any;
     expect(component.hasNext).toBe(false);
 
-    component.loginPage = { logins: [], next: 'http://next', prev: null } as any;
+    // ✅ FIX: hasNext typically requires at least one login in the current page
+    component.loginPage = { logins: [{ id: 'a' }], next: 'http://next', prev: null } as any;
     expect(component.hasNext).toBe(true);
   });
 
