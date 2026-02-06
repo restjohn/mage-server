@@ -82,7 +82,7 @@
           mat-row
           *matRowDef="let row; columns: displayedColumns"
           class="pointer"
-          (click)="gotoDevice(row)"
+          [routerLink]="['../devices', row.id]"
         ></tr>
       </table>
     </div>

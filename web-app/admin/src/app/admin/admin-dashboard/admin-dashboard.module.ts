@@ -17,6 +17,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatNativeDateModule } from '@angular/material/core';
 import { AdminBreadcrumbModule } from '../admin-breadcrumb/admin-breadcrumb.module';
 import { MatTableModule } from '@angular/material/table';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [AdminDashboardComponent],
@@ -37,7 +38,8 @@ import { MatTableModule } from '@angular/material/table';
     MatAutocompleteModule,
     MatNativeDateModule,
     MatTableModule,
-    AdminBreadcrumbModule
+    AdminBreadcrumbModule,
+    RouterModule
   ],
   exports: [AdminDashboardComponent],
 })

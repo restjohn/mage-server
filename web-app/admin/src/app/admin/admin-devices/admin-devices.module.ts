@@ -24,7 +24,7 @@ import { CoreModule } from '../../core/core.module';
 import { AdminBreadcrumbModule } from '../admin-breadcrumb/admin-breadcrumb.module';
 import { DeviceDashboardComponent } from './dashboard/devices-dashboard.component';
 import { MatOptionModule } from '@angular/material/core';
-import { DevicesService } from './devices.service';
+import { AdminDeviceService } from '../services/admin-device.service';
 import { CreateDeviceDialogComponent } from './create-device/create-device.component';
 import { AdminUsersModule } from '../admin-users/admin-users.module';
 import { DeviceDetailsComponent } from './device-details/device-details.component';
@@ -76,7 +76,7 @@ import { LoginsModule } from '../../logins/logins.module';
         DeviceDetailsComponent,
     ],
     providers: [
-        DevicesService
+        AdminDeviceService
     ]
 })
-export class AdminDevicessModule { }
+export class AdminDevicesModule { }

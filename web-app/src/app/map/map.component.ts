@@ -25,7 +25,7 @@ import { FilterComponent } from '../filter/filter.component'
 import { MatDialog } from '@angular/material/dialog'
 import { ExportDialogComponent } from '../export/export-dialog.component'
 import _ from 'underscore'
-import * as moment from 'moment'
+import moment from 'moment';
 import { Subscription } from 'rxjs'
 import { ContactDialogComponent } from '../contact/contact-dialog.component'
 

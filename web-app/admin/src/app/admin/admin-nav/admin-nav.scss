@@ -1,3 +1,17 @@
+:host {
+  --admin-banner-extra: 0px;
+  --admin-nav-float-top: calc(72px + var(--admin-banner-extra, 0px));
+  --admin-backdrop-top: calc(120px + var(--admin-banner-extra, 0px));
+  --admin-backdrop-top-mobile: calc(110px + var(--admin-banner-extra, 0px));
+  --admin-drawer-open-mt-mobile: calc(86px + var(--admin-banner-extra, 0px));
+}
+
+@media (max-width: 599px) {
+  :host {
+    --admin-nav-float-top: calc(66px + var(--admin-banner-extra, 0px));
+  }
+}
+
 ::ng-deep app-admin-side-nav {
   position: relative;
 }
@@ -11,24 +25,31 @@
 }
 
 .nav-float-wrapper {
-  position: fixed;
-  top: 72px;
-  left: 5px;
+  position: sticky;
+  top: var(--admin-nav-float-top, 72px);
   z-index: 10000;
-  display: flex;
+  pointer-events: none;
+  width: 0;
+  height: 0;
 
-  @media (max-width: 599px) {
-    top: 66px !important;
+  .nav-float-inner {
+    position: absolute;
+    left: 5px;
+    top: 0;
+    display: flex;
+    width: max-content;
+    pointer-events: auto;
   }
 
   .nav-divider {
-    left: 105px;
+    left: 95px;
     width: 1px;
     height: 38px;
     background: rgba(0, 0, 0, 0.25);
     margin: 0 4px;
     border-radius: 1px;
-    position: fixed;
+    position: absolute;
+    top: 0;
   }
 
   .nav-toggle {
@@ -41,7 +62,7 @@
     padding: 0.55rem 0.9rem;
     cursor: pointer;
     transition: background 0.25s ease, transform 0.15s ease;
-    position: fixed;
+    position: relative;
 
     .label {
       font-weight: 400;
@@ -66,10 +87,10 @@
     inset: 0;
     background: rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(1px);
-    margin-top: 120px;
+    margin-top: var(--admin-backdrop-top, 120px);
 
     @media (max-width: 599px) {
-      margin-top: 110px;
+      margin-top: var(--admin-backdrop-top-mobile, 110px);
     }
   }
 
@@ -180,9 +201,7 @@
       opacity: 0;
 
       &.open {
-        transform: translateY(0);
-        opacity: 1;
-        margin-top: 86px;
+        margin-top: var(--admin-drawer-open-mt-mobile, 86px);
         transform: translateY(0);
         opacity: 1;
         height: auto;

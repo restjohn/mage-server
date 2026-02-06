@@ -13,15 +13,16 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { DeviceDashboardComponent } from './devices-dashboard.component';
-import { DevicesResponse, DevicesService } from '../devices.service';
-import { StateService } from '@uirouter/angular';
 import {
-  LocalStorageService,
-  UserService
-} from 'admin/src/app/upgrade/ajs-upgraded-providers';
-import { Device } from 'admin/src/@types/dashboard/devices-dashboard';
+  DevicesResponse,
+  AdminDeviceService
+} from '../../services/admin-device.service';
+import { AdminUserService } from '../../services/admin-user.service';
+import { Device } from '../../../../@types/dashboard/devices-dashboard';
+import { AdminToastService } from '../../services/admin-toast.service';
 
 const mockDevices: Device[] = [
   {
@@ -30,8 +31,8 @@ const mockDevices: Device[] = [
     userAgent: 'UA_A',
     description: 'A Device',
     user: {
-      displayName: 'Device A User',
-      id: ''
+      displayName: 'Lily Hoshikawa',
+      id: 'u1'
     }
   } as Device,
   {
@@ -40,8 +41,8 @@ const mockDevices: Device[] = [
     userAgent: 'UA_B',
     description: 'B Device',
     user: {
-      displayName: 'Device B User',
-      id: ''
+      displayName: 'Kikunojo',
+      id: 'u2'
     }
   } as Device
 ];
@@ -56,23 +57,26 @@ const mockDevicesResponse: DevicesResponse = {
 describe('DeviceDashboardComponent', () => {
   let component: DeviceDashboardComponent;
   let fixture: ComponentFixture<DeviceDashboardComponent>;
-  let deviceServiceSpy: jasmine.SpyObj<DevicesService>;
-  let userServiceSpy: any;
+  let deviceServiceSpy: jasmine.SpyObj<AdminDeviceService>;
+  let userServiceSpy: Partial<AdminUserService> & any;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
-  let stateSpy: jasmine.SpyObj<StateService>;
-  let localStorageSpy: jasmine.SpyObj<LocalStorageService>;
+  let toastSpy: jasmine.SpyObj<AdminToastService>;
 
   beforeEach(async () => {
-    deviceServiceSpy = jasmine.createSpyObj('DevicesService', ['getDevices']);
-    userServiceSpy = { myself: { role: { permissions: ['CREATE_USER'] } } };
+    deviceServiceSpy = jasmine.createSpyObj('AdminDeviceService', [
+      'getDevices'
+    ]);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    stateSpy = jasmine.createSpyObj('StateService', ['go']);
-    localStorageSpy = jasmine.createSpyObj('LocalStorageService', ['getToken']);
-    localStorageSpy.getToken.and.returnValue('mockToken');
+    toastSpy = jasmine.createSpyObj('AdminToastService', ['show']);
+
+    userServiceSpy = {
+      myself$: of({ role: { permissions: ['CREATE_DEVICE'] } })
+    };
 
     await TestBed.configureTestingModule({
       declarations: [DeviceDashboardComponent],
       imports: [
+        RouterTestingModule.withRoutes([]),
         MatDialogModule,
         MatPaginatorModule,
         MatFormFieldModule,
@@ -83,11 +87,10 @@ describe('DeviceDashboardComponent', () => {
         NoopAnimationsModule
       ],
       providers: [
-        { provide: DevicesService, useValue: deviceServiceSpy },
-        { provide: UserService, useValue: userServiceSpy },
+        { provide: AdminDeviceService, useValue: deviceServiceSpy },
+        { provide: AdminUserService, useValue: userServiceSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        { provide: StateService, useValue: stateSpy },
-        { provide: LocalStorageService, useValue: localStorageSpy }
+        { provide: AdminToastService, useValue: toastSpy }
       ]
     }).compileComponents();
 
@@ -99,10 +102,14 @@ describe('DeviceDashboardComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize permissions properly', () => {
-    component['initPermissions']();
+  it('should initialize permissions properly', fakeAsync(() => {
+    deviceServiceSpy.getDevices.and.returnValue(of(mockDevicesResponse));
+
+    fixture.detectChanges();
+    tick();
+
     expect(component.hasDeviceCreatePermission).toBeTrue();
-  });
+  }));
 
   it('should fetch devices and apply filters', fakeAsync(() => {
     deviceServiceSpy.getDevices.and.returnValue(of(mockDevicesResponse));
@@ -113,7 +120,6 @@ describe('DeviceDashboardComponent', () => {
     expect(deviceServiceSpy.getDevices).toHaveBeenCalledWith(
       component.searchOptions
     );
-
     expect(component.filteredDevices.length).toBe(2);
     expect(component.totalDevices).toBe(2);
   }));
@@ -128,21 +134,22 @@ describe('DeviceDashboardComponent', () => {
 
     deviceServiceSpy.getDevices.and.returnValue(of(filteredResponse));
 
-    component.onSearchTermChanged('device a user');
+    component.onSearchTermChanged('lily');
     tick();
 
-    expect(component.searchOptions.term).toBe('device a user');
+    expect(component.searchOptions.term).toBe('lily');
     expect(deviceServiceSpy.getDevices).toHaveBeenCalledWith(
       component.searchOptions
     );
     expect(component.filteredDevices.length).toBe(1);
-    expect(component.filteredDevices[0].user.displayName).toBe('Device A User');
+
+    const [first] = component.filteredDevices;
+    expect(first.user?.displayName || '').toBe('Lily Hoshikawa');
   }));
 
   it('should clear search and refresh devices', fakeAsync(() => {
     deviceServiceSpy.getDevices.and.returnValue(of(mockDevicesResponse));
 
-    // simulate a prior search
     component.searchOptions.term = 'something';
     component.deviceSearch = 'something';
 
@@ -167,15 +174,6 @@ describe('DeviceDashboardComponent', () => {
     expect(deviceServiceSpy.getDevices).toHaveBeenCalled();
   }));
 
-  it('should navigate to device on click', () => {
-    const device = { id: "123" } as Device;
-    component.gotoDevice(device);
-
-    expect(stateSpy.go).toHaveBeenCalledWith('admin.device', {
-      deviceId: "123"
-    });
-  });
-
   it('should update status filter and refresh devices', fakeAsync(() => {
     deviceServiceSpy.getDevices.and.returnValue(of(mockDevicesResponse));
 
@@ -183,6 +181,7 @@ describe('DeviceDashboardComponent', () => {
     tick();
 
     expect(component.searchOptions.state).toBe('registered');
+    expect(component.searchOptions.page).toBe(0);
     expect(deviceServiceSpy.getDevices).toHaveBeenCalled();
   }));
 
@@ -192,12 +191,12 @@ describe('DeviceDashboardComponent', () => {
     component.onResize();
 
     expect(component.numChars).toBe(Math.ceil(1000 / 8.5));
-    expect(component.toolTipWidth).toBe(1000 * 0.75 + 'px');
+    expect(component.toolTipWidth).toBe(`${1000 * 0.75}px`);
   });
 
   it('should open create device modal and refresh on close', fakeAsync(() => {
     const dialogRefMock = {
-      afterClosed: () => of(true)
+      afterClosed: () => of({ id: '3' } as any)
     };
 
     dialogSpy.open.and.returnValue(dialogRefMock as any);
@@ -207,6 +206,7 @@ describe('DeviceDashboardComponent', () => {
     tick();
 
     expect(dialogSpy.open).toHaveBeenCalled();
+    expect(toastSpy.show).toHaveBeenCalled();
     expect(deviceServiceSpy.getDevices).toHaveBeenCalled();
   }));
 });

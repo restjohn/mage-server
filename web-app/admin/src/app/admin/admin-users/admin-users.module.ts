@@ -25,6 +25,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BulkUserComponent } from './bulk-user/bulk-user.component';
 import { AdminBreadcrumbModule } from '../admin-breadcrumb/admin-breadcrumb.module';
 import { UserSearchBoxComponent } from './user-search/user-search-box.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   imports: [
@@ -46,7 +47,8 @@ import { UserSearchBoxComponent } from './user-search/user-search-box.component'
     MatTooltipModule,
     MatProgressBarModule,
     MatOptionModule,
-    AdminBreadcrumbModule
+    AdminBreadcrumbModule,
+    RouterModule,
   ],
   declarations: [
     UserDashboardComponent,

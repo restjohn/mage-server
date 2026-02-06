@@ -1,7 +1,7 @@
 import { Component, Inject, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core'
 import { UntypedFormGroup, NgModel } from '@angular/forms'
-import { LocalStorageService } from '../../../../app/upgrade/ajs-upgraded-providers'
-import * as moment from 'moment'
+import { LocalStorageService } from 'src/app/http/local-storage.service'
+import moment from 'moment';
 
 interface DateField {
   title: string,
@@ -26,7 +26,7 @@ export class ObservationEditDateComponent implements OnChanges {
   time: moment.Moment
   timeZone: string
 
-  constructor(@Inject(LocalStorageService) localStorageService: any) {
+  constructor(localStorageService: LocalStorageService) {
     this.timeZone = localStorageService.getTimeZoneEdit();
   }
 

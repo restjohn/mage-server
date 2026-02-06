@@ -14,13 +14,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { TeamDashboardComponent } from './dashboard/team-dashboard.component';
 import { CreateTeamDialogComponent } from './create-team/create-team.component';
-import { TeamsService } from './teams-service';
-import { EventsService } from '../admin-event/events.service';
+import { AdminEventsService } from '../services/admin-events.service';
 import { TeamDetailsComponent } from './team-details/team-details.component';
 import { CoreModule } from '../../core/core.module';
 import { DeleteTeamComponent } from './delete-team/delete-team.component';
 import { AdminBreadcrumbModule } from '../admin-breadcrumb/admin-breadcrumb.module';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { AdminTeamsService } from '../services/admin-teams-service';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
     declarations: [
@@ -46,10 +47,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
         MatProgressSpinnerModule,
         AdminBreadcrumbModule,
         MatTooltipModule,
+        RouterModule
     ],
     providers: [
-        TeamsService,
-        EventsService
+        AdminTeamsService,
+        AdminEventsService
     ],
     entryComponents: [
         CreateTeamDialogComponent,

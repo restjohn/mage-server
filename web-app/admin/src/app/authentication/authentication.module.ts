@@ -18,43 +18,43 @@ import { AuthenticationComponent } from './authentication/authentication.compone
 import { SigninModalComponent } from './signin-modal/signin-modal.component';
 
 @NgModule({
-    declarations: [
-        LocalSigninComponent,
-        IdpSigninComponent,
-        LdapSigninComponent,
-        LocalSignupComponent,
-        SigninComponent,
-        AuthorizeComponent,
-        AuthenticationComponent,
-        SigninModalComponent
-    ],
-    imports: [
-        CommonModule,
-        FormsModule,
-        MatDialogModule,
-        MatButtonModule,
-        MatIconModule,
-        MatProgressBarModule,
-        MatSnackBarModule,
-        ContactModule
-    ],
-    exports: [
-        LocalSigninComponent,
-        IdpSigninComponent,
-        LdapSigninComponent,
-        LocalSignupComponent,
-        SigninComponent,
-        AuthorizeComponent,
-        AuthenticationComponent,
-        SigninModalComponent
-    ],
-    providers: [
-        {
-            provide: '$stateParams',
-            useFactory: (i: any) => i.get('$stateParams'),
-            deps: ['$injector']
-        }
-    ],
-    schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  declarations: [
+    LocalSigninComponent,
+    IdpSigninComponent,
+    LdapSigninComponent,
+    LocalSignupComponent,
+    SigninComponent,
+    AuthorizeComponent,
+    AuthenticationComponent,
+    SigninModalComponent
+  ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressBarModule,
+    MatSnackBarModule,
+    ContactModule
+  ],
+  exports: [
+    LocalSigninComponent,
+    IdpSigninComponent,
+    LdapSigninComponent,
+    LocalSignupComponent,
+    SigninComponent,
+    AuthorizeComponent,
+    AuthenticationComponent,
+    SigninModalComponent
+  ],
+  providers: [
+    {
+      provide: 'httpBuffer',
+      useFactory: (i: any) => i.get('httpBuffer'),
+      deps: ['$injector']
+    }
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class AuthenticationModule { }
+export class AuthenticationModule {}

@@ -13,7 +13,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatInputModule } from '@angular/material/input';
 import { CoreModule } from '../../core/core.module';
 import { LayerDashboardComponent } from './dashboard/layer-dashboard.component';
@@ -24,6 +23,7 @@ import { LayerDetailsComponent } from './layer-details/layer-details.component';
 import { DeleteLayerComponent } from './delete-layer/delete-layer.component';
 import { LayerPreviewComponent } from './layer-preview/layer-preview.component';
 import { ImageryLayerSettingsComponent } from './imagery-layer-settings/imagery-layer-settings.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
     declarations: [
@@ -32,7 +32,7 @@ import { ImageryLayerSettingsComponent } from './imagery-layer-settings/imagery-
         LayerDetailsComponent,
         DeleteLayerComponent,
         LayerPreviewComponent,
-        ImageryLayerSettingsComponent
+        ImageryLayerSettingsComponent,
     ],
     imports: [
         CommonModule,
@@ -50,10 +50,10 @@ import { ImageryLayerSettingsComponent } from './imagery-layer-settings/imagery-
         MatDividerModule,
         MatProgressBarModule,
         MatProgressSpinnerModule,
-        MatSnackBarModule,
         MatInputModule,
         CoreModule,
-        AdminBreadcrumbModule
+        AdminBreadcrumbModule,
+        RouterModule
     ],
     providers: [
         LayersService

@@ -1,18 +1,28 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
-import { EventService, FilterService } from '../../../app/upgrade/ajs-upgraded-providers';
+import { of } from 'rxjs';
 
 import { ObservationEditFormPickerComponent } from './observation-edit-form-picker.component';
+import { AdminEventsService } from '../../admin/services/admin-events.service';
+import { FilterService } from 'src/app/filter/filter.service';
+
+import { EventService } from 'src/app/event/event.service';
 
 class MockFilterService {
   getEvent(): any {
-    return {}
+    return {};
+  }
+}
+
+class MockAdminEventsService {
+  getFormsForEvent(): any {
+    return [];
   }
 }
 
 class MockEventService {
-  getFormsForEvent(): any {
-    return []
+  getFormsForEvent() {
+    return [];
   }
 }
 
@@ -22,19 +32,16 @@ describe('ObservationEditFormPickerComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ObservationEditFormPickerComponent ],
-      providers: [{
-        provide: FilterService,
-        useClass: MockFilterService
-      },{
-        provide: EventService,
-        useClass: MockEventService
-      },{
-        provide: MatBottomSheetRef,
-        useValue: {}
-      }]
-    })
-    .compileComponents();
+      declarations: [ObservationEditFormPickerComponent],
+      providers: [
+        { provide: FilterService, useClass: MockFilterService },
+        { provide: AdminEventsService, useClass: MockAdminEventsService },
+
+        { provide: EventService, useClass: MockEventService },
+
+        { provide: MatBottomSheetRef, useValue: { dismiss: jasmine.createSpy('dismiss') } }
+      ]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

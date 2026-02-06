@@ -23,7 +23,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { UpgradeModule } from '@angular/upgrade/static';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { MomentModule } from '../../../app/moment/moment.module';
 import { AdminBreadcrumbModule } from '../admin-breadcrumb/admin-breadcrumb.module';
@@ -42,6 +41,7 @@ import { AdminFeedEditTopicConfigurationComponent } from './admin-feed/admin-fee
 import { JsonSchemaModule } from '../../json-schema/json-schema.module';
 import { FeedItemSummaryModule } from '../../feed/feed-item/feed-item-summary/feed-item-summary.module';
 import { StaticIconModule } from '@ngageoint/mage.web-core-lib/static-icon'
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -63,11 +63,9 @@ import { StaticIconModule } from '@ngageoint/mage.web-core-lib/static-icon'
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
-    UpgradeModule,
     AdminBreadcrumbModule,
     MatAutocompleteModule,
     MatTabsModule,
-    MatSnackBarModule,
     MatToolbarModule,
     MatIconModule,
     MatTooltipModule,
@@ -92,7 +90,9 @@ import { StaticIconModule } from '@ngageoint/mage.web-core-lib/static-icon'
     MomentModule,
     FeedItemSummaryModule,
     JsonSchemaModule,
-    StaticIconModule
+    StaticIconModule,
+    RouterModule,
+    MatSnackBarModule
   ],
   exports: [
     AdminFeedsComponent,

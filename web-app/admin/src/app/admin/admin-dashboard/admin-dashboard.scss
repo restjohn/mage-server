@@ -1,5 +1,6 @@
 ::ng-deep .admin-main-content {
   transition: margin-left 0.3s;
+
   &:has(admin-dashboard) {
     height: 92vh;
     overflow-y: auto;
@@ -40,6 +41,7 @@
     display: flex;
     gap: 24px;
     height: 29vh;
+    overflow: hidden;
 
     @media (max-width: 959px) {
       height: 784px;
@@ -48,8 +50,6 @@
     @media (max-height: 600px) {
       height: 784px;
     }
-
-    overflow: hidden;
 
     .inactive-users,
     .unregistered-devices {
@@ -91,7 +91,8 @@
             height: 20px;
           }
 
-          mat-list-item {
+          mat-list-item,
+          a[mat-list-item] {
             padding-top: 4px !important;
             padding-bottom: 4px !important;
             min-height: 48px;
@@ -227,7 +228,6 @@
     --row-height: 73px;
     --min-page-size: 5;
     --base-table-height: calc(var(--row-height) * var(--min-page-size));
-
     display: flex;
     flex-direction: column;
     position: relative;

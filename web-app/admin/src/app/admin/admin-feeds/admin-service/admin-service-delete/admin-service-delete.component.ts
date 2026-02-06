@@ -17,7 +17,7 @@ export class AdminServiceDeleteComponent {
   service: Service
   feeds: Feed[]
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: ServiceWithFeeds) {
+  constructor( @Inject(MAT_DIALOG_DATA) public data: ServiceWithFeeds) {
     this.service = data.service
     this.feeds = data.feeds
   }

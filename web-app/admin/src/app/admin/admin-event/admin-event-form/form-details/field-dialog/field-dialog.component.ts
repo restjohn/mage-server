@@ -94,7 +94,7 @@ export class FieldDialogComponent {
             if (this.isEditMode && f.id === this.data.existingField?.id) {
                 return false;
             }
-            const existingName = f.name || f.title.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+            const existingName = f.name || (f.title || "").toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
             return existingName === newFieldName;
         });
     }

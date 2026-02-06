@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core'
-import * as moment from 'moment'
+import moment from 'moment';
 import { MatRipple } from '@angular/material/core';
 import { animate, style, transition, trigger } from '@angular/animations'
 import { FeedPanelService } from '../../feed-panel/feed-panel.service'

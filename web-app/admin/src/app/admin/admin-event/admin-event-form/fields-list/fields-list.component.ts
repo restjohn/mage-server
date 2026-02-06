@@ -43,7 +43,7 @@ export class FieldsListComponent {
 
         dialogRef.afterClosed().subscribe((result: Field | undefined) => {
             if (result) {
-                const fieldName = result.title.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+                const fieldName = (result.title || "").toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
                 result.name = fieldName;
                 result.id = this.getNextFieldId();
                 this.fields.push(result);

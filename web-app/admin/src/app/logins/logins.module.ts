@@ -13,6 +13,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatTableModule } from '@angular/material/table';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
     declarations: [LoginsComponent],
@@ -29,7 +30,8 @@ import { MatTableModule } from '@angular/material/table';
         MatDatepickerModule,
         MatAutocompleteModule,
         MatNativeDateModule,
-        MatTableModule
+        MatTableModule,
+        RouterModule
     ],
     exports: [LoginsComponent],
 })
