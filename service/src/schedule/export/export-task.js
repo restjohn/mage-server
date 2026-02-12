@@ -3,7 +3,7 @@ const log = require('../../logger')
   , path = require('path');
 
 class ExportTask {
-  constructor({exportDirectory, exportTtl}, exportResource) {
+  constructor({ exportDirectory, exportTtl }, exportResource) {
     this.exportDirectory = exportDirectory;
     this.exportTtl = exportTtl;
     this.exportResource = exportResource;
