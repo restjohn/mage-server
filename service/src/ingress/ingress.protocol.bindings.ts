@@ -43,7 +43,7 @@ export interface IngressProtocolWebBinding {
    * The `flowState` parameter is a URL-safe, percent-encoded string value which holds any state information the app
    * needs to persist across multiple ingress protocol requests.
    * This is primarily for saving information about how Mage delivers the final ingress result to the client, such as
-   * a direct response, or a redirect URL suitable for the modile or web apps.
+   * a direct response, or a redirect URL suitable for the mobile or web apps.
    * Different protocols have different ways of persisting state across requests, such as the OAuth/OpenID Connect
    * `state` parameter and the SAML `RelayState` body attribute.  The protocol must store this value and return the
    * value in the {@link IdentityProviderAdmissionWebUser#flowState admission result}.

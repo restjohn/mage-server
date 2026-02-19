@@ -74,7 +74,7 @@ function createIdpAuthenticationTokenVerificationStrategy(passport: passport.Aut
   })
 }
 
-export function CreateIngressRoutes(ingressApp: IngressUseCases, idpCache: IngressProtocolWebBindingCache, tokenService: JWTService, passport: passport.Authenticator): IngressRoutes {
+export function CreateIngressRoutes(ingressApp: IngressUseCases, idpCache: IngressProtocolWebBindingCache, tokenService: JWTService, passport: passport.Authenticator, userRepo: UserRepository): IngressRoutes {
 
   const routeToIdp = express.Router()
     .all('/',

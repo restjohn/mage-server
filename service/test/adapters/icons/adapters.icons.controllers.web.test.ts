@@ -9,7 +9,7 @@ import uniqid from 'uniqid'
 import express from 'express'
 import { StaticIcon } from '../../../lib/entities/icons/entities.icons'
 import { GetStaticIconContentRequest, GetStaticIconRequest, ListStaticIconsRequest, StaticIconWithContent } from '../../../lib/app.api/icons/app.api.icons'
-import _ from 'lodash'
+import _, { create } from 'lodash'
 import { entityNotFound, EntityNotFoundError } from '../../../lib/app.api/app.api.errors'
 import { PageOf } from '../../../lib/entities/entities.global'
 import { Readable } from 'stream'
@@ -94,6 +94,7 @@ describe('icons web controller', function() {
       const id = uniqid()
       const appReq: GetStaticIconRequest = createAppRequest({ iconRef: { id }})
       appReqFactory.createRequest(Arg.all()).returns(appReq)
+      appReqFactory.createRequest(Arg.all()).mimicks(createAppRequest)
       appLayer.getIcon(Arg.all()).resolves(AppResponse.error(entityNotFound(id, 'StaticIcon')))
       const res = await client.get(`${root}/${id}`)
 

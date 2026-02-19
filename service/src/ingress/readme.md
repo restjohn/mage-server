@@ -1,6 +1,6 @@
 # Mage Ingress
 
-Ingress is the process Mage users to enroll, authenticate, and admit users to establish sessions.
+Ingress is the process Mage uses to enroll, authenticate, and admit users to establish sessions.
 
 ## Concepts
 

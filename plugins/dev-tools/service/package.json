@@ -1,0 +1,20 @@
+{
+  "name": "@ngageoint/mage.dev-tools.service",
+  "version": "1.0.0",
+  "description": "Development and testing utilities for Mage",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nga",
+    "geoint",
+    "mage",
+    "plugin"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "@ngageoint/mage.service": "^6.3.0-beta"
+  }
+}

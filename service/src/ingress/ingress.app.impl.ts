@@ -62,7 +62,7 @@ export function CreateAdmitFromIdentityProviderOperation(idpRepo: IdentityProvid
     }
     try {
       const admissionToken = await tokenService.generateToken(admission.mageAccount.id, TokenAssertion.Authenticated, 5 * 60)
-      return AppResponse.success({ mageAccount: admission.mageAccount, admissionToken })
+      return AppResponse.success({ mageAccount: admission.mageAccount, idpAuthenticationToken: admissionToken })
     }
     catch (err) {
       console.error(`error generating admission token while authenticating user ${admission.mageAccount.username}`, err)

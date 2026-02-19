@@ -43,7 +43,7 @@ import { UserRepository, UserExpanded } from './entities/users/entities.users'
 import { EnvironmentService } from './entities/systemInfo/entities.systemInfo'
 import { WebRoutesHooks, GetAppRequestContext } from './plugins.api/plugins.api.web'
 import { UsersAppLayer, UsersRoutes } from './adapters/users/adapters.users.controllers.web'
-import { SearchUsers } from './app.impl/users/app.impl.users'
+import { CreateUserOperation, SearchUsers } from './app.impl/users/app.impl.users'
 import { RoleBasedUsersPermissionService } from './permissions/permissions.users'
 import { MongoosePluginStateRepository } from './adapters/plugins/adapters.plugins.db.mongoose'
 import path from 'path'
@@ -68,6 +68,7 @@ import { MongooseSettingsRepository, SettingsModel } from './adapters/settings/a
 import { FetchMapSettings, UpdateMapSettings } from './app.impl/settings/app.impl.settings'
 import { RoleBasedMapPermissionService } from './permissions/permissions.settings'
 import { SettingRepository } from './entities/settings/entities.settings'
+import { IdentityProviderRepository } from './ingress/ingress.entities'
 
 
 export interface MageService {
@@ -347,6 +348,9 @@ type Repositories = {
   users: {
     userRepo: UserRepository
   },
+  ingress: {
+    idpRepo: IdentityProviderRepository
+  },
   enviromentInfo: EnvironmentService,
   settings: {
     settingRepo: SettingRepository
@@ -437,8 +441,10 @@ async function initAppLayer(repos: Repositories): Promise<AppLayer> {
 
 async function initUsersAppLayer(repos: Repositories): Promise<AppLayer['users']> {
   const usersPermissions = new RoleBasedUsersPermissionService()
+  const createUser = CreateUserOperation(repos.users.userRepo, repos.ingress.idpRepo)
   const searchUsers = SearchUsers(repos.users.userRepo, usersPermissions)
   return {
+    createUser,
     searchUsers
   }
 }

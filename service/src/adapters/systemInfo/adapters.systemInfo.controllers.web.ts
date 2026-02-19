@@ -5,7 +5,7 @@ import { SystemInfoAppLayer } from '../../app.api/systemInfo/app.api.systemInfo'
 import { AppRequest, AppRequestContext } from '../../app.api/app.api.global'
 import { UserWithRole } from '../../permissions/permissions.role-based.base'
 
-type SystemInfoRequestType = AppRequest<UserWithRole, AppRequestContext<UserWithRole>>;
+interface SystemInfoRequestType extends AppRequest<UserWithRole, AppRequestContext<UserWithRole>> { derp: boolean }
 
 
 export function SystemInfoRoutes(appLayer: SystemInfoAppLayer, createAppRequest: WebAppRequestFactory): express.Router {
@@ -14,7 +14,7 @@ export function SystemInfoRoutes(appLayer: SystemInfoAppLayer, createAppRequest:
 
   routes.route('/')
     .get(async (req, res, next) => {
-     const appReq = createAppRequest<SystemInfoRequestType>(req); // Define appReq
+     const appReq = createAppRequest<SystemInfoRequestType>(req, {derp: true}); // Define appReq
      // Check for Authorization header
      if (req.headers.authorization) {
         // Directly use passport.authenticate with a custom callback
