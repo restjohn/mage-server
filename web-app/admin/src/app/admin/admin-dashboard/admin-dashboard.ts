@@ -5,6 +5,7 @@ import {
   OnDestroy,
   OnInit
 } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 import { AdminBreadcrumb } from '../admin-breadcrumb/admin-breadcrumb.model';
@@ -52,7 +53,9 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private userService: AdminUserService,
     private deviceService: AdminDeviceService,
     private devicePagingService: DevicePagingService,
-    private userPagingService: UserPagingService
+    private userPagingService: UserPagingService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -87,6 +90,16 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  goToUser(user: any): void {
+    if (!user?.id) return;
+    this.router.navigate(['../users', user.id], { relativeTo: this.route });
+  }
+
+  goToDevice(device: any): void {
+    if (!device?.id) return;
+    this.router.navigate(['../devices', device.id], { relativeTo: this.route });
   }
 
   count(): number {
@@ -192,23 +205,26 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     return this.currentUser?.role?.permissions?.includes(permission) || false;
   }
 
-  activateUser(event: MouseEvent, user: any): void {
-    event.preventDefault();
-    event.stopPropagation();
+  activateUser(user: any): void {
+    if (!user?.id) return;
+
     user.active = true;
 
-    this.userService.updateUser(user.id, user, () => {
-      this.userPagingService
-        .refresh(this.stateAndData)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(() => {
-          this.inactiveUsers = this.userPagingService.users(
-            this.stateAndData[this.userState]
-          );
-        });
+    this.userService
+      .updateUser(user.id, user)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.userPagingService
+          .refresh(this.stateAndData)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(() => {
+            this.inactiveUsers = this.userPagingService.users(
+              this.stateAndData[this.userState]
+            );
+          });
 
-      this.onUserActivated.emit({ user });
-    });
+        this.onUserActivated.emit({ user });
+      });
   }
 
   registerDevice(event: MouseEvent, device: any): void {
