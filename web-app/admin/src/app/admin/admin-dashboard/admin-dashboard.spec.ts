@@ -269,7 +269,7 @@ describe('AdminDashboardComponent', () => {
       (_id: string, _user: any, cb: Function) => cb()
     );
 
-    component.activateUser(new MouseEvent('click'), user);
+    component.activateUser(new MouseEvent('click'));
     tick();
 
     expect(user.active).toBeTrue();
