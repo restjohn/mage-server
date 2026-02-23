@@ -28,6 +28,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatTableModule } from '@angular/material/table';
 
+import { RouterTestingModule } from '@angular/router/testing';
 import { AdminUserService } from '../services/admin-user.service';
 import { AdminDeviceService } from '../services/admin-device.service';
 import { DevicePagingService } from '../../services/device-paging.service';
@@ -219,7 +220,8 @@ describe('AdminDashboardComponent', () => {
         MatNativeDateModule,
         MatTableModule,
         AdminBreadcrumbModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
+        RouterTestingModule
       ],
       providers: [
         { provide: AdminUserService, useValue: mockUserService },
@@ -266,10 +268,10 @@ describe('AdminDashboardComponent', () => {
     spyOn(component.onUserActivated, 'emit');
 
     (mockUserService.updateUser as jasmine.Spy).and.callFake(
-      (_id: string, _user: any, cb: Function) => cb()
+      (_id: string, _user: any) => of(_user)
     );
 
-    component.activateUser(new MouseEvent('click'));
+    component.activateUser(user);
     tick();
 
     expect(user.active).toBeTrue();
