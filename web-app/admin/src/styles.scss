@@ -634,3 +634,19 @@ td.mat-cell i.fab {
     }
   }
 }
+
+.mat-snack-bar-container.mage-toast-panel {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.mat-snack-bar-container.mage-toast-panel .mat-simple-snackbar {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.mat-snack-bar-container.mage-toast-panel .mat-simple-snackbar-action {
+  margin: 0 !important;
+}

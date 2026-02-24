@@ -43,20 +43,15 @@
   left: 0;
   right: 0;
   top: 0;
-
   background: #fff;
   border-bottom: 2px solid #e5e7eb;
-
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
-
   transform: translateY(-8px);
   opacity: 0;
   pointer-events: none;
-
   max-height: 0;
   overflow: hidden;
-
   transition: max-height 220ms ease, transform 220ms ease, opacity 180ms ease;
 }
 
@@ -64,13 +59,12 @@
   transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
-
   max-height: 340px;
   overflow: visible;
 }
 
 .integrated-navbar .login-filters {
-  margin: 0 auto;
+  margin-left: 20px;
 }
 
 .integrated-navbar .filter-section {
@@ -218,13 +212,15 @@
 }
 
 .table-scroll.login-table-scroll {
-  height: calc(var(--row-height, 44px) * var(--min-page-size, 5) + 44px);
-  max-height: calc(var(--row-height, 44px) * var(--min-page-size, 5) + 44px);
+  height: calc(var(--row-height, 44px) * var(--min-page-size, 5) + 88px);
+  max-height: calc(var(--row-height, 44px) * var(--min-page-size, 5) + 88px);
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
 }
 
 .logins-table {
@@ -232,75 +228,62 @@
   border-collapse: collapse;
   font-size: 0.9rem;
   table-layout: fixed;
-
-  thead th,
-  tfoot tr {
-    position: sticky;
-  }
-
-  thead th {
-    top: 0;
-  }
-
-  tfoot tr {
-    bottom: 0;
-  }
-
-  th,
-  td {
-    font-size: 12px;
-    text-align: left;
-    padding: 0.35rem 0.75rem;
-    border-bottom: 1px solid #f1f5f9;
-    vertical-align: middle;
-    color: #111827;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  tbody td {
-    height: var(--row-height, 44px);
-  }
-
-  thead th,
-  tfoot tr {
-    background: #f9fafb;
-    border-bottom: 2px solid #e5e7eb;
-    z-index: 1;
-    height: 44px;
-  }
-
-  tfoot {
-    position: relative;
-    bottom: -22px;
-  }
-
-  tbody tr:first-of-type td {
-    padding-top: 10px;
-  }
-
-  tbody tr:hover {
-    background: #f8fafc;
-  }
-
-  .login-device i {
-    margin-right: 0.25rem;
-  }
-
-  .login-device.unknown {
-    color: #9ca3af;
-  }
 }
 
-.prev-button {
-  display: flex;
-  justify-content: flex-start;
+.logins-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+  z-index: 2;
+  height: 44px;
 }
 
-.next-button {
+.logins-table th,
+.logins-table td {
+  font-size: 12px;
+  text-align: left;
+  padding: 0.35rem 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logins-table tbody td {
+  height: var(--row-height, 44px);
+}
+
+.logins-table tbody tr:first-of-type td {
+  padding-top: 10px;
+}
+
+.logins-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.logins-table .login-device i {
+  margin-right: 0.25rem;
+}
+
+.logins-table .login-device.unknown {
+  color: #9ca3af;
+}
+
+.pagination-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  height: 44px;
+  background: #f9fafb;
+  border-top: 2px solid #e5e7eb;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.75rem;
+  margin-top: auto;
 }
 
 .empty-state {

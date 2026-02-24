@@ -13,7 +13,7 @@ export class AdminToastService {
     message: string,
     route?: any[] | string,
     linkText?: string,
-    duration = 5000
+    duration = 10000
   ): void {
     const data: AdminToastData = { message, route, linkText };
 

@@ -42,10 +42,7 @@
               ×
             </button>
 
-            <div
-              class="suggestions"
-              *ngIf="loginSearchResults?.length && userText"
-            >
+            <div class="suggestions" *ngIf="loginSearchResults?.length && userText">
               <div
                 class="suggestion-item"
                 *ngFor="let u of loginSearchResults"
@@ -79,10 +76,7 @@
               ×
             </button>
 
-            <div
-              class="suggestions"
-              *ngIf="loginDeviceSearchResults?.length && deviceText"
-            >
+            <div class="suggestions" *ngIf="loginDeviceSearchResults?.length && deviceText">
               <div
                 class="suggestion-item"
                 *ngFor="let d of loginDeviceSearchResults"
@@ -173,35 +167,27 @@
         </td>
       </tr>
     </tbody>
-
-    <tfoot>
-      <tr>
-        <td class="prev-button">
-          <button
-            mat-button
-            type="button"
-            (click)="pageLogin(loginPage?.prev)"
-            [disabled]="!hasPrev"
-          >
-            ← Previous
-          </button>
-        </td>
-
-        <td *ngIf="!userId || !deviceId"></td>
-
-        <td class="next-button">
-          <button
-            mat-button
-            type="button"
-            (click)="pageLogin(loginPage?.next)"
-            [disabled]="!hasNext"
-          >
-            Next →
-          </button>
-        </td>
-      </tr>
-    </tfoot>
   </table>
+
+  <div class="pagination-bar" *ngIf="loginPage && loginPage.logins.length > 0">
+    <button
+      mat-button
+      type="button"
+      (click)="pageLogin(loginPage?.prev)"
+      [disabled]="!hasPrev"
+    >
+      ← Previous
+    </button>
+
+    <button
+      mat-button
+      type="button"
+      (click)="pageLogin(loginPage?.next)"
+      [disabled]="!hasNext"
+    >
+      Next →
+    </button>
+  </div>
 
   <div class="empty-state" *ngIf="!loginPage || loginPage.logins.length === 0">
     <div class="empty-state-content">
