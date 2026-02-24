@@ -583,9 +583,8 @@ td.mat-cell i.fab {
 }
 
 :not(admin-navigation) {
-
-  >.mat-icon-button,
-  >.mat-mdc-icon-button {
+  > .mat-icon-button,
+  > .mat-mdc-icon-button {
     color: rgba(0, 0, 0, 0.54);
 
     .mat-icon {
@@ -649,4 +648,9 @@ td.mat-cell i.fab {
 
 .mat-snack-bar-container.mage-toast-panel .mat-simple-snackbar-action {
   margin: 0 !important;
+}
+
+.mat-dialog-container {
+  background-color: RGBA(0, 0, 0, 0);
+  box-shadow: none;
 }
