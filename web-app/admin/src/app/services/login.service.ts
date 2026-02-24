@@ -6,7 +6,7 @@ import moment from 'moment';
 @Injectable({ providedIn: 'root' })
 export class LoginService {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   query(options?: {
     filter?: any;
@@ -49,7 +49,7 @@ export class LoginService {
     const url = options.url || '/api/logins';
 
     return firstValueFrom(
-      this.http.get<any>(url, { params })
+      this.http.get<any>(url, options.url ? {} : { params })
     );
   }
 }

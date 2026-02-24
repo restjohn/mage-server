@@ -11,12 +11,15 @@
   display: flex;
   gap: 25px;
 }
+
 .align-items-center {
   align-items: center !important;
 }
+
 .pointer {
   cursor: pointer;
 }
+
 .ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -25,6 +28,7 @@
 .w-100 {
   width: 100% !important;
 }
+
 .w-90 {
   width: 90% !important;
 }
@@ -32,9 +36,11 @@
 .text-danger {
   color: #f44336;
 }
+
 .text-warning {
   color: #ff9800;
 }
+
 .text-success {
   color: #16a34a;
 }
@@ -552,11 +558,11 @@
 
 @keyframes spin {
   0% {
-      transform: rotate(0deg);
+    transform: rotate(0deg);
   }
 
   100% {
-      transform: rotate(360deg);
+    transform: rotate(360deg);
   }
 }
 
@@ -574,4 +580,57 @@ td.mat-cell i.fab {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+:not(admin-navigation) {
+
+  >.mat-icon-button,
+  >.mat-mdc-icon-button {
+    color: rgba(0, 0, 0, 0.54);
+
+    .mat-icon {
+      color: rgba(0, 0, 0, 0.54);
+    }
+
+    &:hover {
+      color: rgba(0, 0, 0, 0.87);
+
+      .mat-icon {
+        color: rgba(0, 0, 0, 0.87);
+      }
+    }
+
+    &:not([disabled]) {
+      opacity: 1;
+
+      svg,
+      svg path {
+        fill: currentColor;
+        opacity: 1;
+      }
+    }
+  }
+}
+
+.mat-mdc-icon-button:not([disabled]),
+.mat-icon-button:not([disabled]) {
+  color: rgba(0, 0, 0, 0.54);
+
+  .mat-icon {
+    color: rgba(0, 0, 0, 0.54);
+  }
+
+  svg,
+  svg path {
+    fill: currentColor;
+    opacity: 1;
+  }
+
+  &:hover {
+    color: rgba(0, 0, 0, 0.87);
+
+    .mat-icon {
+      color: rgba(0, 0, 0, 0.87);
+    }
+  }
 }

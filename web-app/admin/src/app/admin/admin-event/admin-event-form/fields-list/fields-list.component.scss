@@ -90,21 +90,7 @@
     }
 }
 
-button[mat-icon-button] {
-    color: rgba(0, 0, 0, 0.54);
 
-    mat-icon {
-        color: rgba(0, 0, 0, 0.54);
-    }
-
-    &:hover {
-        color: rgba(0, 0, 0, 0.87);
-
-        mat-icon {
-            color: rgba(0, 0, 0, 0.87);
-        }
-    }
-}
 
 .fields-list-compact,
 ::ng-deep .cdk-drag-preview {
