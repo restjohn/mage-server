@@ -582,35 +582,6 @@ td.mat-cell i.fab {
   justify-content: center;
 }
 
-:not(admin-navigation) {
-  > .mat-icon-button,
-  > .mat-mdc-icon-button {
-    color: rgba(0, 0, 0, 0.54);
-
-    .mat-icon {
-      color: rgba(0, 0, 0, 0.54);
-    }
-
-    &:hover {
-      color: rgba(0, 0, 0, 0.87);
-
-      .mat-icon {
-        color: rgba(0, 0, 0, 0.87);
-      }
-    }
-
-    &:not([disabled]) {
-      opacity: 1;
-
-      svg,
-      svg path {
-        fill: currentColor;
-        opacity: 1;
-      }
-    }
-  }
-}
-
 .mat-mdc-icon-button:not([disabled]),
 .mat-icon-button:not([disabled]) {
   color: rgba(0, 0, 0, 0.54);
@@ -630,6 +601,23 @@ td.mat-cell i.fab {
 
     .mat-icon {
       color: rgba(0, 0, 0, 0.87);
+    }
+  }
+}
+
+.mat-toolbar {
+
+  .mat-mdc-icon-button,
+  .mat-icon-button {
+    color: white !important;
+
+    .mat-icon {
+      color: white !important;
+    }
+
+    svg,
+    svg path {
+      fill: white !important;
     }
   }
 }
