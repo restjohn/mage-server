@@ -153,7 +153,7 @@
                     >
                       <a
                         class="row-item text-decoration-none"
-                        [routerLink]="['../../user', user.id]"
+                        [routerLink]="['../../users', user.id]"
                       >
                         <div class="row-icon">
                           <i class="fa fa-user"></i>
@@ -218,7 +218,11 @@
                         >
                           <button
                             class="action-button btn-danger btn-sm"
-                            (click)="removeMember($event, user)"
+                            (click)="
+                              $event.preventDefault();
+                              $event.stopPropagation();
+                              removeMember($event, user)
+                            "
                             title="Remove Member"
                           >
                             <i class="fa fa-trash"></i>
@@ -313,7 +317,11 @@
                         >
                           <button
                             class="action-button btn-danger btn-sm"
-                            (click)="removeTeam($event, team)"
+                            (click)="
+                              $event.preventDefault();
+                              $event.stopPropagation();
+                              removeTeam($event, team)
+                            "
                             title="Remove Team"
                           >
                             <i class="fa fa-trash"></i>
@@ -478,10 +486,7 @@
               <ng-template #itemTemplate let-form>
                 <a
                   class="form-info text-decoration-none"
-                  [routerLink]="[
-                    './forms',
-                    form.id,
-                  ]"
+                  [routerLink]="['./forms', form.id]"
                 >
                   <div class="form-name">
                     <mat-icon class="form-icon">description</mat-icon>

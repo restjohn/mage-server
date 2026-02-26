@@ -773,7 +773,26 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (updatedUser) => {
-          this.user = updatedUser;
+          const merged: any = { ...(this.user as any), ...(updatedUser as any) };
+        
+          const roleFromResponse = (updatedUser as any)?.role;
+          if (roleFromResponse && typeof roleFromResponse === 'object') {
+            merged.role = roleFromResponse;
+          } else {
+            const roleId =
+              (updatedUser as any)?.roleId ||
+              (updatedUser as any)?.role?.id ||
+              (this.editUser as any)?.selectedRole?.id ||
+              (this.user as any)?.role?.id;
+        
+            if (roleId && Array.isArray(this.roles)) {
+              const fullRole = this.roles.find((r: any) => r?.id === roleId);
+              if (fullRole) merged.role = fullRole;
+            }
+          }
+        
+          this.user = merged as User;
+        
           this.isEditingUser = false;
           this.editUser = null;
           this.saving = false;
@@ -854,7 +873,15 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.userService
       .updateUser(user.id, user)
       .pipe(takeUntil(this.destroy$))
-      .subscribe();
+      .subscribe((updatedUser) => {
+        const merged: any = { ...(this.user as any), ...(updatedUser as any) };
+        if (!merged.role) {
+          const roleId = (updatedUser as any)?.roleId || (this.user as any)?.role?.id;
+          const fullRole = this.roles?.find((r: any) => r?.id === roleId);
+          if (fullRole) merged.role = fullRole;
+        }
+        this.user = merged as User;
+      });
   }
 
   enableUser(user: User): void {

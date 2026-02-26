@@ -162,11 +162,26 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
     return filterObject;
   }
 
-  refreshUsers(onDone?: () => void): void {
+  private applyFilterToState(pageIndex: number): void {
     const state = this.stateAndData['all'];
-    state.pageSize = this.pageSize;
-    state.pageIndex = this.pageIndex;
-    state.userFilter = this.getFilter();
+    const filterConfig = this.getFilter();
+    state.userFilter.pageSize = this.pageSize;
+    state.userFilter.pageIndex = pageIndex;
+    if (typeof filterConfig.active === 'boolean') {
+      state.userFilter.active = filterConfig.active;
+    } else {
+      delete state.userFilter.active;
+    }
+    if (typeof filterConfig.enabled === 'boolean') {
+      state.userFilter.enabled = filterConfig.enabled;
+    } else {
+      delete state.userFilter.enabled;
+    }
+  }
+
+  refreshUsers(onDone?: () => void): void {
+    this.applyFilterToState(this.pageIndex);
+    const state = this.stateAndData['all'];
 
     this.userPagingService
       .refresh(this.stateAndData)
@@ -191,8 +206,8 @@ export class UserDashboardComponent implements OnInit, OnDestroy {
   }
 
   search(): void {
+    this.applyFilterToState(0);
     const state = this.stateAndData['all'];
-    state.userFilter = this.getFilter();
     this.error = null;
 
     this.userPagingService

@@ -1,5 +1,4 @@
 import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import {
@@ -49,7 +48,6 @@ export class DeviceDashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private modal: MatDialog,
-    private router: Router,
     private deviceService: AdminDeviceService,
     private userService: AdminUserService,
     private toastService: AdminToastService

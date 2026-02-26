@@ -80,7 +80,8 @@ exports.getLogins = function (options, callback) {
   };
 
   Login.find(conditions, null, o).populate([{ path: 'userId' }, { path: 'deviceId' }]).exec(function (err, logins) {
-    callback(err, options.firstLoginId ? logins.reverse() : logins);
+    if (err || !logins) return callback(err, logins);
+    callback(null, options.firstLoginId ? logins.reverse() : logins);
   });
 };
 
